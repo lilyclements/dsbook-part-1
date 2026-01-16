@@ -19,3 +19,9 @@ fixsh.R
 ziptex
 crc-stuff/
 irizarrycr9781032116556introductiontodatasciencep/
+
+# PreTeXt build artifacts
+output/
+logs/
+.error_schema.log
+.cache/

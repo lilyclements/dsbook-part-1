@@ -28,7 +28,29 @@ jobs:
           python-version: '3.11'
 
       - name: Install PreTeXt CLI
-        run: pip install pretext
+        run: pip install -r requirements.txt
+
+      - name: Create Runestone cache workaround
+        run: |
+          mkdir -p ~/.ptx/2.32.0/rs_cache
+          if [ ! -f ~/.ptx/2.32.0/rs_cache/rs_services.xml ]; then
+            cat > ~/.ptx/2.32.0/rs_cache/rs_services.xml << 'EOF'
+          <?xml version="1.0" ?>
+          <all>
+            <js type="list">
+              <item type="str">prefix-runtime.f91c1a4dc12163f2.bundle.js</item>
+              <item type="str">prefix-723.3e6434f80549315a.bundle.js</item>
+              <item type="str">prefix-runestone.fe35e59c546f8d19.bundle.js</item>
+            </js>
+            <css type="list">
+              <item type="str">prefix-723.3bccd435914aa0ff.css</item>
+              <item type="str">prefix-runestone.557d81b04b3ec0e4.css</item>
+            </css>
+            <cdn-url type="str">https://runestone.academy/cdn/runestone/</cdn-url>
+            <version type="str">7.10.0</version>
+          </all>
+          EOF
+          fi
 
       - name: Build PreTeXt web output
         run: pretext build web
