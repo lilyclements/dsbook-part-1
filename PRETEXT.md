@@ -40,10 +40,18 @@ The PreText textbook follows the same structure as the Quarto files in the main 
 
 ## Files
 
+### Source Files (tracked in git)
 - `source/main.ptx` - Main PreText book file with complete structure
 - `project.ptx` - Project configuration file
 - `publication/publication.ptx` - Publication settings
-- `requirements.txt` - Python dependencies (PreTeXt 2.36.0)
+- `executables.ptx` - Executables configuration
+- `requirements.txt` - Python dependencies (PreTeXt 2.32.0)
+
+### Build Artifacts (ignored in git)
+- `output/` - Generated HTML/PDF output (not committed)
+- `logs/` - Build logs (not committed)
+- `.cache/` - Build cache (not committed)
+- `.error_schema.log` - Error logs (not committed)
 
 ## Building the Book
 
