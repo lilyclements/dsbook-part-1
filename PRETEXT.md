@@ -1,6 +1,6 @@
 # PreText Textbook Structure
 
-This directory contains the PreText version of "Introduction to Data Science".
+This repository contains a PreText version of "Introduction to Data Science".
 
 ## Structure
 
@@ -43,13 +43,19 @@ The PreText textbook follows the same structure as the Quarto files in the main 
 - `source/main.ptx` - Main PreText book file with complete structure
 - `project.ptx` - Project configuration file
 - `publication/publication.ptx` - Publication settings
+- `requirements.txt` - Python dependencies (PreTeXt 2.36.0)
 
 ## Building the Book
 
-To build this PreText book, you need to have PreText CLI installed. Then run:
+To build this PreText book, you need to have PreText CLI installed. Install dependencies first:
 
 ```bash
-cd pretext
+pip install -r requirements.txt
+```
+
+Then build the book:
+
+```bash
 pretext build web
 ```
 
@@ -57,6 +63,8 @@ For PDF output:
 ```bash
 pretext build print
 ```
+
+The output will be generated in the `output/` directory.
 
 ## Notes
 
