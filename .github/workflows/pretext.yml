@@ -30,6 +30,9 @@ jobs:
       - name: Install PreTeXt CLI
         run: pip install -r requirements.txt
 
+      - name: Initialize PreTeXt system resources
+        run: pretext init --system
+
       - name: Create Runestone cache workaround
         run: |
           mkdir -p ~/.ptx/2.32.0/rs_cache
