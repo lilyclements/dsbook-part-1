@@ -29,15 +29,18 @@ def convert_inline_markdown(text):
         return '<url href="{}">{}</url>'.format(m.group(2), escape_xml(m.group(1)))
     text = re.sub(r'\[([^\]]+)\]\(([^\)]+)\)', link_repl, text)
     
+    # Convert inline R code `r ...` to just <c>...</c> (we can't execute it)
+    text = re.sub(r'`r\s+([^`]+)`', r'<c>\1</c>', text)
+    
     # Now escape XML characters for remaining text
     # But we need to preserve our already-created tags
-    parts = re.split(r'(<url href="[^"]+">.*?</url>|<xref ref="[^"]+"/>)', text)
+    parts = re.split(r'(<url href="[^"]+">.*?</url>|<xref ref="[^"]+"/>|<c>.*?</c>)', text)
     for i in range(len(parts)):
         if not parts[i].startswith('<'):
             parts[i] = escape_xml(parts[i])
     text = ''.join(parts)
     
-    # Convert inline code `text`
+    # Convert inline code `text` (remaining ones)
     text = re.sub(r'`([^`]+)`', r'<c>\1</c>', text)
     
     # Convert bold **text**
@@ -47,8 +50,12 @@ def convert_inline_markdown(text):
     text = re.sub(r'(?<![<\w])\*([^\*<]+)\*(?![>\w])', r'<em>\1</em>', text)
     text = re.sub(r'(?<![<\w])_([^_<]+)_(?![>\w])', r'<em>\1</em>', text)
     
-    # Convert inline math $...$
+    # Convert inline math $...$ but NOT escaped dollar signs \$
+    # First protect escaped dollar signs
+    text = text.replace(r'\$', '<<<DOLLAR>>>')
     text = re.sub(r'\$([^\$]+)\$', r'<m>\1</m>', text)
+    # Restore escaped dollar signs as regular dollar signs
+    text = text.replace('<<<DOLLAR>>>', '$')
     
     return text
 
@@ -312,7 +319,7 @@ def convert_qmd_to_ptx(qmd_content, chapter_id, chapter_title):
             continue
         
         # Handle display math blocks
-        if line.strip().startswith('$$'):
+        if line.strip().startswith('$$') and not line.strip().endswith('$$'):
             flush_para()
             close_list()
             i += 1
@@ -324,6 +331,20 @@ def convert_qmd_to_ptx(qmd_content, chapter_id, chapter_title):
                 indent = '          ' + '  ' * subsection_depth
                 result.append(indent + '<me>')
                 result.append('\n'.join(math_lines))
+                result.append(indent + '</me>')
+                result.append('')
+            i += 1
+            continue
+        
+        # Handle single-line display math
+        if line.strip().startswith('$$') and line.strip().endswith('$$'):
+            flush_para()
+            close_list()
+            math_content = line.strip()[2:-2]  # Remove $$ from both ends
+            if math_content:
+                indent = '          ' + '  ' * subsection_depth
+                result.append(indent + '<me>')
+                result.append(math_content)
                 result.append(indent + '</me>')
                 result.append('')
             i += 1

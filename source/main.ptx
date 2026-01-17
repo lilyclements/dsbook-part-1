@@ -5443,7 +5443,7 @@ heights |&gt;
             </input>
           </program>
 
-          <p>For example, this plot gives us an idea of the range of the data. However, this plot has limitations as well, since we can't really see all the <c>r sum(heights<m>sex=="Female")</c> and <c>r sum(heights</m>sex=="Male")</c> points plotted for females and males, respectively, and many points are plotted on top of each other. As we have previously described, visualizing the distribution is much more informative. But before doing this, we point out two ways we can improve a plot showing all the points.</p>
+          <p>For example, this plot gives us an idea of the range of the data. However, this plot has limitations as well, since we can't really see all the <c>sum(heights<m>sex=="Female")</c> and <c>sum(heights</m>sex=="Male")</c> points plotted for females and males, respectively, and many points are plotted on top of each other. As we have previously described, visualizing the distribution is much more informative. But before doing this, we point out two ways we can improve a plot showing all the points.</p>
 
           <p>The first is to add <em>jitter</em>, which adds a small random shift to each point. In this case, adding horizontal jitter does not alter the interpretation, since the point heights do not change, but we minimize the number of points that fall on top of each other and, therefore, get a better visual sense of how the data is distributed. A second improvement comes from using <em>alpha blending</em>: making the points somewhat transparent. The more points fall on top of each other, the darker the plot, which also helps us get a sense of how the points are distributed. Here is the same plot with jitter and alpha blending:</p>
 
@@ -5599,9 +5599,7 @@ grid.arrange(p1, p2, ncol = 2)
 
             <p>For this reason, it is common to use a log transformation when displaying ratios. This is because the logarithm of a ratio has a symmetric property:</p>
 
-            <me>
-\log(A/B) = -\log(B/A)
-            </me>
+            <p>\log(A/B) = -\log(B/A)</p>
 
             <p>This means that if <m>A</m> is three times larger than <m>B</m>, the log ratio is equally distant from zero as when <m>B</m> is three times larger than <m>A</m>, but in the opposite direction. This symmetry around zero makes differences easier to interpret visually.</p>
 
@@ -6489,7 +6487,7 @@ gapminder |&gt;
 
           <p>We now shift our attention to the second question related to the commonly held notion that wealth distribution across the world has become worse during the last decades. When general audiences are asked if poor countries have become poorer and rich countries become richer, the majority answers yes. By using stratification, histograms, smooth densities, and boxplots, we will be able to understand if this is in fact the case. First we learn how transformations can sometimes help provide more informative summaries and plots.</p>
 
-          <p>The <c>gapminder</c> data table includes a column with the countries' gross domestic product (GDP). GDP measures the market value of goods and services produced by a country in a year. The GDP per person is often used as a rough summary of a country's wealth. Here we divide this quantity by 365 to obtain the more interpretable measure <em>dollars per day</em>. Using current US dollars as a unit, a person surviving on an income of less than \$2 a day is defined to be living in <em>absolute poverty</em>. We add this variable to the data table:</p>
+          <p>The <c>gapminder</c> data table includes a column with the countries' gross domestic product (GDP). GDP measures the market value of goods and services produced by a country in a year. The GDP per person is often used as a rough summary of a country's wealth. Here we divide this quantity by 365 to obtain the more interpretable measure <em>dollars per day</em>. Using current US dollars as a unit, a person surviving on an income of less than $2 a day is defined to be living in <em>absolute poverty</em>. We add this variable to the data table:</p>
 
           <program language="r">
             <input>
@@ -6517,9 +6515,9 @@ gapminder |&gt;
 
             <p>We use the <c>color = "black"</c> argument to draw a boundary and clearly distinguish the bins.</p>
 
-            <p>In this plot, we see that for the majority of countries, averages are below \<m>10 a day. However, the majority of the x-axis is dedicated to the <c>r filter(gapminder, year == past_year &amp; !is.na(gdp)) |&gt; summarise(x = sum(dollars_per_day&gt;10)) |&gt; pull(x)</c> countries with averages above \</m>10. So the plot is not very informative about countries with values below \$10 a day.</p>
+            <p>In this plot, we see that for the majority of countries, averages are below $10 a day. However, the majority of the x-axis is dedicated to the <c>filter(gapminder, year == past_year & !is.na(gdp)) |> summarise(x = sum(dollars_per_day>10)) |> pull(x)</c> countries with averages above $10. So the plot is not very informative about countries with values below $10 a day.</p>
 
-            <p>It might be more informative to quickly be able to see how many countries have average daily incomes of about \<m>1 (extremely poor), \</m>2 (very poor), \<m>4 (poor), \</m>8 (middle), \<m>16 (well off), \</m>32 (rich), \$64 (very rich) per day. These changes are multiplicative, and log transformations convert multiplicative changes into additive ones: when using base 2, a doubling of a value turns into an increase by 1.</p>
+            <p>It might be more informative to quickly be able to see how many countries have average daily incomes of about $1 (extremely poor), $2 (very poor), $4 (poor), $8 (middle), $16 (well off), $32 (rich), $64 (very rich) per day. These changes are multiplicative, and log transformations convert multiplicative changes into additive ones: when using base 2, a doubling of a value turns into an increase by 1.</p>
 
             <p>Here is the distribution if we apply a log base 2 transform:</p>
 
@@ -6543,7 +6541,7 @@ gapminder |&gt;
 
             <p>In general, we do not recommend using the natural log for data exploration and visualization. This is because while <m>2^2, 2^3, 2^4, \dots</m> or <m>10^2, 10^3, \dots</m> are easy to mentally compute, but the same is not true for <m>\mathrm{e}^2, \mathrm{e}^3, \dots</m>. The natural log scale is not intuitive or easy to interpret.</p>
 
-            <p>In the dollars per day example, we used base 2 instead of base 10 because the resulting range is easier to interpret. The range of the untransformed values is <c>r with(filter(gapminder, year==past_year), range(dollars_per_day, na.rm=TRUE))</c>.</p>
+            <p>In the dollars per day example, we used base 2 instead of base 10 because the resulting range is easier to interpret. The range of the untransformed values is <c>with(filter(gapminder, year==past_year), range(dollars_per_day, na.rm=TRUE))</c>.</p>
 
             <p>In base 10, this turns into a range that includes very few integers: just 0 and 1. With base 2, our range includes -2, -1, 0, 1, 2, 3, 4, and 5. It is easier to compute <m>2^x</m> and <m>10^x</m> when <m>x</m> is an integer and between -10 and 10, so we prefer to have smaller integers in the scale. Another consequence of a limited range is that choosing the binwidth is more challenging. With log base 2, we know that a binwidth of 1 will translate to a bin with range <m>x</m> to <m>2x</m>.</p>
 
@@ -6768,7 +6766,7 @@ country_list &lt;- gapminder |&gt;
               </input>
             </program>
 
-            <p>These <c>r length(country_list)</c> countries account for <c>r round(gapminder |&gt; filter(year==present_year) |&gt; summarize(perc=sum(population[country%in%country_list], na.rm=TRUE)/sum(population, na.rm=TRUE)) |&gt; pull(perc)*100 )</c>% of the world population, so this subset should be representative. We can compare the distributions using this code:</p>
+            <p>These <c>length(country_list)</c> countries account for <c>round(gapminder |> filter(year==present_year) |> summarize(perc=sum(population[country%in%country_list], na.rm=TRUE)/sum(population, na.rm=TRUE)) |> pull(perc)*100 )</c>% of the world population, so this subset should be representative. We can compare the distributions using this code:</p>
 
             <program language="r">
               <input>
@@ -6782,7 +6780,7 @@ gapminder |&gt;
               </input>
             </program>
 
-            <p>We now see that the rich countries have become a bit richer, but percentage-wise, the poor countries appear to have improved more. In particular, we see that the proportion of <em>developing</em> countries earning more than \$16 a day increased substantially.</p>
+            <p>We now see that the rich countries have become a bit richer, but percentage-wise, the poor countries appear to have improved more. In particular, we see that the proportion of <em>developing</em> countries earning more than $16 a day increased substantially.</p>
 
             <p>To see which specific regions improved the most, we can remake the boxplots we made above, but now adding the year 2010 and then using facet to compare the two years.</p>
 
@@ -6799,7 +6797,7 @@ gapminder |&gt;
               </input>
             </program>
 
-            <p>Here, we pause to introduce another powerful <alert>ggplot2</alert> feature. Because we want to compare each region before and after, it would be convenient to have the <c>r past_year</c> boxplot next to the <c>r present_year</c> boxplot for each region. In general, comparisons are easier when data are plotted next to each other.</p>
+            <p>Here, we pause to introduce another powerful <alert>ggplot2</alert> feature. Because we want to compare each region before and after, it would be convenient to have the <c>past_year</c> boxplot next to the <c>present_year</c> boxplot for each region. In general, comparisons are easier when data are plotted next to each other.</p>
 
             <p>So instead of faceting, we keep the data from each year together and ask to color (or fill) them depending on the year. Note that groups are automatically separated by year and each pair of boxplots drawn next to each other. Because the year column is a number, we have to convert it into a factor since <alert>ggplot2</alert> automatically assigns a color to each category of a factor.</p>
 
@@ -6818,7 +6816,7 @@ gapminder |&gt;
 
             <p>The previous data exploration suggested that the income gap between rich and poor countries has narrowed considerably during the last 40 years. We used a series of histograms and boxplots to see this. We suggest a succinct way to convey this message with just one plot.</p>
 
-            <p>Let's start by noting that density plots for income distribution in <c>r past_year</c> and <c>r present_year</c> deliver the message that the gap is closing:</p>
+            <p>Let's start by noting that density plots for income distribution in <c>past_year</c> and <c>present_year</c> deliver the message that the gap is closing:</p>
 
             <program language="r">
               <input>
@@ -6831,7 +6829,7 @@ gapminder |&gt;
               </input>
             </program>
 
-            <p>In the <c>r past_year</c> plot, we see two clear modes: poor and rich countries. In <c>r present_year</c>, it appears that some of the poor countries have shifted towards the right, closing the gap.</p>
+            <p>In the <c>past_year</c> plot, we see two clear modes: poor and rich countries. In <c>present_year</c>, it appears that some of the poor countries have shifted towards the right, closing the gap.</p>
 
             <p>The next message we need to convey is that the reason for this change in distribution is that several poor countries became richer, rather than some rich countries becoming poorer. To do this, we can assign a color to the groups we identified during data exploration.</p>
 
@@ -6986,96 +6984,117 @@ surv_income |&gt; ggplot(aes(income, infant_survival_rate, label = group, color 
             <p>The logistic or logit transformation for a proportion or rate <m>p</m> is defined as:</p>
 
             <me>
+f(p) = \log \left( \frac{p}{1-p} \right)
+            </me>
 
-When $p$ is a proportion or probability, the quantity that is being logged, $p/(1-p)$, is called the *odds*. In this case $p$ is the proportion of infants that survived. The odds tell us how many more infants are expected to survive than to die. The log transformation makes this symmetric. If the rates are the same, then the log odds is 0. Fold increases or decreases turn into positive and negative increments, respectively.
+            <p>When <m>p</m> is a proportion or probability, the quantity that is being logged, <m>p/(1-p)</m>, is called the <em>odds</em>. In this case <m>p</m> is the proportion of infants that survived. The odds tell us how many more infants are expected to survive than to die. The log transformation makes this symmetric. If the rates are the same, then the log odds is 0. Fold increases or decreases turn into positive and negative increments, respectively.</p>
 
-This scale is useful when we want to highlight differences near 0 or 1. For survival rates this is important because a survival rate of 90% is unacceptable, while a survival of 99% is relatively good. We would much prefer a survival rate closer to 99.9%. We want our scale to highlight these difference and the logit does this. Note that 99.9/0.1 is about 10 times bigger than 99/1 which is about 10 times larger than 90/10. By using the log, these fold changes turn into constant increases.
+            <p>This scale is useful when we want to highlight differences near 0 or 1. For survival rates this is important because a survival rate of 90% is unacceptable, while a survival of 99% is relatively good. We would much prefer a survival rate closer to 99.9%. We want our scale to highlight these difference and the logit does this. Note that 99.9/0.1 is about 10 times bigger than 99/1 which is about 10 times larger than 90/10. By using the log, these fold changes turn into constant increases.</p>
 
-### Show the data
+          </subsection>
 
-Now, back to our plot. Based on the plot above, do we conclude that a country with a low income is destined to have low survival rate? Do we conclude that survival rates in Sub-Saharan Africa are all lower than in Southern Asia, which in turn are lower than in the Pacific Islands, and so on?
+          <subsection xml:id="subsec-show-the-data">
+            <title>Show the data</title>
 
-Jumping to this conclusion based on a plot showing averages is referred to as the *ecological fallacy*. The almost perfect relationship between survival rates and income is only observed for the averages at the region level. Once we show all the data, we see a somewhat more complicated story:
+            <p>Now, back to our plot. Based on the plot above, do we conclude that a country with a low income is destined to have low survival rate? Do we conclude that survival rates in Sub-Saharan Africa are all lower than in Southern Asia, which in turn are lower than in the Pacific Islands, and so on?</p>
 
-```{r ecological-fallacy-all-data, echo=FALSE}
+            <p>Jumping to this conclusion based on a plot showing averages is referred to as the <em>ecological fallacy</em>. The almost perfect relationship between survival rates and income is only observed for the averages at the region level. Once we show all the data, we see a somewhat more complicated story:</p>
+
+            <program language="r">
+              <input>
 library(ggrepel)
-highlight <- c("Sierra Leone", "Mauritius",  "Sudan", "Botswana", "Tunisia",
+highlight &lt;- c("Sierra Leone", "Mauritius",  "Sudan", "Botswana", "Tunisia",
                "Cambodia","Singapore","Chile", "Haiti", "Bolivia",
                "United States","Sweden", "Angola", "Serbia")
 
-gapminder |> filter(year %in% present_year & !is.na(gdp) & !is.na(infant_mortality) & !is.na(group) ) |>
-  mutate(country_name = ifelse(country %in% highlight, as.character(country), "")) |>
+gapminder |&gt; filter(year %in% present_year &amp; !is.na(gdp) &amp; !is.na(infant_mortality) &amp; !is.na(group) ) |&gt;
+  mutate(country_name = ifelse(country %in% highlight, as.character(country), "")) |&gt;
   ggplot(aes(dollars_per_day, 1 - infant_mortality/1000, col = group, label = country_name)) +
   scale_x_continuous(trans = "log2", limits = c(0.25, 150)) +
   scale_y_continuous(trans = "logit",limits = c(0.875, .9981),
                      breaks = c(.85,.90,.95,.99,.995,.998)) + 
   geom_point(alpha = 0.5, size = 3) +
   geom_text_repel(size = 4, show.legend = FALSE)
-```
+              </input>
+            </program>
 
-Specifically, we see that there is a large amount of variability. We see that countries from the same regions can be quite different and that countries with the same income can have different survival rates. For example, while on average Sub-Saharan Africa had the worse health and economic outcomes, there is wide variability within that group. Mauritius and Botswana are doing better than Angola and Sierra Leone, with Mauritius comparable to Western countries.
+            <p>Specifically, we see that there is a large amount of variability. We see that countries from the same regions can be quite different and that countries with the same income can have different survival rates. For example, while on average Sub-Saharan Africa had the worse health and economic outcomes, there is wide variability within that group. Mauritius and Botswana are doing better than Angola and Sierra Leone, with Mauritius comparable to Western countries.</p>
 
-## Case study 3: vaccines and infectious diseases {#sec-vaccines}
+          </subsection>
 
+        </section>
 
-Vaccines have helped save millions of lives. In the 19th century, before herd immunization was achieved through vaccination programs, deaths from infectious diseases, such as smallpox and polio, were common. Today however, vaccination programs have become somewhat controversial despite all the scientific evidence for their importance.
+        <section xml:id="sec-vaccines">
+          <title>Case study 3: vaccines and infectious diseases</title>
 
-The controversy started with a paper^[<http://www.thelancet.com/journals/lancet/article/PIIS0140-6736(97)11096-0/abstract>] published in 1988 and led by Andrew Wakefield claiming 
-there was a link between the administration of the measles, mumps, and rubella (MMR) vaccine and the appearance of autism and bowel disease. 
-Despite much scientific evidence contradicting this finding, sensationalist media reports and fear-mongering from conspiracy theorists led parts of the public into believing that vaccines were harmful. As a result, many parents ceased to vaccinate their children. This dangerous practice can be potentially disastrous given that the Centers for Disease Control (CDC) estimates that vaccinations will prevent more than 21 million hospitalizations and 732,000 deaths among children born in the last 20 years (see Benefits from Immunization during the Vaccines for Children Program Era — United States, 1994-2013, MMWR^[<https://www.cdc.gov/mmwr/preview/mmwrhtml/mm6316a4.htm>]). 
-The 1988 paper has since been retracted and Andrew Wakefield was eventually "struck off the UK medical register, with a statement identifying deliberate falsification in the research published in The Lancet, and was thereby barred from practicing medicine in the UK." (source: Wikipedia^[<https://en.wikipedia.org/wiki/Andrew_Wakefield>]). Yet misconceptions persist, in part due to self-proclaimed activists who continue to disseminate misinformation about vaccines. 
+          <p>Vaccines have helped save millions of lives. In the 19th century, before herd immunization was achieved through vaccination programs, deaths from infectious diseases, such as smallpox and polio, were common. Today however, vaccination programs have become somewhat controversial despite all the scientific evidence for their importance.</p>
 
-Effective communication of data is a strong antidote to misinformation and fear-mongering. In the introduction to this part of the book we showed an example, provided by a Wall Street Journal article^[<http://graphics.wsj.com/infectious-diseases-and-vaccines/>], showing data related to the impact of vaccines on battling infectious diseases.  Here we reconstruct that example.
+          <p>The controversy started with a paper published in 1988 and led by Andrew Wakefield claiming there was a link between the administration of the measles, mumps, and rubella (MMR) vaccine and the appearance of autism and bowel disease. Despite much scientific evidence contradicting this finding, sensationalist media reports and fear-mongering from conspiracy theorists led parts of the public into believing that vaccines were harmful. As a result, many parents ceased to vaccinate their children. This dangerous practice can be potentially disastrous given that the Centers for Disease Control (CDC) estimates that vaccinations will prevent more than 21 million hospitalizations and 732,000 deaths among children born in the last 20 years (see Benefits from Immunization during the Vaccines for Children Program Era — United States, 1994-2013, MMWR). The 1988 paper has since been retracted and Andrew Wakefield was eventually "struck off the UK medical register, with a statement identifying deliberate falsification in the research published in The Lancet, and was thereby barred from practicing medicine in the UK." (source: Wikipedia). Yet misconceptions persist, in part due to self-proclaimed activists who continue to disseminate misinformation about vaccines.</p>
 
+          <p>Effective communication of data is a strong antidote to misinformation and fear-mongering. In the introduction to this part of the book we showed an example, provided by a Wall Street Journal article, showing data related to the impact of vaccines on battling infectious diseases.  Here we reconstruct that example.</p>
 
-### Vaccine data
+          <subsection xml:id="subsec-vaccine-data">
+            <title>Vaccine data</title>
 
-The data used for these plots were collected, organized, and distributed by the Tycho Project^[<http://www.tycho.pitt.edu/>]. They include weekly reported counts for seven diseases from 1928 to 2011, from all fifty states. We include the yearly totals in the __dslabs__ package:
+            <p>The data used for these plots were collected, organized, and distributed by the Tycho Project. They include weekly reported counts for seven diseases from 1928 to 2011, from all fifty states. We include the yearly totals in the __dslabs__ package:</p>
 
-```{r message=FALSE, warning=FALSE}
+            <program language="r">
+              <input>
 library(tidyverse)
 library(RColorBrewer)
 library(dslabs)
 names(us_contagious_diseases)
-```
+              </input>
+            </program>
 
-We create a temporary object `dat` that stores only the measles data, includes a per 100,000 rate, orders states by average value of disease and removes Alaska and Hawaii since they only became states in the late 1950s. Note that there is a `weeks_reporting` column that tells us for how many weeks of the year data was reported. We have to adjust for that value when computing the rate.
+            <p>We create a temporary object <c>dat</c> that stores only the measles data, includes a per 100,000 rate, orders states by average value of disease and removes Alaska and Hawaii since they only became states in the late 1950s. Note that there is a <c>weeks_reporting</c> column that tells us for how many weeks of the year data was reported. We have to adjust for that value when computing the rate.</p>
 
-```{r}
-the_disease <- "Measles"
-dat <- us_contagious_diseases |>
-  filter(!state %in% c("Hawaii","Alaska") & disease == the_disease) |>
-  mutate(rate = count / population * 10000 * 52 / weeks_reporting) |> 
-  mutate(state = reorder(state, ifelse(year <= 1963, rate, NA), 
+            <program language="r">
+              <input>
+the_disease &lt;- "Measles"
+dat &lt;- us_contagious_diseases |&gt;
+  filter(!state %in% c("Hawaii","Alaska") &amp; disease == the_disease) |&gt;
+  mutate(rate = count / population * 10000 * 52 / weeks_reporting) |&gt; 
+  mutate(state = reorder(state, ifelse(year &lt;= 1963, rate, NA), 
                          median, na.rm = TRUE)) 
-```
+              </input>
+            </program>
 
+          </subsection>
 
-### Trend plots 
+          <subsection xml:id="subsec-trend-plots">
+            <title>Trend plots</title>
 
-We can now easily plot disease rates per year. Here are the measles data from California:
+            <p>We can now easily plot disease rates per year. Here are the measles data from California:</p>
 
-```{r california-measles-time-series}
-dat |> filter(state == "California" & !is.na(rate)) |>
+            <program language="r">
+              <input>
+dat |&gt; filter(state == "California" &amp; !is.na(rate)) |&gt;
   ggplot(aes(year, rate)) +
   geom_line() + 
   ylab("Cases per 10,000")  + 
   geom_vline(xintercept = 1963, col = "blue")
-```
+              </input>
+            </program>
 
-We add a vertical line at 1963 since this is when the vaccine was introduced ^[Control, Centers for Disease; Prevention (2014). CDC health information for international travel 2014 (the yellow book). p. 250. ISBN 9780199948505]. 
+            <p>We add a vertical line at 1963 since this is when the vaccine was introduced .</p>
 
+          </subsection>
 
-## Heatmaps
+        </section>
 
-Now can we show data for all states in one plot? We have three variables to show: year, state, and rate. In the WSJ figure, they use the x-axis for year, the y-axis for state, and color hue to represent rates. However, the color scale they use, which goes from yellow to blue to green to orange to red, can be improved.  
+        <section xml:id="sec-heatmaps">
+          <title>Heatmaps</title>
 
-In our example, we want to use a sequential palette since there is no meaningful center, just low and high rates.
+          <p>Now can we show data for all states in one plot? We have three variables to show: year, state, and rate. In the WSJ figure, they use the x-axis for year, the y-axis for state, and color hue to represent rates. However, the color scale they use, which goes from yellow to blue to green to orange to red, can be improved.</p>
 
-We use the geometry `geom_tile` to tile the region with colors representing disease rates. We use a square root transformation to avoid having the really high counts dominate the plot. Notice that missing values are shown in grey. Note that once a disease was pretty much eradicated, some states stopped reporting cases all together. This is why we see so much grey after 1980.
+          <p>In our example, we want to use a sequential palette since there is no meaningful center, just low and high rates.</p>
 
-```{r vaccines-plot, out.width="100%", fig.height=5}
-dat |> ggplot(aes(year, state, fill = rate)) +
+          <p>We use the geometry <c>geom_tile</c> to tile the region with colors representing disease rates. We use a square root transformation to avoid having the really high counts dominate the plot. Notice that missing values are shown in grey. Note that once a disease was pretty much eradicated, some states stopped reporting cases all together. This is why we see so much grey after 1980.</p>
+
+          <program language="r">
+            <input>
+dat |&gt; ggplot(aes(year, state, fill = rate)) +
   geom_tile(color = "grey50") +
   scale_x_continuous(expand = c(0,0)) +
   scale_fill_gradientn(colors = brewer.pal(9, "Reds"), trans = "sqrt") +
@@ -7085,21 +7104,26 @@ dat |> ggplot(aes(year, state, fill = rate)) +
         legend.position = "bottom", 
         text = element_text(size = 8)) +
   labs(title = the_disease, x = "", y = "")
-```
+            </input>
+          </program>
 
-This plot makes a very striking argument for the contribution of vaccines. However, one limitation of this plot is that it uses color to represent quantity, which we earlier explained makes it harder to know exactly how high values are going. Position and lengths are better cues. If we are willing to lose state information, we can make a version of the plot that shows the values with position. We can also show the average for the US, which we compute like this:
+          <p>This plot makes a very striking argument for the contribution of vaccines. However, one limitation of this plot is that it uses color to represent quantity, which we earlier explained makes it harder to know exactly how high values are going. Position and lengths are better cues. If we are willing to lose state information, we can make a version of the plot that shows the values with position. We can also show the average for the US, which we compute like this:</p>
 
-```{r}
-avg <- us_contagious_diseases |>
-  filter(disease == the_disease) |> group_by(year) |>
+          <program language="r">
+            <input>
+avg &lt;- us_contagious_diseases |&gt;
+  filter(disease == the_disease) |&gt; group_by(year) |&gt;
   summarize(us_rate = sum(count, na.rm = TRUE) / 
               sum(population, na.rm = TRUE) * 10000)
-```
+            </input>
+          </program>
 
-Now to make the plot we simply use the `geom_line` geometry:
-```{r time-series-vaccines-plot}
-dat |> 
-  filter(!is.na(rate)) |>
+          <p>Now to make the plot we simply use the <c>geom_line</c> geometry:</p>
+
+          <program language="r">
+            <input>
+dat |&gt; 
+  filter(!is.na(rate)) |&gt;
     ggplot() +
   geom_line(aes(year, rate, group = state),  color = "grey50", 
             show.legend = FALSE, alpha = 0.2, linewidth = 1) +
@@ -7111,27 +7135,22 @@ dat |>
             mapping = aes(x, y, label = "US average"), 
             color = "black") + 
   geom_vline(xintercept = 1963, col = "blue")
-```
+            </input>
+          </program>
 
-In theory, we could use color to represent the categorical value state, but it is hard to pick 50 distinct colors.
+          <p>In theory, we could use color to represent the categorical value state, but it is hard to pick 50 distinct colors.</p>
 
-## Exercises
+        </section>
 
+        <section xml:id="sec-exercises">
+          <title>Exercises</title>
 
-1. Reproduce the image plot we previously made but for smallpox. For this plot, do not include years in which cases were not reported in 10 or more weeks.
-
-2. Now reproduce the time series plot we previously made, but this time following the instructions of the previous question for smallpox.
-
-3. For the state of California, make a time series plot showing rates for all diseases. Include only years with 10 or more weeks reporting. Use a different color for each disease.
-
-4. Now do the same for the rates for the US. Hint: compute the US rate as the total divided by total population using `summarize`.
-
-
-
-
-            </me>
-
-          </subsection>
+          <ol>
+            <li><p>Reproduce the image plot we previously made but for smallpox. For this plot, do not include years in which cases were not reported in 10 or more weeks.</p></li>
+            <li><p>Now reproduce the time series plot we previously made, but this time following the instructions of the previous question for smallpox.</p></li>
+            <li><p>For the state of California, make a time series plot showing rates for all diseases. Include only years with 10 or more weeks reporting. Use a different color for each disease.</p></li>
+            <li><p>Now do the same for the rates for the US. Hint: compute the US rate as the total divided by total population using <c>summarize</c>.</p></li>
+          </ol>
 
         </section>
       </chapter>
