@@ -6032,7 +6032,7 @@ if(knitr::is_html_output()){
 
         </section>
 
-        <section xml:id="sec-exercises">
+        <section xml:id="sec-dataviz-principles-exercises">
           <title>Exercises</title>
 
           <p>For these exercises, we will be using the vaccines data in the __dslabs__ package:</p>
@@ -7144,7 +7144,7 @@ dat |&gt;
 
         </section>
 
-        <section xml:id="sec-exercises">
+        <section xml:id="sec-dataviz-in-practice-exercises">
           <title>Exercises</title>
 
           <ol>
