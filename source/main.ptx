@@ -1873,22 +1873,2883 @@ installed.packages()
 
       <chapter xml:id="ch-programming-basics">
         <title>Programming basics</title>
-        <p>Content will be added here.</p>
+        
+        <p>
+          We teach R because it greatly facilitates data analysis, the main topic of this book. By coding in R, we can efficiently perform exploratory data analysis, build data analysis pipelines, and prepare data visualization to communicate results. However, R is not just a data analysis environment but a programming language. Advanced R programmers can develop complex packages and even improve R itself, but we do not cover advanced programming in this book. Nonetheless, in this section, we introduce three key programming concepts: conditional expressions, for-loops, and functions. These are not just key building blocks for advanced programming, but are sometimes useful during data analysis. We also note that there are several functions that are widely used to program in R but that we will not cover in this book. These include <c>split</c>, <c>cut</c>, <c>do.call</c>, and <c>Reduce</c>. These are worth learning if you plan to become an expert R programmer.
+        </p>
+        
+        <section xml:id="sec-conditionals">
+          <title>Conditional expressions</title>
+          
+          <p>
+            Conditional expressions are one of the basic features of programming. They are used for what is called <em>flow control</em>. The most common conditional expression is the if-else statement. In R, we can actually perform quite a bit of data analysis without conditionals. However, they do come up occasionally, and you will need them once you start writing your own functions and packages.
+          </p>
+          
+          <p>
+            Here is a very simple example showing the general structure of an if-else statement. The basic idea is to print the reciprocal of <c>a</c> unless <c>a</c> is 0:
+          </p>
+          
+          <program language="r">
+            <input>
+a &lt;- 0
+
+if (a != 0) {
+  print(1/a)
+} else{
+  print("No reciprocal for 0.")
+}
+            </input>
+          </program>
+          
+          <p>
+            Let's look at one more example using the US murders data frame:
+          </p>
+          
+          <program language="r">
+            <input>
+library(dslabs)
+murder_rate &lt;- murders$total / murders$population*100000
+            </input>
+          </program>
+          
+          <p>
+            Here is a very simple example that tells us the state with the lowest murder rate if it is lower than 0.5 per 100,000. The if-else statement protects us from the case in which no state satisfies the condition.
+          </p>
+          
+          <program language="r">
+            <input>
+ind &lt;- which.min(murder_rate)
+
+if (murder_rate[ind] &lt; 0.5) {
+  print(murders$state[ind]) 
+} else{
+  print("No state has murder rate that low")
+}
+            </input>
+          </program>
+          
+          <p>
+            If we try it again with a rate of 0.25, we get a different answer:
+          </p>
+          
+          <program language="r">
+            <input>
+if (murder_rate[ind] &lt; 0.25) {
+  print(murders$state[ind]) 
+} else{
+  print("No state has a murder rate that low.")
+}
+            </input>
+          </program>
+          
+          <p>
+            A related function that is very useful is <c>ifelse</c>. This function takes three arguments: a logical and two possible answers. If the logical is <c>TRUE</c>, the value in the second argument is returned and if <c>FALSE</c>, the value in the third argument is returned. Here is an example:
+          </p>
+          
+          <program language="r">
+            <input>
+a &lt;- 0
+ifelse(a &gt; 0, 1/a, NA)
+            </input>
+          </program>
+          
+          <p>
+            The function is particularly useful because it works on vectors. It examines each entry of the logical vector and returns elements from the vector provided in the second argument, if the entry is <c>TRUE</c>, or elements from the vector provided in the third argument, if the entry is <c>FALSE</c>.
+          </p>
+          
+          <program language="r">
+            <input>
+a &lt;- c(0, 1, 2, -4, 5)
+result &lt;- ifelse(a &gt; 0, 1/a, NA)
+            </input>
+          </program>
+          
+          <p>
+            Here is an example of how this function can be readily used to replace all the missing values in a vector with zeros:
+          </p>
+          
+          <program language="r">
+            <input>
+no_nas &lt;- ifelse(is.na(na_example), 0, na_example) 
+sum(is.na(no_nas))
+            </input>
+          </program>
+          
+          <p>
+            Two other useful functions are <c>any</c> and <c>all</c>. The <c>any</c> function takes a vector of logicals and returns <c>TRUE</c> if any of the entries is <c>TRUE</c>. The <c>all</c> function takes a vector of logicals and returns <c>TRUE</c> if all of the entries are <c>TRUE</c>. Here is an example:
+          </p>
+          
+          <program language="r">
+            <input>
+z &lt;- c(TRUE, TRUE, FALSE)
+any(z)
+all(z)
+            </input>
+          </program>
+          
+          <note>
+            <p>You are ready to do exercises 1-3.</p>
+          </note>
+          
+        </section>
+        
+        <section xml:id="sec-defining-functions">
+          <title>Defining functions</title>
+          
+          <p>
+            As you become more experienced, you will find yourself needing to perform the same operations over and over. A simple example is computing averages. We can compute the average of a vector <c>x</c> using the <c>sum</c> and <c>length</c> functions: <c>sum(x)/length(x)</c>. Because we do this repeatedly, it is much more efficient to write a function that performs this operation. This particular operation is so common that someone already wrote the <c>mean</c> function and it is included in base R. However, you will encounter situations in which the function does not already exist, so R permits you to write your own. A simple version of a function that computes the average can be defined like this:
+          </p>
+          
+          <program language="r">
+            <input>
+avg &lt;- function(x){
+  s &lt;- sum(x)
+  n &lt;- length(x)
+  s/n
+}
+            </input>
+          </program>
+          
+          <p>
+            Now <c>avg</c> is a function that computes the mean:
+          </p>
+          
+          <program language="r">
+            <input>
+x &lt;- 1:100
+identical(mean(x), avg(x))
+            </input>
+          </program>
+          
+          <p>
+            Notice that variables defined inside a function are not saved in the workspace. So while we use <c>s</c> and <c>n</c> when we call <c>avg</c>, the values are created and changed only during the call. Here is an illustrative example:
+          </p>
+          
+          <program language="r">
+            <input>
+s &lt;- 3
+avg(1:10)
+s
+            </input>
+          </program>
+          
+          <p>
+            Note how <c>s</c> is still 3 after we call <c>avg</c>.
+          </p>
+          
+          <p>
+            In general, functions are objects, so we assign them to variable names with <c>&lt;-</c>. The function <c>function</c> tells R you are about to define a function. The general form of a function definition looks like this:
+          </p>
+          
+          <program language="r">
+            <input>
+my_function &lt;- function(VARIABLE_NAME){
+  perform operations on VARIABLE_NAME and calculate VALUE
+  VALUE
+}
+            </input>
+          </program>
+          
+          <p>
+            The functions you define can have multiple arguments as well as default values. For example, we can define a function that computes either the arithmetic or geometric average depending on a user defined variable like this:
+          </p>
+          
+          <program language="r">
+            <input>
+avg &lt;- function(x, arithmetic = TRUE){
+  n &lt;- length(x)
+  ifelse(arithmetic, sum(x)/n, prod(x)^(1/n))
+}
+            </input>
+          </program>
+          
+          <p>
+            We will learn more about how to create functions through experience as we face more complex tasks.
+          </p>
+          
+          <note>
+            <p>You are ready to do exercises 4-7.</p>
+          </note>
+          
+        </section>
+        
+        <section xml:id="sec-namespaces">
+          <title>Namespaces</title>
+          
+          <p>
+            Once you start becoming more of an R expert user, you will likely need to load several add-on packages for some of your analysis. Once you start doing this, it is likely that two packages use the same name for two different functions. And often these functions do completely different things. In fact, you have already encountered this because both <alert>dplyr</alert> and the R-base <alert>stats</alert> package define a <c>filter</c> function. There are five other examples in <alert>dplyr</alert>. We know this because when we first load <alert>dplyr</alert> we see the following message:
+          </p>
+          
+          <pre>
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+          </pre>
+          
+          <p>
+            Now when we type <c>filter</c> it uses the <alert>dplyr</alert> one. But what if we want to use the <alert>stats</alert> version?
+          </p>
+          
+          <p>
+            These functions live in different <em>namespaces</em>. R will follow a certain order when searching for a function in these <em>namespaces</em>. You can see the order by typing:
+          </p>
+          
+          <program language="r">
+            <input>
+search()
+            </input>
+          </program>
+          
+          <p>
+            The first entry in this list is the global environment which includes all the objects you define.
+          </p>
+          
+          <p>
+            So what if we want to use the <alert>stats</alert> <c>filter</c> instead of the <alert>dplyr</alert> filter but <alert>dplyr</alert> appears first in the search list? You can force the use of a specific namespace by using double colons (<c>::</c>) like this:
+          </p>
+          
+          <program language="r">
+            <input>
+stats::filter
+            </input>
+          </program>
+          
+          <p>
+            If we want to be absolutely sure that we use the <alert>dplyr</alert> <c>filter</c>, we can use
+          </p>
+          
+          <program language="r">
+            <input>
+dplyr::filter
+            </input>
+          </program>
+          
+          <p>
+            Also note that if we want to use a function in a package without loading the entire package, we can use the double colon as well.
+          </p>
+          
+          <note>
+            <title>Tip</title>
+            <p>If you want to see all the packages that have function called, for example <c>filter</c>, you can use double questions marks: <c>??filter</c>.</p>
+          </note>
+          
+          <p>
+            For more on this more advanced topic we recommend the R packages book<fn><url href="http://r-pkgs.had.co.nz/namespace.html"/></fn>.
+          </p>
+          
+        </section>
+        
+        <section xml:id="sec-for-loops">
+          <title>For-loops</title>
+          
+          <p>
+            The formula for the sum of the series <m>1+2+\dots+n</m> is <m>S_n = n(n+1)/2</m>. What if we weren't sure that was the right function? How could we check? Using what we learned about functions we can create one that computes <m>S_n</m>:
+          </p>
+          
+          <program language="r">
+            <input>
+compute_s_n &lt;- function(n) { 
+  sum(1:n)
+}
+            </input>
+          </program>
+          
+          <p>
+            How can we compute <m>S_n</m> for various values of <m>n</m>, say <m>n=1,\dots,25</m>? Do we write 25 lines of code calling <c>compute_s_n</c>? No, that is what for-loops are for in programming. In this case, we are performing exactly the same task over and over, and the only thing that is changing is the value of <m>n</m>. For-loops let us define the range that our variable takes (in our example <m>n=1,\dots,10</m>), then change the value and evaluate expression as you <em>loop</em>.
+          </p>
+          
+          <p>
+            Perhaps the simplest example of a for-loop is this useless piece of code:
+          </p>
+          
+          <program language="r">
+            <input>
+for (i in 1:5) {
+  print(i)
+}
+            </input>
+          </program>
+          
+          <p>
+            Here is the for-loop we would write for our <m>S_n</m> example:
+          </p>
+          
+          <program language="r">
+            <input>
+m &lt;- 25
+s_n &lt;- vector(length = m) # create an empty vector
+for (n in 1:m) {
+  s_n[n] &lt;- compute_s_n(n)
+}
+            </input>
+          </program>
+          
+          <p>
+            In each iteration <m>n=1</m>, <m>n=2</m>, etc..., we compute <m>S_n</m> and store it in the <m>n</m>th entry of <c>s_n</c>.
+          </p>
+          
+          <p>
+            Now we can create a plot to search for a pattern:
+          </p>
+          
+          <program language="r">
+            <input>
+n &lt;- 1:m
+plot(n, s_n)
+            </input>
+          </program>
+          
+          <p>
+            If you noticed that it appears to be a quadratic, you are on the right track because the formula is <m>n(n+1)/2</m>.
+          </p>
+          
+        </section>
+        
+        <section xml:id="sec-vectorization">
+          <title>Vectorization and functionals</title>
+          
+          <p>
+            Although for-loops are an important concept to understand, in R we rarely use them. As you learn more R, you will realize that <em>vectorization</em> is preferred over for-loops since it results in shorter and clearer code. We already saw examples in the Vector Arithmetic section. A <em>vectorized</em> function is a function that will apply the same operation on each of the vectors.
+          </p>
+          
+          <program language="r">
+            <input>
+x &lt;- 1:10
+sqrt(x)
+y &lt;- 1:10
+x*y
+            </input>
+          </program>
+          
+          <p>
+            To make this calculation, there is no need for for-loops. However, not all functions work this way. For instance, the function we just wrote, <c>compute_s_n</c>, does not work element-wise since it is expecting a scalar. This piece of code does not run the function on each entry of <c>n</c>:
+          </p>
+          
+          <program language="r">
+            <input>
+n &lt;- 1:25
+compute_s_n(n)
+            </input>
+          </program>
+          
+          <p>
+            <em>Functionals</em> are functions that help us apply the same function to each entry in a vector, matrix, data frame, or list. Here we cover the functional that operates on numeric, logical, and character vectors: <c>sapply</c>.
+          </p>
+          
+          <p>
+            The function <c>sapply</c> permits us to perform element-wise operations on any function. Here is how it works:
+          </p>
+          
+          <program language="r">
+            <input>
+x &lt;- 1:10
+sapply(x, sqrt)
+            </input>
+          </program>
+          
+          <p>
+            Each element of <c>x</c> is passed on to the function <c>sqrt</c> and the result is returned. These results are concatenated. In this case, the result is a vector of the same length as the original <c>x</c>. This implies that the for-loop above can be written as follows:
+          </p>
+          
+          <program language="r">
+            <input>
+n &lt;- 1:25
+s_n &lt;- sapply(n, compute_s_n)
+            </input>
+          </program>
+          
+          <p>
+            Other functionals are <c>apply</c>, <c>lapply</c>, <c>tapply</c>, <c>mapply</c>, <c>vapply</c>, and <c>replicate</c>. We mostly use <c>sapply</c>, <c>apply</c>, and <c>replicate</c> in this book, but we recommend familiarizing yourselves with the others as they can be very useful.
+          </p>
+          
+          <note>
+            <p>You are ready to do exercises 8-11.</p>
+          </note>
+          
+        </section>
+        
+        <section xml:id="sec-programming-exercises">
+          <title>Exercises</title>
+          
+          <ol>
+            <li>
+              <p>What will this conditional expression return?</p>
+              <program language="r">
+                <input>
+x &lt;- c(1,2,-3,4)
+
+if(all(x&gt;0)){
+  print("All Positives")
+} else{
+  print("Not all positives")
+}
+                </input>
+              </program>
+            </li>
+            
+            <li>
+              <p>Which of the following expressions is always <c>FALSE</c> when at least one entry of a logical vector <c>x</c> is TRUE?</p>
+              <p>a. <c>all(x)</c></p>
+              <p>b. <c>any(x)</c></p>
+              <p>c. <c>any(!x)</c></p>
+              <p>d. <c>all(!x)</c></p>
+            </li>
+            
+            <li>
+              <p>The function <c>nchar</c> tells you how many characters long a character vector is. Write a line of code that assigns to the object <c>new_names</c> the state abbreviation when the state name is longer than 8 characters.</p>
+            </li>
+            
+            <li>
+              <p>Create a function <c>sum_n</c> that for any given value, say <m>n</m>, computes the sum of the integers from 1 to n (inclusive). Use the function to determine the sum of integers from 1 to 5,000.</p>
+            </li>
+            
+            <li>
+              <p>Create a function <c>altman_plot</c> that takes two arguments, <c>x</c> and <c>y</c>, and plots the difference against the sum.</p>
+            </li>
+            
+            <li>
+              <p>After running the code below, what is the value of <c>x</c>?</p>
+              <program language="r">
+                <input>
+x &lt;- 3
+my_func &lt;- function(y){
+  x &lt;- 5
+  y+5
+}
+                </input>
+              </program>
+            </li>
+            
+            <li>
+              <p>Write a function <c>compute_s_n</c> that for any given <m>n</m> computes the sum <m>S_n = 1^2 + 2^2 + 3^2 + \dots n^2</m>. Report the value of the sum when <m>n=10</m>.</p>
+            </li>
+            
+            <li>
+              <p>Define an empty numerical vector <c>s_n</c> of size 25 using <c>s_n &lt;- vector("numeric", 25)</c> and store in the results of <m>S_1, S_2, \dots S_{25}</m> using a for-loop.</p>
+            </li>
+            
+            <li>
+              <p>Repeat exercise 8, but this time use <c>sapply</c>.</p>
+            </li>
+            
+            <li>
+              <p>Plot <m>S_n</m> versus <m>n</m>. Use points defined by <m>n=1,\dots,25</m>.</p>
+            </li>
+            
+            <li>
+              <p>Confirm that the formula for this sum is <m>S_n= n(n+1)(2n+1)/6</m>.</p>
+            </li>
+          </ol>
+          
+        </section>
+        
       </chapter>
 
       <chapter xml:id="ch-tidyverse">
         <title>The tidyverse</title>
-        <p>Content will be added here.</p>
+  
+  <p>
+    Up to now we have been manipulating vectors by reordering and subsetting them through indexing. However, once we start more advanced analyses, the preferred unit for data storage is not the vector but the data frame. In this chapter we learn to work directly with data frames, which greatly facilitate the organization of information. We will be using data frames for the majority of this book. We will focus on a specific data format referred to as <em>tidy</em> and on specific collection of packages that are particularly helpful for working with <em>tidy</em> data referred to as the <em>tidyverse</em>.
+  </p>
+  
+  <p>
+    We can load all the tidyverse packages at once by installing and loading the <alert>tidyverse</alert> package:
+  </p>
+  
+  <program language="r">
+    <input>
+library(tidyverse)
+    </input>
+  </program>
+  
+  <p>
+    We will learn how to implement the tidyverse approach throughout the book, but before delving into the details, in this chapter we introduce some of the most widely used tidyverse functionality, starting with the <alert>dplyr</alert> package for manipulating data frames and the <alert>purrr</alert> package for working with functions. Note that the tidyverse also includes a graphing package, <alert>ggplot2</alert>, which we introduce later in Chapter 8 in the Data Visualization part of the book, the <alert>readr</alert> package discussed in Chapter 19, and many others. In this chapter, we first introduce the concept of <em>tidy data</em> and then demonstrate how we use the tidyverse to work with data frames in this format.
+  </p>
+  
+  <section xml:id="sec-tidy-data">
+    <title>Tidy data</title>
+    
+    <p>
+      We say that a data table is in <em>tidy</em> format if each row represents one observation and columns represent the different variables available for each of these observations. The <c>murders</c> dataset is an example of a tidy data frame.
+    </p>
+    
+    <program language="r">
+      <input>
+library(dslabs)
+head(murders)
+      </input>
+    </program>
+    
+    <p>
+      Each row represent a state with each of the five columns providing a different variable related to these states: name, abbreviation, region, population, and total murders.
+    </p>
+    
+    <p>
+      To see how the same information can be provided in different formats, consider the following example:
+    </p>
+    
+    <program language="r">
+      <input>
+tidy_data &lt;- gapminder |&gt; 
+  filter(country %in% c("South Korea", "Germany") &amp; !is.na(fertility)) |&gt;
+  select(country, year, fertility)
+head(tidy_data, 6)
+      </input>
+    </program>
+    
+    <p>
+      This tidy dataset provides fertility rates for two countries across the years. This is a tidy dataset because each row represents one observation with the three variables being country, year, and fertility rate. However, this dataset originally came in another format and was reshaped for the <alert>dslabs</alert> package. Originally, the data was in the following format:
+    </p>
+    
+    <program language="r">
+      <input>
+path &lt;- system.file("extdata", package = "dslabs")
+filename &lt;- file.path(path, "fertility-two-countries-example.csv")
+wide_data &lt;- read_csv(filename)
+select(wide_data, country, `1960`:`1962`) |&gt; as.data.frame()
+      </input>
+    </program>
+    
+    <p>
+      The same information is provided, but there are two important differences in the format: 1) each row includes several observations and 2) one of the variables, year, is stored in the header. For the tidyverse packages to be optimally used, data need to be reshaped into <em>tidy</em> format, which you will learn to do in the Data Wrangling part of the book. Until then, we will use example datasets that are already in tidy format.
+    </p>
+    
+    <p>
+      Although not immediately obvious, as you go through the book you will start to appreciate the advantages of working in a framework in which functions use tidy formats for both inputs and outputs. You will see how this permits the data analyst to focus on more important aspects of the analysis rather than the format of the data.
+    </p>
+    
+    <note>
+      <p>
+        You are ready to do exercises 1-4.
+      </p>
+    </note>
+    
+  </section>
+  
+  <section xml:id="sec-refining-data-frames">
+    <title>Refining data frames</title>
+    
+    <p>
+      The <alert>dplyr</alert> package from the <alert>tidyverse</alert> introduces functions that perform some of the most common operations when working with data frames and uses names for these functions that are relatively easy to remember. For instance, to change the data table by adding a new column, we use <c>mutate</c>. To filter the data table to a subset of rows, we use <c>filter</c>. Finally, to subset the data by selecting specific columns, we use <c>select</c>.
+    </p>
+    
+    <subsection xml:id="subsec-adding-columns">
+      <title>Adding columns</title>
+      
+      <p>
+        We want all the necessary information for our analysis to be included in the data frame. The first task is to add the murder rates to our murders data frame. The function <c>mutate</c> takes the data frame as a first argument and the name and values of the variable as a second argument using the convention <c>name = values</c>. So, to add murder rates, we use:
+      </p>
+      
+      <program language="r">
+        <input>
+murders &lt;- mutate(murders, rate = total/population*100000)
+        </input>
+      </program>
+      
+      <p>
+        Notice that here we used <c>total</c> and <c>population</c> inside the function, which are objects that are <alert>not</alert> defined in our workspace. But why don't we get an error?
+      </p>
+      
+      <p>
+        This is one of <alert>dplyr</alert>'s main features. Functions in this package, such as <c>mutate</c>, know to look for variables in the data frame provided in the first argument. In the call to mutate above, <c>total</c> will have the values in <c>murders$total</c>. This approach makes the code much more readable.
+      </p>
+      
+      <p>
+        We can see that the new column is added:
+      </p>
+      
+      <program language="r">
+        <input>
+head(murders)
+        </input>
+      </program>
+      
+    </subsection>
+    
+    <subsection xml:id="subsec-row-wise-subsetting">
+      <title>Row-wise subsetting</title>
+      
+      <p>
+        Now suppose that we want to filter the data frame to only show the entries for which the murder rate is lower than 0.71. To do this we use the <c>filter</c> function, which takes the data frame as the first argument and then a conditional statement as the second. Like <c>mutate</c>, we can use the unquoted variable names from <c>murders</c> inside the function and it will know we mean the columns and not objects in the workspace.
+      </p>
+      
+      <program language="r">
+        <input>
+filter(murders, rate &lt;= 0.71)
+        </input>
+      </program>
+      
+    </subsection>
+    
+    <subsection xml:id="subsec-column-wise-subsetting">
+      <title>Column-wise subsetting</title>
+      
+      <p>
+        Although our data frame only has six columns, some data frames include hundreds. If we want to view just a few, we can use the <alert>dplyr</alert> <c>select</c> function. In the code below we select three columns, assign this to a new object and then filter the new object:
+      </p>
+      
+      <program language="r">
+        <input>
+new_dataframe &lt;- select(murders, state, region, rate)
+filter(new_dataframe, rate &lt;= 0.71)
+        </input>
+      </program>
+      
+      <p>
+        In the call to <c>select</c>, the first argument <c>murders</c> is an object, but <c>state</c>, <c>region</c>, and <c>rate</c> are variable names.
+      </p>
+      
+      <p>
+        <alert>dplyr</alert> offers a series of helper functions to select columns based on their content. For example, the following code uses the function <c>where</c> to keep only the numeric columns:
+      </p>
+      
+      <program language="r">
+        <input>
+new_dataframe &lt;- select(murders, where(is.numeric))
+names(new_dataframe)
+        </input>
+      </program>
+      
+      <p>
+        The helper functions <c>starts_with</c>, <c>ends_with</c>, <c>contains</c>, <c>matches</c>, and <c>num_range</c> can be used to select columns based on their names. Here is an example showing all the rows that start with <c>r</c>:
+      </p>
+      
+      <program language="r">
+        <input>
+new_dataframe &lt;- select(murders, starts_with("r"))
+names(new_dataframe)
+        </input>
+      </program>
+      
+      <p>
+        The helper function <c>everything</c> selects all columns.
+      </p>
+      
+    </subsection>
+    
+    <subsection xml:id="subsec-transforming-variables">
+      <title>Transforming variables</title>
+      
+      <p>
+        The function <c>mutate</c> can also be used to transform variables. For example, the following code takes the log transformation of the population variable:
+      </p>
+      
+      <program language="r">
+        <input>
+mutate(murders, population = log10(population))
+        </input>
+      </program>
+      
+      <p>
+        Often, we need to apply the same transformation to several variables. The function <c>across</c> facilitates the operation. For example if want to log transform both population and total murders we can use:
+      </p>
+      
+      <program language="r">
+        <input>
+mutate(murders, across(c(population, total), log10))
+        </input>
+      </program>
+      
+      <p>
+        The helper functions come in handy when using across. An example is if we want to apply the same transformation to all numeric variables:
+      </p>
+      
+      <program language="r">
+        <input>
+mutate(murders, across(where(is.numeric), log10))
+        </input>
+      </program>
+      
+      <p>
+        or all character variables:
+      </p>
+      
+      <program language="r">
+        <input>
+mutate(murders, across(where(is.character), tolower))
+        </input>
+      </program>
+      
+      <note>
+        <p>
+          You are ready to do exercises 5-11.
+        </p>
+      </note>
+      
+    </subsection>
+    
+  </section>
+  
+  <section xml:id="sec-the-pipe">
+    <title>The pipe</title>
+    
+    <p>
+      In R we can perform a series of operations, for example <c>select</c> and then <c>filter</c>, by sending the results of one function to another using what is called the <em>pipe operator</em>: <c>%&gt;%</c>. Since R version 4.1.0, you can also use <c>|&gt;</c>. Some details are included below.
+    </p>
+    
+    <p>
+      We wrote code in Section 4.2.3 to show three variables (state, region, rate) for states that have murder rates below 0.71. To do this, we defined the intermediate object <c>new_dataframe</c>. In <alert>dplyr</alert> we can write code that looks more like a description of what we want to do without intermediate objects:
+    </p>
+    
+    <me>
+      \mbox{original data }
+      \rightarrow \mbox{ select }
+      \rightarrow \mbox{ filter }
+    </me>
+    
+    <p>
+      For such an operation, we can use the pipe <c>|&gt;</c>. The code looks like this:
+    </p>
+    
+    <program language="r">
+      <input>
+murders |&gt; select(state, region, rate) |&gt; filter(rate &lt;= 0.71)
+      </input>
+    </program>
+    
+    <p>
+      This line of code is equivalent to the two lines in Section 4.2.3 What is going on here?
+    </p>
+    
+    <p>
+      In general, the pipe <em>sends</em> the result of the left side of the pipe to be the first argument of the function on the right side of the pipe. Here is a very simple example:
+    </p>
+    
+    <program language="r">
+      <input>
+16 |&gt; sqrt()
+      </input>
+    </program>
+    
+    <p>
+      We can continue to pipe values along:
+    </p>
+    
+    <program language="r">
+      <input>
+16 |&gt; sqrt() |&gt; log2()
+      </input>
+    </program>
+    
+    <p>
+      The above statement is equivalent to <c>log2(sqrt(16))</c>.
+    </p>
+    
+    <p>
+      Remember that the pipe sends values to the first argument, so we can define other arguments as if the first argument is already defined:
+    </p>
+    
+    <program language="r">
+      <input>
+16 |&gt; sqrt() |&gt; log(base = 2)
+      </input>
+    </program>
+    
+    <p>
+      Therefore, when using the pipe with data frames and <alert>dplyr</alert>, we no longer need to specify the required first argument since the <alert>dplyr</alert> functions we have described all take the data as the first argument. In the code we wrote:
+    </p>
+    
+    <program language="r">
+      <input>
+murders |&gt; select(state, region, rate) |&gt; filter(rate &lt;= 0.71)
+      </input>
+    </program>
+    
+    <p>
+      <c>murders</c> is the first argument of the <c>select</c> function, and the new data frame (formerly <c>new_dataframe</c>) is the first argument of the <c>filter</c> function.
+    </p>
+    
+    <p>
+      Note that the pipe works well with functions where the first argument is the input data. Functions in <alert>tidyverse</alert> packages like <alert>dplyr</alert> have this format and can be used easily with the pipe.
+    </p>
+    
+  </section>
+  
+  <section xml:id="sec-summarizing-data">
+    <title>Summarizing data</title>
+    
+    <p>
+      An important part of exploratory data analysis is summarizing data. The average and standard deviation are two examples of widely used summary statistics. More informative summaries can often be achieved by first splitting data into groups. In this section, we cover two new <alert>dplyr</alert> verbs that make these computations easier: <c>summarize</c> and <c>group_by</c>. We learn to access resulting values using the <c>pull</c> function.
+    </p>
+    
+    <program language="r">
+      <input>
+library(tidyverse)
+      </input>
+    </program>
+    
+    <subsection xml:id="subsec-summarize-function">
+      <title>The <c>summarize</c> function</title>
+      
+      <p>
+        The <c>summarize</c> function in <alert>dplyr</alert> provides a way to compute summary statistics with intuitive and readable code. We start with a simple example based on heights. The <c>heights</c> dataset includes heights and sex reported by students in an in-class survey.
+      </p>
+      
+      <program language="r">
+        <input>
+library(dplyr)
+library(dslabs)
+        </input>
+      </program>
+      
+      <p>
+        The following code computes the average and standard deviation for females:
+      </p>
+      
+      <program language="r">
+        <input>
+s &lt;- heights |&gt; 
+  filter(sex == "Female") |&gt;
+  summarize(average = mean(height), standard_deviation = sd(height))
+s
+        </input>
+      </program>
+      
+      <p>
+        This takes our original data frame as input, filters it to keep only females, and then produces a new summarized table with just the average and the standard deviation of heights. We get to choose the names of the columns of the resulting table. For example, above we decided to use <c>average</c> and <c>standard_deviation</c>, but we could have used other names just the same.
+      </p>
+      
+      <p>
+        Because the resulting table stored in <c>s</c> is a data frame, we can access the components with the accessor <c>$</c>:
+      </p>
+      
+      <program language="r">
+        <input>
+s$average
+s$standard_deviation
+        </input>
+      </program>
+      
+      <p>
+        As with most other <alert>dplyr</alert> functions, <c>summarize</c> is aware of the variable names and we can use them directly. So when inside the call to the <c>summarize</c> function we write <c>mean(height)</c>, the function is accessing the column with the name "height" and then computing the average of the resulting numeric vector. We can compute any other summary that operates on vectors and returns a single value.
+      </p>
+      
+      <p>
+        For another example of how we can use the <c>summarize</c> function, let's compute the average murder rate for the United States. Remember our data table includes total murders and population size for each state and we have already used <alert>dplyr</alert> to add a murder rate column:
+      </p>
+      
+      <program language="r">
+        <input>
+murders &lt;- murders |&gt; mutate(rate = total/population*100000)
+        </input>
+      </program>
+      
+      <p>
+        Remember that the US murder rate is <alert>not</alert> the average of the state murder rates:
+      </p>
+      
+      <program language="r">
+        <input>
+murders |&gt;
+  summarize(rate = mean(rate))
+        </input>
+      </program>
+      
+      <p>
+        This is because in the computation above, the small states are given the same weight as the large ones. The US murder rate is the total number of murders in the US divided by the total US population. So the correct computation is:
+      </p>
+      
+      <program language="r">
+        <input>
+us_murder_rate &lt;- murders |&gt;
+  summarize(rate = sum(total)/sum(population)*100000)
+us_murder_rate
+        </input>
+      </program>
+      
+      <p>
+        This computation counts larger states proportionally to their size which results in a larger value.
+      </p>
+      
+    </subsection>
+    
+    <subsection xml:id="subsec-multiple-summaries">
+      <title>Multiple summaries</title>
+      
+      <p>
+        Suppose we want three summaries from the same variable such as the median, minimum, and maximum heights. We can use <c>summarize</c> like this:
+      </p>
+      
+      <program language="r">
+        <input>
+heights |&gt; summarize(median = median(height), min = min(height), max = max(height))
+        </input>
+      </program>
+      
+      <p>
+        But we can obtain these three values with just one line using the <c>quantile</c> function: <c>quantile(x, c(0.5, 0, 1))</c> returns the median (50th percentile), the min (0th percentile), and max (100th percentile) of the vector <c>x</c>. Here we can't use <c>summarize</c> because it expects one value per row. Instead we have to use the <c>reframe</c> function:
+      </p>
+      
+      <program language="r">
+        <input>
+heights |&gt; reframe(quantiles = quantile(height, c(0.5, 0, 1)))
+        </input>
+      </program>
+      
+      <p>
+        However, if we want a column per summary, as the <c>summarize</c> call above, we have to define a function that returns a data frame like this:
+      </p>
+      
+      <program language="r">
+        <input>
+median_min_max &lt;- function(x){
+  qs &lt;- quantile(x, c(0.5, 0, 1))
+  data.frame(median = qs[1], min = qs[2], max = qs[3])
+}
+        </input>
+      </program>
+      
+      <p>
+        Then we can call <c>summarize</c> as above:
+      </p>
+      
+      <program language="r">
+        <input>
+heights |&gt; summarize(median_min_max(height))
+        </input>
+      </program>
+      
+    </subsection>
+    
+    <subsection xml:id="subsec-group-by">
+      <title>Group then summarize with <c>group_by</c></title>
+      
+      <p>
+        A common operation in data exploration is to first split data into groups and then compute summaries for each group. For example, we may want to compute the average and standard deviation for men's and women's heights separately. The <c>group_by</c> function helps us do this.
+      </p>
+      
+      <p>
+        If we type this:
+      </p>
+      
+      <program language="r">
+        <input>
+heights |&gt; group_by(sex)
+        </input>
+      </program>
+      
+      <p>
+        The result does not look very different from <c>heights</c>, except we see <c>Groups: sex [2]</c> when we print the object. Although not immediately obvious from its appearance, this is now a special data frame called a <em>grouped data frame</em>, and <alert>dplyr</alert> functions, in particular <c>summarize</c>, will behave differently when acting on this object. Conceptually, you can think of this table as many tables, with the same columns but not necessarily the same number of rows, stacked together in one object. When we summarize the data after grouping, this is what happens:
+      </p>
+      
+      <program language="r">
+        <input>
+heights |&gt; 
+  group_by(sex) |&gt;
+  summarize(average = mean(height), standard_deviation = sd(height))
+        </input>
+      </program>
+      
+      <p>
+        The <c>summarize</c> function applies the summarization to each group separately.
+      </p>
+      
+      <p>
+        For another example, let's compute the median, minimum, and maximum murder rate in the four regions of the country using the <c>median_min_max</c> defined above:
+      </p>
+      
+      <program language="r">
+        <input>
+murders |&gt; 
+  group_by(region) |&gt;
+  summarize(median_min_max(rate))
+        </input>
+      </program>
+      
+    </subsection>
+    
+    <subsection xml:id="subsec-extracting-variables">
+      <title>Extracting variables with <c>pull</c></title>
+      
+      <p>
+        The <c>us_murder_rate</c> object defined in Section 4.4.1 represents just one number. Yet we are storing it in a data frame:
+      </p>
+      
+      <program language="r">
+        <input>
+class(us_murder_rate)
+        </input>
+      </program>
+      
+      <p>
+        since, as most <alert>dplyr</alert> functions, <c>summarize</c> always returns a data frame.
+      </p>
+      
+      <p>
+        This might be problematic if we want to use this result with functions that require a numeric value. Here we show a useful trick for accessing values stored in data when using pipes: when a data object is piped that object and its columns can be accessed using the <c>pull</c> function. To get a number from the original data table with one additional line of code we can type:
+      </p>
+      
+      <program language="r">
+        <input>
+us_murder_rate &lt;- murders |&gt; 
+  summarize(rate = sum(total)/sum(population)*100000) |&gt;
+  pull(rate)
+
+us_murder_rate
+        </input>
+      </program>
+      
+      <p>
+        which is now a numeric:
+      </p>
+      
+      <program language="r">
+        <input>
+class(us_murder_rate)
+        </input>
+      </program>
+      
+    </subsection>
+    
+  </section>
+  
+  <section xml:id="sec-sorting">
+    <title>Sorting</title>
+    
+    <p>
+      When examining a dataset, it is often convenient to sort the data frame by the different columns. We know about the <c>order</c> and <c>sort</c> function, but for ordering entire data frames, the <alert>dplyr</alert> function <c>arrange</c> is useful. For example, here we order the states by population size:
+    </p>
+    
+    <program language="r">
+      <input>
+murders |&gt; arrange(population) |&gt; head()
+      </input>
+    </program>
+    
+    <p>
+      With <c>arrange</c> we get to decide which column to sort by. To see the states sorted by murder rates, for example, we would use <c>arrange(rate)</c> instead.
+    </p>
+    
+    <p>
+      Note that the default behavior is to order in ascending order. In <alert>dplyr</alert>, the function <c>desc</c> transforms a vector so that it is in descending order. To sort the data frame by murder rates in descending order, we can type:
+    </p>
+    
+    <program language="r">
+      <input>
+murders |&gt; arrange(desc(rate)) 
+      </input>
+    </program>
+    
+    <subsection xml:id="subsec-nested-sorting">
+      <title>Nested sorting</title>
+      
+      <p>
+        If we are ordering by a column with ties, we can use a second column to break the tie. Similarly, a third column can be used to break ties between first and second and so on. Here we order by <c>region</c>, then within region we order by murder rate:
+      </p>
+      
+      <program language="r">
+        <input>
+murders |&gt; 
+  arrange(region, rate) |&gt; 
+  head()
+        </input>
+      </program>
+      
+    </subsection>
+    
+    <subsection xml:id="subsec-top-n">
+      <title>The top <m>n</m></title>
+      
+      <p>
+        In the code above, we have used the function <c>head</c> to avoid having the page fill up with the entire dataset. For instance, using <c>arrange(desc(rate))</c> followed by <c>head</c> would show the 6 states with the largest murder rates, in order. Instead, to view a specific number of observations with the highest murder rates, we can use the <c>slice_max</c> function. This function takes a data frame as it's first argument, the number of rows to show in the second, and the variable to filter by in the third. Here is an example of how to see the top 5 rows:
+      </p>
+      
+      <program language="r">
+        <input>
+murders |&gt; slice_max(rate, n = 5)
+        </input>
+      </program>
+      
+      <p>
+        The function <c>slice_min</c> does the same, but for the smallest values.
+      </p>
+      
+      <note>
+        <p>
+          You are ready to do exercises 12-19.
+        </p>
+      </note>
+      
+    </subsection>
+    
+  </section>
+  
+  <section xml:id="sec-tibbles">
+    <title>Tibbles</title>
+    
+    <p>
+      To work with the tidyverse, data must be stored in data frames. We introduced the data frame in Chapter 3 and have been using the <c>murders</c> data frame throughout the book. In Section 4.4.3 we introduced the <c>group_by</c> function, which permits stratifying data before computing summary statistics. But where is the group information stored in the data frame?
+    </p>
+    
+    <program language="r">
+      <input>
+murders |&gt; group_by(region)
+      </input>
+    </program>
+    
+    <p>
+      Notice that there are no columns with this information. But, if you look closely at the output above, you see the line <c>A tibble</c> followed by dimensions. We can learn the class of the returned object using:
+    </p>
+    
+    <program language="r">
+      <input>
+murders |&gt; group_by(region) |&gt; class()
+      </input>
+    </program>
+    
+    <p>
+      The <c>tbl</c>, pronounced "tibble", is a special kind of data frame. The functions <c>group_by</c> and <c>summarize</c> always return this type of data frame. The <c>group_by</c> function returns a special kind of <c>tbl</c>, the <c>grouped_df</c>. We will say more about these later. For consistency, the <alert>dplyr</alert> manipulation verbs (<c>select</c>, <c>filter</c>, <c>mutate</c>, and <c>arrange</c>) preserve the class of the input: if they receive a regular data frame they return a regular data frame, while if they receive a tibble they return a tibble. But tibbles are the preferred format in the tidyverse and as a result tidyverse functions that produce a data frame from scratch return a tibble. For example, in Chapter 19 we will see that tidyverse functions used to import data create tibbles.
+    </p>
+    
+  </section>
+  
+  <section xml:id="sec-tibbles-vs-data-frames">
+    <title>Tibbles versus data frames</title>
+    
+    <p>
+      Tibbles are very similar to data frames. In fact, you can think of them as a modern version of data frames. Nonetheless there are some important differences which we describe next.
+    </p>
+    
+    <p>
+      <alert>(1) Tibbles display better</alert>
+    </p>
+    
+    <p>
+      The print method for tibbles is more readable than that of a data frame. To see this, compare the outputs of typing <c>murders</c> and the output of murders if we convert it to a tibble. We can do this using <c>as_tibble(murders)</c>. If using RStudio, output for a tibble adjusts to your window size. To see this, change the width of your R console and notice how more/less columns are shown.
+    </p>
+    
+    <p>
+      If you subset the columns of a data frame, you may get back an object that is not a data frame, such as a vector or scalar. For example:
+    </p>
+    
+    <program language="r">
+      <input>
+class(murders[,4])
+      </input>
+    </program>
+    
+    <p>
+      is not a data frame. With tibbles this does not happen:
+    </p>
+    
+    <program language="r">
+      <input>
+class(as_tibble(murders)[,4])
+      </input>
+    </program>
+    
+    <p>
+      This is useful in the tidyverse since functions require data frames as input.
+    </p>
+    
+    <p>
+      With tibbles, if you want to access the vector that defines a column, and not get back a data frame, you need to use the accessor <c>$</c>:
+    </p>
+    
+    <program language="r">
+      <input>
+class(as_tibble(murders)$population)
+      </input>
+    </program>
+    
+    <p>
+      A related feature is that tibbles will give you a warning if you try to access a column that does not exist. If we accidentally write <c>Population</c> instead of <c>population</c> this:
+    </p>
+    
+    <program language="r">
+      <input>
+murders$Population
+      </input>
+    </program>
+    
+    <p>
+      returns a <c>NULL</c> with no warning, which can make it harder to debug. In contrast, if we try this with a tibble we get an informative warning:
+    </p>
+    
+    <program language="r">
+      <input>
+as_tibble(murders)$Population
+      </input>
+    </program>
+    
+    <p>
+      <alert>(2) Tibbles can have complex entries</alert>
+    </p>
+    
+    <p>
+      While data frame columns need to be vectors of numbers, strings, or logical values, tibbles can have more complex objects, such as lists or functions. Also, we can create tibbles with functions:
+    </p>
+    
+    <program language="r">
+      <input>
+tibble(id = c(1, 2, 3), func = c(mean, median, sd))
+      </input>
+    </program>
+    
+    <p>
+      <alert>(3) Tibbles can be grouped</alert>
+    </p>
+    
+    <p>
+      The function <c>group_by</c> returns a special kind of tibble: a grouped tibble. This class stores information that lets you know which rows are in which groups. The tidyverse functions, in particular the <c>summarize</c> function, are aware of the group information.
+    </p>
+    
+    <subsection xml:id="subsec-creating-tibbles">
+      <title>Creating tibbles</title>
+      
+      <p>
+        It is sometimes useful for us to create our own data frames. To create a data frame in the tibble format, you can do this by using the <c>tibble</c> function.
+      </p>
+      
+      <program language="r">
+        <input>
+grades &lt;- tibble(names = c("John", "Juan", "Jean", "Yao"), 
+                     exam_1 = c(95, 80, 90, 85), 
+                     exam_2 = c(90, 85, 85, 90))
+        </input>
+      </program>
+      
+      <p>
+        Note that base R (without packages loaded) has the <c>data.frame</c> function that can be used to create a regular data frame rather than a tibble.
+      </p>
+      
+      <program language="r">
+        <input>
+grades &lt;- data.frame(names = c("John", "Juan", "Jean", "Yao"), 
+                     exam_1 = c(95, 80, 90, 85), 
+                     exam_2 = c(90, 85, 85, 90))
+        </input>
+      </program>
+      
+      <p>
+        To convert a regular data frame to a tibble, you can use the <c>as_tibble</c> function.
+      </p>
+      
+      <program language="r">
+        <input>
+as_tibble(grades) |&gt; class()
+        </input>
+      </program>
+      
+    </subsection>
+    
+  </section>
+  
+  <section xml:id="sec-the-placeholder">
+    <title>The placeholder</title>
+    
+    <p>
+      One of the advantages of using the pipe <c>|&gt;</c> is that we do not have to keep naming new objects as we manipulate the data frame. The object on the left-hand side of the pipe is used as the first argument of the function on the right-hand side of the pipe. But what if we want to pass it as argument to the right-hand side function that is not the first? The answer is the placeholder operator <c>_</c> (for the <c>%&gt;%</c> pipe the placeholder is <c>.</c>). Below is a simple example that passes the <c>base</c> argument to the <c>log</c> function. The following three are equivalent:
+    </p>
+    
+    <program language="r">
+      <input>
+log(8, base = 2)
+2 |&gt; log(8, base = _)
+2 %&gt;% log(8, base = .)
+      </input>
+    </program>
+    
+  </section>
+  
+  <section xml:id="sec-purrr-package">
+    <title>The <alert>purrr</alert> package</title>
+    
+    <p>
+      In Chapter 3 we learned about the <c>sapply</c> function, which permitted us to apply the same function to each element of a vector. We constructed a function and used <c>sapply</c> to compute the sum of the first <c>n</c> integers for several values of <c>n</c> like this:
+    </p>
+    
+    <program language="r">
+      <input>
+compute_s_n &lt;- function(n) {
+  sum(1:n)
+}
+n &lt;- 1:25
+s_n &lt;- sapply(n, compute_s_n)
+      </input>
+    </program>
+    
+    <p>
+      This type of operation, applying the same function or procedure to elements of an object, is quite common in data analysis. The <alert>purrr</alert> package includes functions similar to <c>sapply</c> but that better interact with other tidyverse functions. The main advantage is that we can better control the output type of functions. In contrast, <c>sapply</c> can return several different object types; for example, we might expect a numeric result from a line of code, but <c>sapply</c> might convert our result to character under some circumstances. <alert>purrr</alert> functions will never do this: they will return objects of a specified type or return an error if this is not possible.
+    </p>
+    
+    <p>
+      The first <alert>purrr</alert> function we will learn is <c>map</c>, which works very similar to <c>sapply</c> but always, without exception, returns a list:
+    </p>
+    
+    <program language="r">
+      <input>
+library(purrr)
+s_n &lt;- map(n, compute_s_n)
+class(s_n)
+      </input>
+    </program>
+    
+    <p>
+      If we want a numeric vector, we can instead use <c>map_dbl</c> which always returns a vector of numeric values.
+    </p>
+    
+    <program language="r">
+      <input>
+s_n &lt;- map_dbl(n, compute_s_n)
+class(s_n)
+      </input>
+    </program>
+    
+    <p>
+      This produces the same results as the <c>sapply</c> call shown above.
+    </p>
+    
+    <p>
+      A particularly useful <alert>purrr</alert> function for interacting with the rest of the tidyverse is <c>map_df</c>, which always returns a tibble data frame. However, the function being called needs to return a vector or a list with names. For this reason, the following code would result in a <c>Argument 1 must have names</c> error:
+    </p>
+    
+    <program language="r">
+      <input>
+s_n &lt;- map_df(n, compute_s_n)
+      </input>
+    </program>
+    
+    <p>
+      The function needs to return a data frame to make this work:
+    </p>
+    
+    <program language="r">
+      <input>
+compute_s_n &lt;- function(n) {
+  tibble(sum = sum(1:n))
+}
+s_n &lt;- map_df(n, compute_s_n)
+      </input>
+    </program>
+    
+    <p>
+      The <alert>purrr</alert> package provides much more functionality not covered here. For more details you can consult <url href="https://jennybc.github.io/purrr-tutorial/">this online resource</url>.
+    </p>
+    
+  </section>
+  
+  <section xml:id="sec-tidyverse-conditionals">
+    <title>Tidyverse conditionals</title>
+    
+    <p>
+      A typical data analysis will often involve one or more conditional operations. In Chapter 3 we described the <c>ifelse</c> function, which we will use extensively in this book. In this section we present two <alert>dplyr</alert> functions that provide further functionality for performing conditional operations.
+    </p>
+    
+    <subsection xml:id="subsec-case-when">
+      <title><c>case_when</c></title>
+      
+      <p>
+        The <c>case_when</c> function is useful for vectorizing conditional statements. It is similar to <c>ifelse</c> but can output any number of values, as opposed to just <c>TRUE</c> or <c>FALSE</c>. Here is an example splitting numbers into negative, positive, and 0:
+      </p>
+      
+      <program language="r">
+        <input>
+x &lt;- c(-2, -1, 0, 1, 2)
+case_when(x &lt; 0 ~ "Negative", 
+          x &gt; 0 ~ "Positive", 
+          TRUE  ~ "Zero")
+        </input>
+      </program>
+      
+      <p>
+        A common use for this function is to define categorical variables based on existing variables. For example, suppose we want to compare the murder rates in four groups of states: <em>New England</em>, <em>West Coast</em>, <em>South</em>, and <em>other</em>. For each state, we need to ask if it is in New England, if it is not we ask if it is in the West Coast, if not we ask if it is in the South, and if not we assign <em>other</em>. Here is how we use <c>case_when</c> to do this:
+      </p>
+      
+      <program language="r">
+        <input>
+murders |&gt; 
+  mutate(group = case_when(
+    abb %in% c("ME", "NH", "VT", "MA", "RI", "CT") ~ "New England",
+    abb %in% c("WA", "OR", "CA") ~ "West Coast",
+    region == "South" ~ "South",
+    TRUE ~ "Other")) |&gt;
+  group_by(group) |&gt;
+  summarize(rate = sum(total)/sum(population)*10^5) 
+        </input>
+      </program>
+      
+    </subsection>
+    
+    <subsection xml:id="subsec-between">
+      <title><c>between</c></title>
+      
+      <p>
+        A common operation in data analysis is to determine if a value falls inside an interval. We can check this using conditionals. For example, to check if the elements of a vector <c>x</c> are between <c>a</c> and <c>b</c> we can type
+      </p>
+      
+      <program language="r">
+        <input>
+x &gt;= a &amp; x &lt;= b
+        </input>
+      </program>
+      
+      <p>
+        However, this can become cumbersome, especially within the tidyverse approach. The <c>between</c> function performs the same operation.
+      </p>
+      
+      <program language="r">
+        <input>
+between(x, a, b)
+        </input>
+      </program>
+      
+    </subsection>
+    
+  </section>
+  
+  <section xml:id="sec-tidyverse-exercises">
+    <title>Exercises</title>
+    
+    <p>
+      1. Examine the built-in dataset <c>co2</c>. Which of the following is true:
+    </p>
+    
+    <ol marker="a.">
+      <li><c>co2</c> is tidy data: it has one year for each row.</li>
+      <li><c>co2</c> is not tidy: we need at least one column with a character vector.</li>
+      <li><c>co2</c> is not tidy: it is a matrix instead of a data frame.</li>
+      <li><c>co2</c> is not tidy: to be tidy we would have to wrangle it to have three columns (year, month and value), then each co2 observation would have a row.</li>
+    </ol>
+    
+    <p>
+      2. Examine the built-in dataset <c>ChickWeight</c>. Which of the following is true:
+    </p>
+    
+    <ol marker="a.">
+      <li><c>ChickWeight</c> is not tidy: each chick has more than one row.</li>
+      <li><c>ChickWeight</c> is tidy: each observation (a weight) is represented by one row. The chick from which this measurement came is one of the variables.</li>
+      <li><c>ChickWeight</c> is not tidy: we are missing the year column.</li>
+      <li><c>ChickWeight</c> is tidy: it is stored in a data frame.</li>
+    </ol>
+    
+    <p>
+      3. Examine the built-in dataset <c>BOD</c>. Which of the following is true:
+    </p>
+    
+    <ol marker="a.">
+      <li><c>BOD</c> is not tidy: it only has six rows.</li>
+      <li><c>BOD</c> is not tidy: the first column is just an index.</li>
+      <li><c>BOD</c> is tidy: each row is an observation with two values (time and demand)</li>
+      <li><c>BOD</c> is tidy: all small datasets are tidy by definition.</li>
+    </ol>
+    
+    <p>
+      4. Which of the following built-in datasets is tidy (you can pick more than one):
+    </p>
+    
+    <ol marker="a.">
+      <li><c>BJsales</c></li>
+      <li><c>EuStockMarkets</c></li>
+      <li><c>DNase</c></li>
+      <li><c>Formaldehyde</c></li>
+      <li><c>Orange</c></li>
+      <li><c>UCBAdmissions</c></li>
+    </ol>
+    
+    <p>
+      5. Load the <alert>dplyr</alert> package and the murders dataset.
+    </p>
+    
+    <program language="r">
+      <input>
+library(dplyr)
+library(dslabs)
+      </input>
+    </program>
+    
+    <p>
+      You can add columns using the <alert>dplyr</alert> function <c>mutate</c>. This function is aware of the column names and inside the function you can call them unquoted:
+    </p>
+    
+    <program language="r">
+      <input>
+murders &lt;- mutate(murders, population_in_millions = population/10^6)
+      </input>
+    </program>
+    
+    <p>
+      We can write <c>population</c> rather than <c>murders$population</c>. The function <c>mutate</c> knows we are grabbing columns from <c>murders</c>.
+    </p>
+    
+    <p>
+      Use the function <c>mutate</c> to add a murders column named <c>rate</c> with the per 100,000 murder rate as in the example code above. Make sure you redefine <c>murders</c> as done in the example code above (<c>murders &lt;- [your code]</c>) so we can keep using this variable.
+    </p>
+    
+    <p>
+      6. If <c>rank(x)</c> gives you the ranks of <c>x</c> from lowest to highest, <c>rank(-x)</c> gives you the ranks from highest to lowest. Use the function <c>mutate</c> to add a column <c>rank</c> containing the rank of murder rate from highest to lowest. Make sure you redefine <c>murders</c> so we can keep using this variable.
+    </p>
+    
+    <p>
+      7. With <alert>dplyr</alert>, we can use <c>select</c> to show only certain columns. For example, with this code we would only show the states and population sizes:
+    </p>
+    
+    <program language="r">
+      <input>
+select(murders, state, population)
+      </input>
+    </program>
+    
+    <p>
+      Use <c>select</c> to show the state names and abbreviations in <c>murders</c>. Do not redefine <c>murders</c>, just show the results.
+    </p>
+    
+    <p>
+      8. The <alert>dplyr</alert> function <c>filter</c> is used to choose specific rows of the data frame to keep. Unlike <c>select</c> which is for columns, <c>filter</c> is for rows. For example, you can show just the New York row like this:
+    </p>
+    
+    <program language="r">
+      <input>
+filter(murders, state == "New York")
+      </input>
+    </program>
+    
+    <p>
+      You can use other logical vectors to filter rows.
+    </p>
+    
+    <p>
+      Use <c>filter</c> to show the top 5 states with the highest murder rates. From here on, do not change the murders dataset, just show the result. Remember that you can filter based on the <c>rank</c> column.
+    </p>
+    
+    <p>
+      9. We can remove rows using the <c>!=</c> operator. For example, to remove Florida, we would do this:
+    </p>
+    
+    <program language="r">
+      <input>
+no_florida &lt;- filter(murders, state != "Florida")
+      </input>
+    </program>
+    
+    <p>
+      Create a new data frame called <c>no_south</c> that removes states from the South region. How many states are in this category? You can use the function <c>nrow</c> for this.
+    </p>
+    
+    <p>
+      10. We can also use <c>%in%</c> to filter with <alert>dplyr</alert>. You can therefore see the data from New York and Texas like this:
+    </p>
+    
+    <program language="r">
+      <input>
+filter(murders, state %in% c("New York", "Texas"))
+      </input>
+    </program>
+    
+    <p>
+      Create a new data frame called <c>murders_nw</c> with only the states from the Northeast and the West. How many states are in this category?
+    </p>
+    
+    <p>
+      11. Suppose you want to live in the Northeast or West <alert>and</alert> want the murder rate to be less than 1. We want to see the data for the states satisfying these options. Note that you can use logical operators like <c>&amp;</c> with <c>filter</c>. Here is an example in which we filter to keep only small states in the Northeast region.
+    </p>
+    
+    <program language="r">
+      <input>
+filter(murders, population &lt; 5000000 &amp; region == "Northeast")
+      </input>
+    </program>
+    
+    <p>
+      Make sure <c>murders</c> has been defined with <c>rate</c> and <c>rank</c> and still has all states. Create a table called <c>my_states</c> that contains rows for states satisfying both the conditions: it is in the Northeast or West and the murder rate is less than 1. Use <c>select</c> to show only the state name, the rate, and the rank.
+    </p>
+    
+    <p>
+      12. The pipe <c>|&gt;</c> can be used to perform operations sequentially without having to define intermediate objects. Start by redefining <c>murders</c> to include rate and rank.
+    </p>
+    
+    <program language="r">
+      <input>
+murders &lt;- mutate(murders, rate =  total/population*100000, 
+                  rank = rank(-rate))
+      </input>
+    </program>
+    
+    <p>
+      In the solution to the previous exercise, we did the following:
+    </p>
+    
+    <program language="r">
+      <input>
+my_states &lt;- filter(murders, region %in% c("Northeast", "West") &amp; 
+                      rate &lt; 1)
+
+select(my_states, state, rate, rank)
+      </input>
+    </program>
+    
+    <p>
+      The pipe <c>|&gt;</c> permits us to perform both operations sequentially without having to define an intermediate variable <c>my_states</c>. We therefore could have mutated and selected in the same line like this:
+    </p>
+    
+    <program language="r">
+      <input>
+mutate(murders, rate =  total/population*100000, 
+       rank = rank(-rate)) |&gt;
+  select(state, rate, rank)
+      </input>
+    </program>
+    
+    <p>
+      Notice that <c>select</c> no longer has a data frame as the first argument. The first argument is assumed to be the result of the operation conducted right before the <c>|&gt;</c>.
+    </p>
+    
+    <p>
+      Repeat the previous exercise, but now instead of creating a new object, show the result and only include the state, rate, and rank columns. Use a pipe <c>|&gt;</c> to do this in just one line.
+    </p>
+    
+    <program language="r">
+      <input>
+my_states &lt;- murders |&gt;
+  mutate SOMETHING |&gt; 
+  filter SOMETHING |&gt; 
+  select SOMETHING
+      </input>
+    </program>
+    
+    <p>
+      13. For exercises 13-19, we will be using the data from the survey collected by the United States National Center for Health Statistics (NCHS). This center has conducted a series of health and nutrition surveys since the 1960's. Starting in 1999, about 5,000 individuals of all ages have been interviewed every year and they complete the health examination component of the survey. Part of the data is made available via the <alert>NHANES</alert> package. Once you install the <alert>NHANES</alert> package, you can load the data like this:
+    </p>
+    
+    <program language="r">
+      <input>
+library(NHANES)
+      </input>
+    </program>
+    
+    <p>
+      The <alert>NHANES</alert> data has many missing values. The <c>mean</c> and <c>sd</c> functions in R will return <c>NA</c> if any of the entries of the input vector is an <c>NA</c>. Here is an example:
+    </p>
+    
+    <program language="r">
+      <input>
+library(dslabs)
+mean(na_example)
+sd(na_example)
+      </input>
+    </program>
+    
+    <p>
+      To ignore the <c>NA</c>s we can use the <c>na.rm</c> argument:
+    </p>
+    
+    <program language="r">
+      <input>
+mean(na_example, na.rm = TRUE)
+sd(na_example, na.rm = TRUE)
+      </input>
+    </program>
+    
+    <p>
+      Let's now explore the NHANES data. We will provide some basic facts about blood pressure. First let's select a group to set the standard. We will use 20-to-29-year-old females. <c>AgeDecade</c> is a categorical variable with these ages. Note that the category is coded like <c>" 20-29"</c>, with a space in front! What is the average and standard deviation of systolic blood pressure as saved in the <c>BPSysAve</c> variable? Save it to a variable called <c>ref</c>.
+    </p>
+    
+    <p>
+      Hint: Use <c>filter</c> and <c>summarize</c> and use the <c>na.rm = TRUE</c> argument when computing the average and standard deviation. You can also filter the NA values using <c>filter</c>.
+    </p>
+    
+    <p>
+      14. Using a pipe, assign the average to a numeric variable <c>ref_avg</c>. Hint: Use the code from the previous exercise and then <c>pull</c>.
+    </p>
+    
+    <p>
+      15. Now report the min and max values for the same group.
+    </p>
+    
+    <p>
+      16. Compute the average and standard deviation for females, but for each age group separately rather than a selected decade as in exercise 13. Note that the age groups are defined by <c>AgeDecade</c>. Hint: rather than filtering by age and gender, filter by <c>Gender</c> and then use <c>group_by</c>.
+    </p>
+    
+    <p>
+      17. Repeat exercise 16 for males.
+    </p>
+    
+    <p>
+      18. For males between the ages of 40-49, compare systolic blood pressure across race as reported in the <c>Race1</c> variable. Order the resulting table from lowest to highest average systolic blood pressure.
+    </p>
+    
+    <p>
+      19. Load the <c>murders</c> dataset. Which of the following is true?
+    </p>
+    
+    <ol marker="a.">
+      <li><c>murders</c> is in tidy format and is stored in a tibble.</li>
+      <li><c>murders</c> is in tidy format and is stored in a data frame.</li>
+      <li><c>murders</c> is not in tidy format and is stored in a tibble.</li>
+      <li><c>murders</c> is not in tidy format and is stored in a data frame.</li>
+    </ol>
+    
+    <p>
+      20. Use <c>as_tibble</c> to convert the <c>murders</c> data table into a tibble and save it in an object called <c>murders_tibble</c>.
+    </p>
+    
+    <p>
+      21. Use the <c>group_by</c> function to convert <c>murders</c> into a tibble that is grouped by region.
+    </p>
+    
+    <p>
+      22. Write tidyverse code that is equivalent to this code:
+    </p>
+    
+    <program language="r">
+      <input>
+exp(mean(log(murders$population)))
+      </input>
+    </program>
+    
+    <p>
+      Write it using the pipe so that each function is called without arguments. Use the dot operator to access the population. Hint: The code should start with <c>murders |&gt;</c>.
+    </p>
+    
+    <p>
+      23. Use the <c>map_df</c> to create a data frame with three columns named <c>n</c>, <c>s_n</c>, and <c>s_n_2</c>. The first column should contain the numbers 1 through 100. The second and third columns should each contain the sum of 1 through <m>n</m> with <m>n</m> the row number.
+    </p>
+    
+  </section>
+        
       </chapter>
 
       <chapter xml:id="ch-data-table">
         <title>data.table</title>
-        <p>Content will be added here.</p>
+        
+        
+  
+  <p>
+    In this book, we use tidyverse packages, primarily because they offer readability that is beneficial for beginners. This readability allows us to emphasize data analysis and statistical concepts. However, while tidyverse is beginner-friendly, there are other methods in R that are more efficient and can handle larger datasets more effectively. One such package is <term>data.table</term>, which is widely used in the R community. We'll briefly introduce <term>data.table</term> in this chapter. For those interested in diving deeper, there are numerous online resources, including the mentioned introduction<fn><url href="https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html"/></fn>.
+  </p>
+  
+  <section xml:id="refining-data-tables">
+    <title>Refining data tables</title>
+    
+    <p>
+      <c>data.table</c> is a separate package that needs to be installed. Once installed, we then need to load it along with the other packages we will use:
+    </p>
+    
+    <program language="r">
+      <input>
+library(dplyr)
+library(dslabs)
+library(data.table)
+      </input>
+    </program>
+    
+    <p>
+      We will provide example code showing the <term>data.table</term> approaches to <term>dplyr</term>'s <c>mutate</c>, <c>filter</c>, <c>select</c>, <c>group_by</c>, and <c>summarize</c> shown in <xref ref="sec-tidyverse"/>. As in that chapter, we will use the <c>murders</c> dataset:
+    </p>
+    
+    <p>
+      The first step when using <term>data.table</term> is to convert the data frame into a <c>data.table</c> object using the <c>as.data.table</c> function:
+    </p>
+    
+    <program language="r">
+      <input>
+murders_dt &lt;- as.data.table(murders)
+      </input>
+    </program>
+    
+    <p>
+      Without this initial step, most of the approaches shown below will not work.
+    </p>
+    
+    <subsection xml:id="column-wise-subsetting">
+      <title>Column-wise subsetting</title>
+      
+      <p>
+        Selecting with <term>data.table</term> is done in a similar way to subsetting matrices. While with <term>dplyr</term> we write
+      </p>
+      
+      <program language="r">
+        <input>
+select(murders, state, region)
+        </input>
+      </program>
+      
+      <p>
+        in <term>data.table</term> we use
+      </p>
+      
+      <program language="r">
+        <input>
+murders_dt[, c("state", "region")]
+        </input>
+      </program>
+      
+      <p>
+        We can also use the <c>.()</c> <term>data.table</term> notation to alert R that variables inside the parenthesis are column names, not objects in the R environment. So the above can also be written like this:
+      </p>
+      
+      <program language="r">
+        <input>
+murders_dt[, .(state, region)]
+        </input>
+      </program>
+      
+    </subsection>
+    
+    <subsection xml:id="adding-or-transforming-variables">
+      <title>Adding or transforming variables</title>
+      
+      <p>
+        We learned to use the <term>dplyr</term> <c>mutate</c> function with this example:
+      </p>
+      
+      <program language="r">
+        <input>
+murders &lt;- mutate(murders, rate = total / population * 100000)
+        </input>
+      </program>
+      
+      <p>
+        <term>data.table</term> uses an approach that avoids a new assignment (update by reference). This can help with large datasets that take up most of your computer's memory. The <term>data.table</term> <c>:=</c> function permits us to do this:
+      </p>
+      
+      <program language="r">
+        <input>
+murders_dt[, rate := total / population * 100000]
+        </input>
+      </program>
+      
+      <p>
+        This adds a new column, <c>rate</c>, to the table. Notice that, as in <term>dplyr</term>, we used <c>total</c> and <c>population</c> without quotes.
+      </p>
+      
+      <p>
+        To define new multiple columns, we can use the <c>:=</c> function with multiple arguments:
+      </p>
+      
+      <program language="r">
+        <input>
+murders_dt[, ":="(rate = total / population * 100000, rank = rank(population))]
+        </input>
+      </program>
+      
+    </subsection>
+    
+    <subsection xml:id="reference-versus-copy">
+      <title>Reference versus copy</title>
+      
+      <p>
+        The <term>data.table</term> package is designed to avoid wasting memory. So if you make a copy of a table, like this:
+      </p>
+      
+      <program language="r">
+        <input>
+x &lt;- data.table(a = 1)
+y &lt;- x
+        </input>
+      </program>
+      
+      <p>
+        <c>y</c> is actually referencing <c>x</c>, it is not an new object: <c>y</c> just another name for <c>x</c>. Until you change <c>y</c>, a new object will not be made. However, the <c>:=</c> function changes <em>by reference</em> so if you change <c>x</c>, a new object is not made and <c>y</c> continues to be just another name for <c>x</c>:
+      </p>
+      
+      <program language="r">
+        <input>
+x[, a := 2]
+y
+        </input>
+      </program>
+      
+      <p>
+        You can also change <c>x</c> like this:
+      </p>
+      
+      <program language="r">
+        <input>
+y[, a := 1]
+x
+        </input>
+      </program>
+      
+      <p>
+        To avoid this, you can use the <c>copy</c> function which forces the creation of an actual copy:
+      </p>
+      
+      <program language="r">
+        <input>
+x &lt;- data.table(a = 1)
+y &lt;- copy(x)
+x[, a := 2]
+y
+        </input>
+      </program>
+      
+      <p>
+        Note that the function <c>as.data.table</c> creates a copy of the data frame being converted. However, if working with a large data frames it is helpful to avoid this by using <c>setDT</c>:
+      </p>
+      
+      <program language="r">
+        <input>
+x &lt;- data.frame(a = 1)
+setDT(x)
+        </input>
+      </program>
+      
+      <p>
+        Note that because no copy is being made the following code does not create a new object:
+      </p>
+      
+      <program language="r">
+        <input>
+x &lt;- data.frame(a = 1)
+y &lt;- setDT(x)
+        </input>
+      </program>
+      
+      <p>
+        The objects <c>x</c> and <c>y</c> are referencing the same data table:
+      </p>
+      
+      <program language="r">
+        <input>
+x[, a := 2]
+y
+        </input>
+      </program>
+      
+    </subsection>
+    
+    <subsection xml:id="row-wise-subsetting">
+      <title>Row-wise subsetting</title>
+      
+      <p>
+        With <term>dplyr</term>, we filtered like this:
+      </p>
+      
+      <program language="r">
+        <input>
+filter(murders, rate &lt;= 0.7)
+        </input>
+      </program>
+      
+      <p>
+        With <term>data.table</term>, we again use an approach similar to subsetting matrices, except like <term>dplyr</term>, <term>data.table</term> knows that <c>rate</c> refers to a column name and not an object in the R environment:
+      </p>
+      
+      <program language="r">
+        <input>
+murders_dt[rate &lt;= 0.7]
+        </input>
+      </program>
+      
+      <p>
+        Notice that we can combine the filter and select into one succinct command. Here are the state names and rates for those with rates below 0.7.
+      </p>
+      
+      <program language="r">
+        <input>
+murders_dt[rate &lt;= 0.7, .(state, rate)]
+        </input>
+      </program>
+      
+      <p>
+        which is more compact than the <term>dplyr</term> approach:
+      </p>
+      
+      <program language="r">
+        <input>
+murders |&gt; filter(rate &lt;= 0.7) |&gt; select(state, rate)
+        </input>
+      </program>
+      
+      <note>
+        <p>You are ready to do exercises 1-7.</p>
+      </note>
+      
+    </subsection>
+    
+  </section>
+  
+  <section xml:id="summarizing-data">
+    <title>Summarizing data</title>
+    
+    <p>
+      As an example, we will use the <c>heights</c> dataset:
+    </p>
+    
+    <program language="r">
+      <input>
+heights_dt &lt;- as.data.table(heights)
+      </input>
+    </program>
+    
+    <p>
+      In <term>data.table</term>, we can call functions inside <c>.()</c> and they will be applied to columns So the equivalent of:
+    </p>
+    
+    <program language="r">
+      <input>
+s &lt;- heights |&gt; summarize(avg = mean(height), sd = sd(height))
+      </input>
+    </program>
+    
+    <p>
+      in <term>dplyr</term> is the following in <term>data.table</term>:
+    </p>
+    
+    <program language="r">
+      <input>
+s &lt;- heights_dt[, .(avg = mean(height), sd = sd(height))]
+      </input>
+    </program>
+    
+    <p>
+      Note that this permits a compact way of subsetting and then summarizing. Instead of:
+    </p>
+    
+    <program language="r">
+      <input>
+s &lt;- heights |&gt; 
+  filter(sex == "Female") |&gt;
+  summarize(avg = mean(height), sd = sd(height))
+      </input>
+    </program>
+    
+    <p>
+      we can write:
+    </p>
+    
+    <program language="r">
+      <input>
+s &lt;- heights_dt[sex == "Female", .(avg = mean(height), sd = sd(height))]
+      </input>
+    </program>
+    
+    <subsection xml:id="multiple-summaries">
+      <title>Multiple summaries</title>
+      
+      <p>
+        In <xref ref="sec-tidyverse"/>, we defined the following function to permit multiple column summaries in <term>dplyr</term>:
+      </p>
+      
+      <program language="r">
+        <input>
+median_min_max &lt;- function(x){
+  qs &lt;- quantile(x, c(0.5, 0, 1))
+  data.frame(median = qs[1], minimum = qs[2], maximum = qs[3])
+}
+        </input>
+      </program>
+      
+      <p>
+        In <term>data.table</term> we place a function call within <c>.()</c> to obtain the three number summary:
+      </p>
+      
+      <program language="r">
+        <input>
+heights_dt[, .(median_min_max(height))]
+        </input>
+      </program>
+      
+    </subsection>
+    
+    <subsection xml:id="group-then-summarize">
+      <title>Group then summarize</title>
+      
+      <p>
+        The <c>group_by</c> followed by <c>summarize</c> in <term>dplyr</term> is performed in one line in <term>data.table</term>. We simply add the <c>by</c> argument to split the data into groups based on the values in categorical variable:
+      </p>
+      
+      <program language="r">
+        <input>
+heights_dt[, .(avg = mean(height), sd = sd(height)), by = sex]
+        </input>
+      </program>
+      
+    </subsection>
+    
+  </section>
+  
+  <section xml:id="sorting">
+    <title>Sorting</title>
+    
+    <p>
+      We can order rows using the same approach we use for filter. Here are the states ordered by murder rate:
+    </p>
+    
+    <program language="r">
+      <input>
+murders_dt[order(population)]
+      </input>
+    </program>
+    
+    <p>
+      To sort the table in descending order, we can order by the negative of <c>population</c> or use the <c>decreasing</c> argument:
+    </p>
+    
+    <program language="r">
+      <input>
+murders_dt[order(population, decreasing = TRUE)]
+      </input>
+    </program>
+    
+    <p>
+      Similarly, we can perform nested ordering by including more than one variable in order:
+    </p>
+    
+    <program language="r">
+      <input>
+murders_dt[order(region, rate)]
+      </input>
+    </program>
+    
+    <note>
+      <p>You are ready to do exercises 8-12.</p>
+    </note>
+    
+  </section>
+  
+  <section xml:id="data-table-exercises">
+    <title>Exercises</title>
+    
+    <exercise>
+      <statement>
+        <p>
+          Load the <term>data.table</term> package and the <c>murders</c> dataset and convert it to <c>data.table</c> object:
+        </p>
+        
+        <program language="r">
+          <input>
+library(data.table)
+library(dslabs)
+murders_dt &lt;- as.data.table(murders)
+          </input>
+        </program>
+        
+        <p>
+          Remember you can add columns like this:
+        </p>
+        
+        <program language="r">
+          <input>
+murders_dt[, population_in_millions := population / 10^6]
+          </input>
+        </program>
+        
+        <p>
+          Add a <c>murders</c> column named <c>rate</c> with the per 100,000 murder rate as in the example code above.
+        </p>
+      </statement>
+    </exercise>
+    
+    <exercise>
+      <statement>
+        <p>
+          Add a column <c>rank</c> containing the rank, from highest to lowest murder rate.
+        </p>
+      </statement>
+    </exercise>
+    
+    <exercise>
+      <statement>
+        <p>
+          If we want to only show the states and population sizes, we can use:
+        </p>
+        
+        <program language="r">
+          <input>
+murders_dt[, .(state, population)]
+          </input>
+        </program>
+        
+        <p>
+          Show the state names and abbreviations in <c>murders</c>.
+        </p>
+      </statement>
+    </exercise>
+    
+    <exercise>
+      <statement>
+        <p>
+          You can show just the New York row like this:
+        </p>
+        
+        <program language="r">
+          <input>
+murders_dt[state == "New York"]
+          </input>
+        </program>
+        
+        <p>
+          You can use other logical vectors to filter rows.
+        </p>
+        
+        <p>
+          Show the top 5 states with the highest murder rates. From here on, do not change the <c>murders</c> dataset, just show the result. Remember that you can filter based on the <c>rank</c> column.
+        </p>
+      </statement>
+    </exercise>
+    
+    <exercise>
+      <statement>
+        <p>
+          We can remove rows using the <c>!=</c> operator. For example, to remove Florida, we would do this:
+        </p>
+        
+        <program language="r">
+          <input>
+no_florida &lt;- murders_dt[state != "Florida"]
+          </input>
+        </program>
+        
+        <p>
+          Create a new data frame called <c>no_south</c> that removes states from the South region. How many states are in this category? You can use the function <c>nrow</c> for this.
+        </p>
+      </statement>
+    </exercise>
+    
+    <exercise>
+      <statement>
+        <p>
+          We can also use <c>%in%</c> to filter. You can therefore see the data from New York and Texas as follows:
+        </p>
+        
+        <program language="r">
+          <input>
+murders_dt[state %in% c("New York", "Texas")]
+          </input>
+        </program>
+        
+        <p>
+          Create a new data frame called <c>murders_nw</c> with only the states from the Northeast and the West. How many states are in this category?
+        </p>
+      </statement>
+    </exercise>
+    
+    <exercise>
+      <statement>
+        <p>
+          Suppose you want to live in the Northeast or West <alert>and</alert> want the murder rate to be less than 1. We want to see the data for the states satisfying these options. Note that you can use logical operators with <c>filter</c>. Here is an example in which we filter to keep only small states in the Northeast region.
+        </p>
+        
+        <program language="r">
+          <input>
+murders_dt[population &lt; 5000000 &amp; region == "Northeast"]
+          </input>
+        </program>
+        
+        <p>
+          Make sure <c>murders</c> has been defined with <c>rate</c> and <c>rank</c> and still has all states. Create a table called <c>my_states</c> that contains rows for states satisfying both the conditions: they are in the Northeast or West and the murder rate is less than 1. Show only the state name, the rate, and the rank.
+        </p>
+      </statement>
+    </exercise>
+    
+    <p>
+      For exercises 8-12, we will be using the <term>NHANES</term> data.
+    </p>
+    
+    <program language="r">
+      <input>
+library(NHANES)
+      </input>
+    </program>
+    
+    <exercise>
+      <statement>
+        <p>
+          We will provide some basic facts about blood pressure. First let's select a group to set the standard. We will use 20-to-29-year-old females. <c>AgeDecade</c> is a categorical variable with these ages. Note that the category is coded like <c>" 20-29"</c>, with a space in front! Use the <term>data.table</term> package to compute the average and standard deviation of systolic blood pressure as saved in the <c>BPSysAve</c> variable. Save it to a variable called <c>ref</c>.
+        </p>
+      </statement>
+    </exercise>
+    
+    <exercise>
+      <statement>
+        <p>
+          Report the min and max values for the same group.
+        </p>
+      </statement>
+    </exercise>
+    
+    <exercise>
+      <statement>
+        <p>
+          Compute the average and standard deviation for females, but for each age group separately rather than a selected decade as in exercise 8. Note that the age groups are defined by <c>AgeDecade</c>.
+        </p>
+      </statement>
+    </exercise>
+    
+    <exercise>
+      <statement>
+        <p>
+          Repeat exercise 10 for males.
+        </p>
+      </statement>
+    </exercise>
+    
+    <exercise>
+      <statement>
+        <p>
+          For males between the ages of 40-49, compare systolic blood pressure across race as reported in the <c>Race1</c> variable. Order the resulting table from lowest to highest average systolic blood pressure.
+        </p>
+      </statement>
+    </exercise>
+    
+  </section>
+        
       </chapter>
 
       <chapter xml:id="ch-importing-data">
         <title>Importing data</title>
-        <p>Content will be added here.</p>
+        
+        
+  
+  <p>
+    We have been using datasets already stored as R objects. In data analysis work we rarely have such luck and will have to import data into R from either a file, a database, or another source. Currently, one of the most common ways of storing and sharing data for analysis is through electronic spreadsheets. A spreadsheet stores data in rows and columns. It is basically a file version of a data frame. When saving such a table to a computer file, one needs a way to define when a new row or column ends and the other begins. This in turn defines the cells in which single values are stored. Here is an example of what a comma separated file looks like if we open it with a basic text editor:
+  </p>
+  
+  <figure xml:id="fig-csv-file">
+    <caption>Example of a CSV file opened in a text editor</caption>
+    <image source="R/img/csv-file.png" width="70%"/>
+  </figure>
+  
+  <p>
+    In this chapter, we outline how to load data from a file into R. First, it's crucial to identify the file's location; thus, we touch on file paths and working directories (detailed in <xref ref="sec-unix"/>). Next, we delve into file types (text or binary) and encodings (like ASCII and Unicode), both essential for data import. We then introduce popular functions for data importing, referred to as <em>parsers</em>. Lastly, we offer tips on how to store data in spreadsheets. Advanced topics like extracting data from websites or PDFs will be discussed in the book's Data Wrangling section.
+  </p>
+  
+  <section xml:id="navigating-managing-filesystem">
+    <title>Navigating and managing the filesystem</title>
+    
+    <p>
+      The first step when importing data from a spreadsheet is to locate the file containing the data. Although we do not recommend it, you can use an approach similar to what you do to open files in Microsoft Excel by clicking on the RStudio "File" menu, clicking "Import Dataset", then clicking through folders until you find the file. However, we write code rather than use the point-and-click approach. The key concepts we need to learn to do this are described in detail in <xref ref="sec-unix"/>. Here we provide an overview of the very basics.
+    </p>
+    
+    <subsection xml:id="the-filesystem">
+      <title>The filesystem</title>
+      
+      <p>
+        You can think of your computer's filesystem as a series of nested folders, each containing other folders and files. We refer to folders as <em>directories</em>. We refer to the folder that contains all other folders as the <em>root directory</em>. We refer to the directory in which we are currently located as the <em>working directory</em>. The working directory therefore changes as you move through folders: think of it as your current location.
+      </p>
+      
+    </subsection>
+    
+    <subsection xml:id="relative-full-paths">
+      <title>Relative and full paths</title>
+      
+      <p>
+        The <em>path</em> of a file is a list of directory names that can be thought of as instructions on what folders to click on, and in what order, to find the file. If these instructions are for finding the file from the root directory, we refer to it as the <em>full path</em>. If the instructions are for finding the file starting in the working directory, we refer to it as a <em>relative path</em>. <xref ref="sec-filesystem"/> provides more details on this topic.
+      </p>
+      
+      <p>
+        To see an example of a full path on your system type the following:
+      </p>
+      
+      <program language="r">
+        <input>
+system.file(package = "dslabs")
+        </input>
+      </program>
+      
+      <p>
+        Note that the output will be different across different computers. The <c>system.file</c> function finds the full path to the files that were added to your system when you installed the <alert>dslabs</alert> package. The strings separated by slashes are the directory names. The first slash represents the root directory and we know this is a full path because it starts with a slash.
+      </p>
+      
+      <p>
+        We can use the function <c>list.files</c> to show the names of files and directories in any directory. For example, here are the files in the <alert>dslabs</alert> package directory:
+      </p>
+      
+      <program language="r">
+        <input>
+dir &lt;- system.file(package = "dslabs")
+list.files(dir)
+        </input>
+      </program>
+      
+      <p>
+        Note that these do not start with slash which implies they are <em>relative paths</em>. These relative paths give us the location of the files or directories if the path stored in <c>dir</c> is our working directory.
+      </p>
+      
+      <note>
+        <p>
+          You will not make much use of the <c>system.file</c> function in your day-to-day data analysis work. We introduce it in this section because it facilitates the sharing of spreadsheets that can be used to practice. The spreadsheets are in the <c>extdata</c> directory.
+        </p>
+      </note>
+      
+    </subsection>
+    
+    <subsection xml:id="working-directory">
+      <title>The working directory</title>
+      
+      <p>
+        We highly recommend only using relative paths in your code. The reason is that full paths are unique to your computer and you want your code to be portable. If you want to know the full path of your working directory using the <c>getwd</c> function. If you need to change your working directory, you can use the function <c>setwd</c> or you can change it through RStudio by clicking on "Session".
+      </p>
+      
+      <p>
+        When starting a project, choose a directory to store all related files and set it as your working directory for analysis. This practice ensures that when you use relative paths in functions that import files, R will automatically search for the files in the working directory. For more details on organizing projects in RStudio, see <xref ref="sec-projects"/>.
+      </p>
+      
+    </subsection>
+    
+    <subsection xml:id="generating-path-names">
+      <title>Generating path names</title>
+      
+      <p>
+        The <c>file.path</c> function combines characters to form a complete path, ensuring compatibility with the respective operating system. Linux and Mac use forward slashes <c>/</c>, while Windows uses backslashes <c>\</c>, to separate directories. This function is useful because often you want to define paths using a variable. Here is an example that constructs the full path for a spreadsheet containing the murders data. Here the variable <c>dir</c> contains the full path for the <alert>dslabs</alert> package and <c>extdata/murders.csv</c> is the relative path of the spreadsheet if <c>dir</c> is considered the working directory.
+      </p>
+      
+      <program language="r">
+        <input>
+dir &lt;- system.file(package = "dslabs")
+file_path &lt;- file.path(dir, "extdata/murders.csv")
+        </input>
+      </program>
+      
+      <p>
+        You can copy the file with full path <c>file_path</c> to your working directory using the function <c>file.copy</c>:
+      </p>
+      
+      <program language="r">
+        <input>
+file.copy(file_path, "murders.csv")
+        </input>
+      </program>
+      
+      <p>
+        If the file is copied successfully, this function will return <c>TRUE</c>. Note that we used the same filename for the destination file, but we can give it whatever name we want. If a file with that name already exists in your destination directory, the copy will be unsuccessful. You can change this behavior with the <c>overwrite</c> argument.
+      </p>
+      
+    </subsection>
+    
+  </section>
+  
+  <section xml:id="file-types">
+    <title>File types</title>
+    
+    <p>
+      For most data analysis applications, files can generally be classified into two categories: text files and binary files. In this section we describe the most widely used format for both these types and the best way to identify them. In the last subsection we describe the importance of knowing the file encoding.
+    </p>
+    
+    <note>
+      <p>
+        For this and the following section we assume you have copied the <c>murders.csv</c> file into your working directory. You can use the code at the end of the previous section to do this.
+      </p>
+    </note>
+    
+    <subsection xml:id="text-files">
+      <title>Text files</title>
+      
+      <p>
+        You have already worked with text files. All your R scripts and Quarto files, for example, are text files and so are the Quarto files used to create this book. The <c>murders.csv</c> file mentioned above is also text files. One big advantage of these files is that we can easily "look" at them without having to purchase any kind of special software or follow complicated instructions. Any text editor can be used to examine a text file, including freely available editors such as RStudio or nano. To see this, try opening a csv file using the "Open file" RStudio tool. You should be able to see the content right on your editor.
+      </p>
+      
+      <p>
+        When text files are used to store a spreadsheet, line breaks are used to separate rows and a predefined character, referred to as the <em>delimiter</em>, is used to separate columns within a row. The most common delimiters are comma (<c>,</c>), semicolon (<c>;</c>), space (<c> </c>), and tab (a preset number of spaces or <c>\t</c>). Slightly different approaches are used to read these files into R, so we need to know what delimiter was used. In some cases, the delimiter can be inferred from file suffix. For example, files ending in <c>csv</c> or <c>tsv</c> are expected to be comma and tab delimited, respectively. However, it is harder to infer the delimiter for files ending in <c>txt</c>. As a result we recommend looking at the file rather than inferring from the suffix. You can look at any number of lines from within R using the <c>readLines</c> function:
+      </p>
+      
+      <program language="r">
+        <input>
+readLines("murders.csv", n = 3)
+        </input>
+      </program>
+      
+      <p>
+        This immediately reveals that the file is indeed comma delimited. It also reveals that the file has a header: the first row contains column names rather than data. This is also important to know. Most parsers assume the file starts with a header, but not all files have one.
+      </p>
+      
+    </subsection>
+    
+    <subsection xml:id="binary-files">
+      <title>Binary files</title>
+      
+      <p>
+        Opening image files such as jpg or png in a text editor or using <c>readLines</c> in R will not show comprehensible content because these are <em>binary</em> files. Unlike text files, which are designed for human readability and have standardized conventions, binary files can adopt numerous formats specific to their data type. While R's <c>readBin</c> function can process any binary file, interpreting the output necessitates a thorough understanding of the file's structure. This intricate topic isn't covered in this book. Instead, we concentrate on the prevalent binary formats for spreadsheets: Microsoft Excel's xls and xlsx.
+      </p>
+      
+    </subsection>
+    
+    <subsection xml:id="encoding">
+      <title>Encoding</title>
+      
+      <p>
+        A frequent issue when importing data, whether text or binary, is incorrectly identifying the file's <em>encoding</em>. At its core, a computer translates everything into sequences of 0s and 1s. ASCII is an <em>encoding</em> system that assigns specific numbers to characters. Using 7 bits, ASCII can represent <m>2^7 = 128</m> unique symbols, sufficient for all English keyboard characters. However, many global languages contain characters outside ASCII's range. For instance, the é in "México" isn't in ASCII's catalog. To address this, broader encodings, such as Unicode, emerged. Unicode offers variations using 8, 16, or 32 bits, known as UTF-8, UTF-16, and UTF-32. RStudio typically uses UTF-8 as its default. Notably, ASCII is a subset of UTF-8, meaning that if a file is ASCII-encoded, presuming it's UTF-8 encoded won't cause issues. However, there other encodings, such as ISO-8859-1 (also known as Latin-1) developed for the western European languages, Big5 for Traditional Chinese, and ISO-8859-6 for Arabic.
+      </p>
+      
+      <p>
+        The <alert>dslabs</alert> package includes a file that is not UTF-8 encoded to serve as an example. Notice the strange characters that appear you attempt to read in the first line:
+      </p>
+      
+      <program language="r">
+        <input>
+fn &lt;- "calificaciones.csv"
+file.copy(file.path(system.file("extdata", package = "dslabs"), fn), fn)
+readLines(fn, n = 1)
+        </input>
+      </program>
+      
+      <p>
+        In the following section, we'll introduce several helpful import functions, some of which allow you to specify the file encoding.
+      </p>
+      
+    </subsection>
+    
+  </section>
+  
+  <section xml:id="parsers">
+    <title>Parsers</title>
+    
+    <p>
+      Importing functions, or parsers, are available from base R. However, more powerful and often faster functions are available in the <alert>readr</alert>, <alert>readxl</alert>, and <alert>data.table</alert> packages. In this section we review some examples. We also describe how data can be downloaded or read directly from the internet.
+    </p>
+    
+    <subsection xml:id="base-r">
+      <title>Base R</title>
+      
+      <p>
+        Base R provides several file parsers for example <c>read.csv</c>, <c>read.table</c> and <c>read.delim</c>. The first argument can take either a full or relative path. If a relative path is provided, the parser assumes you want to search in the working directory. Therefore, to read the <c>murders.csv</c> file previously copied to our working directory, we can simply type:
+      </p>
+      
+      <program language="r">
+        <input>
+dat &lt;- read.csv("murders.csv")
+        </input>
+      </program>
+      
+      <p>
+        An often useful R-base importing function is <c>scan</c>, as it provides much flexibility. When reading in spreadsheets many things can go wrong. The file might have multiline headers or be missing cells. With experience you will learn how to deal with different challenges. Carefully reading the help files for the functions discussed here will be useful. With scan you can read-in each cell of a file. Here is an example:
+      </p>
+      
+      <program language="r">
+        <input>
+x &lt;- scan("murders.csv", sep = ",", what = "c")
+x[1:10]
+        </input>
+      </program>
+      
+    </subsection>
+    
+    <subsection xml:id="sec-reader">
+      <title>readr</title>
+      
+      <p>
+        The <alert>readr</alert> package includes parsers, for reading text file spreadsheets into R. <alert>readr</alert> is part of the <alert>tidyverse</alert>, but you can load it directly using:
+      </p>
+      
+      <program language="r">
+        <input>
+library(readr)
+        </input>
+      </program>
+      
+      <p>
+        The following functions are available to read-in text file spreadsheets:
+      </p>
+      
+      <table xml:id="table-readr-functions">
+        <title>readr parsing functions</title>
+        <tabular>
+          <row header="yes">
+            <cell>Function</cell>
+            <cell>Format</cell>
+            <cell>Typical suffix</cell>
+          </row>
+          <row>
+            <cell>read_table</cell>
+            <cell>white space separated values</cell>
+            <cell>txt</cell>
+          </row>
+          <row>
+            <cell>read_csv</cell>
+            <cell>comma separated values</cell>
+            <cell>csv</cell>
+          </row>
+          <row>
+            <cell>read_csv2</cell>
+            <cell>semicolon separated values</cell>
+            <cell>csv</cell>
+          </row>
+          <row>
+            <cell>read_tsv</cell>
+            <cell>tab delimited separated values</cell>
+            <cell>tsv</cell>
+          </row>
+          <row>
+            <cell>read_delim</cell>
+            <cell>general text file format, must define delimiter</cell>
+            <cell>txt</cell>
+          </row>
+        </tabular>
+      </table>
+      
+      <p>
+        It also includes <c>read_lines</c> with similar functionality to <c>readLines</c>.
+      </p>
+      
+      <p>
+        We can read in the <c>murders.csv</c> file using
+      </p>
+      
+      <program language="r">
+        <input>
+dat &lt;- read_csv("murders.csv")
+        </input>
+      </program>
+      
+      <p>
+        Note that we receive a message letting us know what data types were used for each column. Also note that <c>dat</c> is a <c>tibble</c>, not just a data frame. We can suppress this message using the argument <c>show_col_types = FALSE</c>.
+      </p>
+      
+      <p>
+        The <alert>readr</alert> parsers permit us to specify an encoding. It also includes a function that tries to guess the encoding:
+      </p>
+      
+      <program language="r">
+        <input>
+guess_encoding("murders.csv")
+        </input>
+      </program>
+      
+      <p>
+        This function can help us read the file we previously noted was showing strange characters:
+      </p>
+      
+      <program language="r">
+        <input>
+guess_encoding("calificaciones.csv")
+        </input>
+      </program>
+      
+      <p>
+        Once we know the encoding we can specify it through the <c>locale</c> argument:
+      </p>
+      
+      <program language="r">
+        <input>
+dat &lt;- read_csv("calificaciones.csv", show_col_types = FALSE,
+                locale = locale(encoding = "ISO-8859-1"))
+        </input>
+      </program>
+      
+      <p>
+        We learn about locales in <xref ref="sec-locales"/>.
+      </p>
+      
+      <p>
+        We can now see that the characters in the header were read in correctly:
+      </p>
+      
+      <program language="r">
+        <input>
+names(dat)
+        </input>
+      </program>
+      
+    </subsection>
+    
+    <subsection xml:id="readxl">
+      <title>readxl</title>
+      
+      <p>
+        The <alert>readxl</alert> package provides functions to read-in Microsoft Excel formats.
+      </p>
+      
+      <program language="r">
+        <input>
+library(readxl)
+        </input>
+      </program>
+      
+      <p>
+        The main functions are:
+      </p>
+      
+      <table xml:id="table-readxl-functions">
+        <title>readxl parsing functions</title>
+        <tabular>
+          <row header="yes">
+            <cell>Function</cell>
+            <cell>Format</cell>
+            <cell>Typical suffix</cell>
+          </row>
+          <row>
+            <cell>read_excel</cell>
+            <cell>auto detect the format</cell>
+            <cell>xls, xlsx</cell>
+          </row>
+          <row>
+            <cell>read_xls</cell>
+            <cell>original format</cell>
+            <cell>xls</cell>
+          </row>
+          <row>
+            <cell>read_xlsx</cell>
+            <cell>new format</cell>
+            <cell>xlsx</cell>
+          </row>
+        </tabular>
+      </table>
+      
+      <p>
+        The Microsoft Excel formats permit you to have more than one spreadsheet in one file. These are referred to as <em>sheets</em>. The functions listed above read the first sheet by default, but we can also read the others. The <c>excel_sheets</c> function gives us the names of all the sheets in an Excel file. These names can then be passed to the <c>sheet</c> argument in the three functions above to read sheets other than the first.
+      </p>
+      
+    </subsection>
+    
+    <subsection xml:id="data-table">
+      <title>data.table</title>
+      
+      <p>
+        The <alert>data.table</alert> package provides the <c>fread</c> function, a powerful and fast utility designed for reading large datasets. <c>fread</c> automatically detects the format of the input, whether it's delimited text or even files compressed in formats like gzip or zip. It offers a significant speed advantage over the other parsers described here, especially for large files.
+      </p>
+      
+      <program language="r">
+        <input>
+library(data.table)
+dat &lt;- fread("murders.csv")
+        </input>
+      </program>
+      
+      <p>
+        Note <c>fread</c> returns a <c>data.table</c> object.
+      </p>
+      
+    </subsection>
+    
+    <subsection xml:id="downloading-files">
+      <title>Downloading files</title>
+      
+      <p>
+        A common place for data to reside is on the internet. When these data are in files, we can download them and then import them or even read them directly from the web. For example, we note that because our <alert>dslabs</alert> package is on GitHub, the file we downloaded with the package has a url:
+      </p>
+      
+      <program language="r">
+        <input>
+url &lt;- paste0("https://raw.githubusercontent.com/",
+              "rafalab/dslabs/master/inst/extdata/murders.csv")
+        </input>
+      </program>
+      
+      <p>
+        Most parsers can read these files directly:
+      </p>
+      
+      <program language="r">
+        <input>
+dat &lt;- read.csv(url)
+        </input>
+      </program>
+      
+      <p>
+        If you want to have a local copy of the file, you can use the <c>download.file</c> function:
+      </p>
+      
+      <program language="r">
+        <input>
+download.file(url, "murders.csv")
+        </input>
+      </program>
+      
+      <p>
+        This will download the file and save it on your system with the name <c>murders.csv</c>. You can use any name here, not necessarily <c>murders.csv</c>.
+      </p>
+      
+      <warning>
+        <p>
+          The function <c>download.file</c> overwrites existing files without warning.
+        </p>
+      </warning>
+      
+      <p>
+        Two functions that are sometimes useful when downloading data from the internet are <c>tempdir</c> and <c>tempfile</c>. The first creates a directory with a random name that is very likely to be unique. Similarly, <c>tempfile</c> creates a character string, not a file, that is likely to be a unique filename. So you can run a command like this which erases the temporary file once it imports the data:
+      </p>
+      
+      <program language="r">
+        <input>
+tmp_filename &lt;- tempfile()
+download.file(url, tmp_filename)
+dat &lt;- read_csv(tmp_filename)
+file.remove(tmp_filename)
+        </input>
+      </program>
+      
+    </subsection>
+    
+  </section>
+  
+  <section xml:id="organizing-data-spreadsheets">
+    <title>Organizing data with spreadsheets</title>
+    
+    <p>
+      Although this book focuses almost exclusively on data analysis, data management is also an important part of data science operations. As explained in the introduction, we do not cover this topic. However, quite often data analysts need to collect data, or work with others collecting data, in a way that is most conveniently stored in a spreadsheet. Although filling out a spreadsheet by hand is a practice we highly discourage, and we instead recommend the process be automatized as much as possible, sometimes you just have to do it. Therefore, in this section, we provide recommendations on how to organize data in a spreadsheet. Although there are R packages designed to read Microsoft Excel spreadsheets, we generally want to avoid this format. Instead, we recommend Google Sheets as a free software tool. Below we summarize the recommendations made in paper by Karl Broman and Kara Woo<fn><url href="https://www.tandfonline.com/doi/abs/10.1080/00031305.2017.1375989"/></fn>. Please read the paper for important details.
+    </p>
+    
+    <ul>
+      <li><alert>Be Consistent</alert> - Before you commence entering data, have a plan. Once you have a plan, be consistent and stick to it.</li>
+      <li><alert>Choose Good Names for Things</alert> - You want the names you pick for objects, files, and directories to be memorable, easy to spell, and descriptive. This is actually a hard balance to achieve and it does require time and thought. One important rule to follow is <alert>do not use spaces</alert>, use underscores <c>_</c> or dashes instead <c>-</c>. Also, avoid symbols; stick to letters and numbers.</li>
+      <li><alert>Write Dates as YYYY-MM-DD</alert> - To avoid confusion, we strongly recommend using this global ISO 8601 standard.</li>
+      <li><alert>No Empty Cells</alert> - Fill in all cells and use some common code for missing data.</li>
+      <li><alert>Put Just One Thing in a Cell</alert> - It is better to add columns to store the extra information rather than having more than one piece of information in one cell.</li>
+      <li><alert>Make It a Rectangle</alert> - The spreadsheet should be a rectangle.</li>
+      <li><alert>Create a Data Dictionary</alert> - If you need to explain things, such as what the columns are or what the labels used for categorical variables are, do this in a separate file.</li>
+      <li><alert>No Calculations in the Raw Data Files</alert> - Excel permits you to perform calculations. Do not make this part of your spreadsheet. Code for calculations should be in a script.</li>
+      <li><alert>Do Not Use Font Color or Highlighting as Data</alert> - Most import functions are not able to import this information. Encode this information as a variable instead.</li>
+      <li><alert>Make Backups</alert> - Make regular backups of your data.</li>
+      <li><alert>Use Data Validation to Avoid Errors</alert> - Leverage the tools in your spreadsheet software so that the process is as error-free and repetitive-stress-injury-free as possible.</li>
+      <li><alert>Save the Data as Text Files</alert> - Save files for sharing in comma or tab delimited format.</li>
+    </ul>
+    
+  </section>
+  
+  <section xml:id="exercises-importing-data">
+    <title>Exercises</title>
+    
+    <exercise>
+      <statement>
+        <p>
+          Use the <c>read_csv</c> function to read each of the files that the following code saves in the <c>files</c> object:
+        </p>
+        <program language="r">
+          <input>
+path &lt;- system.file("extdata", package = "dslabs")
+files &lt;- list.files(path)
+files
+          </input>
+        </program>
+      </statement>
+    </exercise>
+    
+    <exercise>
+      <statement>
+        <p>
+          Note that the <c>olive</c> file, gives us a warning. This is because the first line of the file is missing the header for the first column.
+        </p>
+        <p>
+          Read the help file for <c>read_csv</c> to figure out how to read in the file without reading this header. If you skip the header, you should not get this warning. Save the result to an object called <c>dat</c>.
+        </p>
+      </statement>
+    </exercise>
+    
+    <exercise>
+      <statement>
+        <p>
+          A problem with the previous approach is that we don't know what the columns represent. Type:
+        </p>
+        <program language="r">
+          <input>
+names(dat)
+          </input>
+        </program>
+        <p>
+          to see that the names are not informative.
+        </p>
+        <p>
+          Use the <c>readLines</c> function to read in just the first line.
+        </p>
+      </statement>
+    </exercise>
+    
+    <exercise>
+      <statement>
+        <p>
+          Pick a measurement you can take on a regular basis. For example, your daily weight or how long it takes you to run 5 miles. Keep a spreadsheet that includes the date, the hour, the measurement, and any other informative variable you think is worth keeping. Do this for 2 weeks. Then make a plot.
+        </p>
+      </statement>
+    </exercise>
+    
+  </section>
+        
       </chapter>
 
     </part>
