@@ -5443,7 +5443,7 @@ heights |&gt;
             </input>
           </program>
 
-          <p>For example, this plot gives us an idea of the range of the data. However, this plot has limitations as well, since we can't really see all the <c>sum(heights<m>sex=="Female")</c> and <c>sum(heights</m>sex=="Male")</c> points plotted for females and males, respectively, and many points are plotted on top of each other. As we have previously described, visualizing the distribution is much more informative. But before doing this, we point out two ways we can improve a plot showing all the points.</p>
+          <p>For example, this plot gives us an idea of the range of the data. However, this plot has limitations as well, since we can't really see all the points plotted for females and males, respectively, and many points are plotted on top of each other. As we have previously described, visualizing the distribution is much more informative. But before doing this, we point out two ways we can improve a plot showing all the points.</p>
 
           <p>The first is to add <em>jitter</em>, which adds a small random shift to each point. In this case, adding horizontal jitter does not alter the interpretation, since the point heights do not change, but we minimize the number of points that fall on top of each other and, therefore, get a better visual sense of how the data is distributed. A second improvement comes from using <em>alpha blending</em>: making the points somewhat transparent. The more points fall on top of each other, the darker the plot, which also helps us get a sense of how the points are distributed. Here is the same plot with jitter and alpha blending:</p>
 
@@ -6517,9 +6517,9 @@ gapminder |&gt;
 
             <p>We use the <c>color = "black"</c> argument to draw a boundary and clearly distinguish the bins.</p>
 
-            <p>In this plot, we see that for the majority of countries, averages are below $10 a day. However, the majority of the x-axis is dedicated to the <c>filter(gapminder, year == past_year & !is.na(gdp)) |> summarise(x = sum(dollars_per_day>10)) |> pull(x)</c> countries with averages above $10. So the plot is not very informative about countries with values below $10 a day.</p>
+            <p>In this plot, we see that for the majority of countries, averages are below 10 dollars a day. However, the majority of the x-axis is dedicated to countries with averages above 10 dollars. So the plot is not very informative about countries with values below 10 dollars a day.</p>
 
-            <p>It might be more informative to quickly be able to see how many countries have average daily incomes of about $1 (extremely poor), $2 (very poor), $4 (poor), $8 (middle), $16 (well off), $32 (rich), $64 (very rich) per day. These changes are multiplicative, and log transformations convert multiplicative changes into additive ones: when using base 2, a doubling of a value turns into an increase by 1.</p>
+            <p>It might be more informative to quickly be able to see how many countries have average daily incomes of about 1 dollar (extremely poor), 2 dollars (very poor), 4 dollars (poor), 8 dollars (middle), 16 dollars (well off), 32 dollars (rich), 64 dollars (very rich) per day. These changes are multiplicative, and log transformations convert multiplicative changes into additive ones: when using base 2, a doubling of a value turns into an increase by 1.</p>
 
             <p>Here is the distribution if we apply a log base 2 transform:</p>
 
