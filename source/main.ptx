@@ -7165,12 +7165,833 @@ dat |&gt;
 
       <chapter xml:id="ch-reshaping-data">
         <title>Reshaping data</title>
-        <p>Content will be added here.</p>
+        
+          <p>As we have seen through the book, having data in <em>tidy</em> format is what makes the tidyverse flow. After the first step in the data analysis process, importing data, a common next step is to reshape the data into a form that facilitates the rest of the analysis. The <alert>tidyr</alert> package, part of <alert>tidyverse</alert>, includes several functions that are useful for tidying data.</p>
+
+          <p>We will use the fertility wide format dataset described in <xref ref="sec-tidy-data"/> as an example in this section.</p>
+
+          <program language="r">
+            <input>
+library(tidyverse) 
+library(dslabs)
+path &lt;- system.file("extdata", package = "dslabs")
+filename &lt;- file.path(path, "fertility-two-countries-example.csv")
+wide_data &lt;- read_csv(filename)
+            </input>
+          </program>
+
+        <section xml:id="sec-pivot-longer">
+          <title>`pivot_longer`</title>
+
+          <p>One of the most used functions in the <alert>tidyr</alert> package is <c>pivot_longer</c>, which is useful for converting wide data into tidy data.</p>
+
+          <p>As with most tidyverse functions, the <c>pivot_longer</c> function's first argument is the data frame that will be converted. Here we want to reshape the <c>wide_data</c> dataset so that each row represents a fertility observation, which implies we need three columns to store the year, country, and the observed value. In its current form, data from different years are in different columns with the year values stored in the column names. Through the <c>names_to</c> and <c>values_to</c> argument we will tell <c>pivot_longer</c> the column names we want to assign to the columns containing the current column names and observations, respectively. The default names are <c>name</c> and <c>value</c>, which are often usable choices. In this case a better choice for these two arguments would be <c>year</c> and <c>fertility</c>. Note that nowhere in the data file does it tell us this is fertility data. Instead, we deciphered this from the file name. Through <c>cols</c>, the second argument, we specify the columns containing observed values; these are the columns that will be <em>pivoted</em>. The default is to pivot all columns so, in most cases, we have to specify the columns. In our example we want columns <c>1960</c>, <c>1961</c> up to <c>2015</c>.</p>
+
+          <p>The code to pivot the fertility data therefore looks like this:</p>
+
+          <program language="r">
+            <input>
+new_tidy_data &lt;- wide_data |&gt;
+  pivot_longer(`1960`:`2015`, names_to = "year", values_to = "fertility")
+            </input>
+          </program>
+
+          <p>We can see that the data have been converted to tidy format with columns <c>year</c> and <c>fertility</c></p>
+
+          <program language="r">
+            <input>
+head(new_tidy_data)
+            </input>
+          </program>
+
+          <p>and that each year resulted in two rows since we have two countries and this column was not pivoted. A somewhat quicker way to write this code is to specify which column will <alert>not</alert> include in the pivot, rather than all the columns that will be pivoted:</p>
+
+          <program language="r">
+            <input>
+new_tidy_data &lt;- wide_data |&gt;
+  pivot_longer(-country, names_to = "year", values_to = "fertility")
+            </input>
+          </program>
+
+          <p>The <c>new_tidy_data</c> object looks like the original <c>tidy_data</c> we defined this way</p>
+
+          <program language="r">
+            <input>
+tidy_data &lt;- gapminder |&gt; 
+  filter(country %in% c("South Korea", "Germany") &amp; !is.na(fertility)) |&gt;
+  select(country, year, fertility)
+            </input>
+          </program>
+
+          <p>with just one minor difference. Can you spot it? Look at the data type of the year column. The <c>pivot_longer</c> function assumes that column names are characters. So we need a bit more wrangling before we are ready to make a plot. We need to convert the year column to be numbers:</p>
+
+          <program language="r">
+            <input>
+new_tidy_data &lt;- wide_data |&gt;
+  pivot_longer(-country, names_to = "year", values_to = "fertility") |&gt;
+  mutate(year = as.integer(year))
+            </input>
+          </program>
+
+          <p>Now that the data is tidy, we can use this relatively simple ggplot code:</p>
+
+          <program language="r">
+            <input>
+new_tidy_data |&gt; 
+  ggplot(aes(year, fertility, color = country)) + 
+  geom_point()
+            </input>
+          </program>
+
+        </section>
+
+        <section xml:id="sec-pivot-wider">
+          <title>`pivot_wider`</title>
+
+          <p>As we will see in later examples, it is sometimes useful for data wrangling purposes to convert tidy data into wide data. We often use this as an intermediate step in tidying up data. The <c>pivot_wider</c> function is basically the inverse of <c>pivot_longer</c>. The first argument is for the data, but since we are using the pipe, we don't show it. The <c>names_from</c> argument tells <c>pivot_wider</c> which variable will be used as the column names. The <c>values_from</c> argument specifies which variable to use to fill out the cells.</p>
+
+          <program language="r">
+            <input>
+new_wide_data &lt;- new_tidy_data |&gt; 
+  pivot_wider(names_from = year, values_from = fertility)
+select(new_wide_data, country, `1960`:`1967`)
+            </input>
+          </program>
+
+          <p>Similar to <c>pivot_wider</c>, <c>names_from</c> and <c>values_from</c> default to <c>name</c> and <c>value</c>.</p>
+
+        </section>
+
+        <section xml:id="sec-separate">
+          <title>Separating variables</title>
+
+          <p>The data wrangling shown above was simple compared to what is usually required. In our example spreadsheet files, we include an illustration that is slightly more complicated. It contains two variables: life expectancy and fertility. However, the way it is stored is not tidy and, as we will explain, not optimal.</p>
+
+          <program language="r">
+            <input>
+path &lt;- system.file("extdata", package = "dslabs")
+
+filename &lt;- "life-expectancy-and-fertility-two-countries-example.csv"
+filename &lt;-  file.path(path, filename)
+
+raw_dat &lt;- read_csv(filename)
+select(raw_dat, 1:5)
+            </input>
+          </program>
+
+          <p>First, note that the data is in wide format. Second, notice that this table includes values for two variables, fertility and life expectancy, with the column name encoding which column represents which variable. Encoding information in the column names is not recommended but, unfortunately, it is quite common. We will put our wrangling skills to work to extract this information and store it in a tidy fashion.</p>
+
+          <p>We can start the data wrangling with the <c>pivot_longer</c> function, but we should no longer use the column name <c>year</c> for the new column since it also contains the variable type. We will call it <c>name</c>, the default, for now:</p>
+
+          <program language="r">
+            <input>
+dat &lt;- raw_dat |&gt; pivot_longer(-country)
+head(dat)
+            </input>
+          </program>
+
+          <p>The result is not exactly what we refer to as tidy since each observation is associated with two, not one, rows. We want to have the values from the two variables, fertility and life expectancy, in two separate columns. The first challenge to achieve this is to separate the <c>name</c> column into the year and the variable type. Notice that the entries in this column separate the year from the variable name with an underscore:</p>
+
+          <program language="r">
+            <input>
+dat$name[1:5]
+            </input>
+          </program>
+
+          <p>Encoding multiple variables in a column name is such a common problem that the <alert>tidyr</alert> package includes function to separate these columns into two or more. The <c>separate_wider_delim</c> function takes three arguments: the name of the column to be separated, the names to be used for the new columns, and the character that separates the variables. So, a first attempt at separating the variable name from the year might be:</p>
+
+          <program language="r">
+            <input>
+dat |&gt; separate_wider_delim(name, delim = "_", 
+                            names = c("year", "name"))
+            </input>
+          </program>
+
+          <p>However, this line of code will give an error. This is because the life expectancy names have three strings separated by <c>_</c> and the fertility names have two. This is a common problem so the <c>separate_wider_delim</c> function has arguments <c>too_few</c> and <c>too_many</c> to handle these situations. We see in the help file that the option <c>too_many = merge</c> <em>will merge together any additional pieces</em>. The following line does what we want:</p>
+
+          <program language="r">
+            <input>
+dat |&gt; separate_wider_delim(name, delim = "_", 
+                            names = c("year", "name"), 
+                            too_many = "merge")
+            </input>
+          </program>
+
+          <p>But we are not done yet. We need to create a column for each variable and change <c>year</c> to a number. As we learned, the <c>pivot_wider</c> function can do this:</p>
+
+          <program language="r">
+            <input>
+dat &lt;- dat |&gt; 
+  separate_wider_delim(name, delim = "_", 
+                       names = c("year", "name"), 
+                       too_many = "merge") |&gt;
+  pivot_wider() |&gt;
+  mutate(year = as.integer(year))
+
+dat
+            </input>
+          </program>
+
+          <p>The data is now in tidy format with one row for each observation with three variables: year, fertility, and life expectancy.</p>
+
+          <p>Three related function are <c>separate_wider_position</c>, <c>separate_wider_regex</c>, and <c>unite</c>. <c>separate_wider_position</c> takes a width instead of delimiter. <c>separate_wider_regex</c>, described in <xref ref="sec-separate"/>_regex, provides much more control over how we separate and what we keep. The <c>unite</c> function can be thought of as the inverse of the <c>separate</c> function: it combines two columns into one.</p>
+
+        </section>
+
+        <section xml:id="sec-reshaping-with-data-table">
+          <title>Reshaping with data.table</title>
+
+          <p>In general, everything you can do with <alert>tidyverse</alert> can be done with <alert>data.table</alert> and base R which, although perhaps harder to read, it is often more flexible, faster, and more efficient. Here we show how the <alert>data.table</alert> approach to <c>pivot_longer</c>, <c>pivot_wider</c>, and <c>separate</c>. We will illustrate with the previously used this example:</p>
+
+          <program language="r">
+            <input>
+path &lt;- system.file("extdata", package = "dslabs")
+filename &lt;- file.path(path, "fertility-two-countries-example.csv")
+            </input>
+          </program>
+
+          <subsection xml:id="subsec-pivot-longer-is-melt">
+            <title>`pivot_longer` is `melt`</title>
+
+            <p>If in <alert>tidyverse</alert> we  write</p>
+
+            <program language="r">
+              <input>
+wide_data &lt;- read_csv(filename)
+new_tidy_data &lt;- wide_data |&gt;
+  pivot_longer(-1, names_to = "year", values_to = "fertility")
+              </input>
+            </program>
+
+            <p>in <alert>data.table</alert> we use the <c>melt</c> function.</p>
+
+            <program language="r">
+              <input>
+#| message: false
+#| warning: false
+library(data.table)
+dt_wide_data &lt;- fread(filename) 
+dt_new_tidy_data  &lt;- melt(dt_wide_data, 
+                      measure.vars = 2:ncol(dt_wide_data), 
+                      variable.name = "year", 
+                      value.name = "fertility")
+              </input>
+            </program>
+
+          </subsection>
+
+          <subsection xml:id="subsec-pivot-wider-is-dcast">
+            <title>`pivot_wider` is `dcast`</title>
+
+            <p>If in <alert>tidyverse</alert> we  write</p>
+
+            <program language="r">
+              <input>
+new_wide_data &lt;- new_tidy_data |&gt; 
+  pivot_wider(names_from = year, values_from = fertility)
+              </input>
+            </program>
+
+            <p>in <alert>data.table</alert> we use the <c>dcast</c> function.</p>
+
+            <program language="r">
+              <input>
+dt_new_wide_data &lt;- dcast(dt_new_tidy_data, formula = ... ~ year,
+                          value.var = "fertility")
+              </input>
+            </program>
+
+          </subsection>
+
+          <subsection xml:id="subsec-separating-variables">
+            <title>Separating variables</title>
+
+            <p>We now illustrate with this previously used example:</p>
+
+            <program language="r">
+              <input>
+path &lt;- system.file("extdata", package = "dslabs")
+filename &lt;- "life-expectancy-and-fertility-two-countries-example.csv"
+filename &lt;-  file.path(path, filename)
+              </input>
+            </program>
+
+            <p>In <alert>tidyverse</alert> we wrangled using</p>
+
+            <program language="r">
+              <input>
+raw_dat &lt;- read_csv(filename)
+dat &lt;- raw_dat |&gt; pivot_longer(-country) |&gt;
+  separate_wider_delim(name, delim = "_", names = c("year", "name"), 
+                       too_many = "merge") |&gt;
+  pivot_wider() |&gt;
+  mutate(year = as.integer(year))
+              </input>
+            </program>
+
+            <p>In <alert>data.table</alert> we can use the <c>tstrsplit</c> function:</p>
+
+            <program language="r">
+              <input>
+dt_raw_dat &lt;- fread(filename)
+dat_long &lt;- melt(dt_raw_dat, 
+                 measure.vars = which(names(dt_raw_dat) != "country"), 
+                 variable.name = "name", value.name = "value")
+dat_long[, c("year", "name", "name2") := 
+           tstrsplit(name, "_", fixed = TRUE, type.convert = TRUE)]
+dat_long[is.na(name2), name2 := ""]
+dat_long[, name := paste(name, name2, sep = "_")][, name2 := NULL]
+dat_wide &lt;- dcast(dat_long, country + year ~ name, value.var = "value")
+              </input>
+            </program>
+
+          </subsection>
+
+        </section>
+
+        <section xml:id="sec-the-janitor-package">
+          <title>The janitor package</title>
+
+          <p>The <alert>janitor</alert> package includes function for some of the most common steps needed to wrangle data. These are particularly useful as these tasks that are often repetitive and time-consuming. Key features include functions for examining and cleaning column names, removing empty or duplicate rows, and converting data types. It also offers capabilities to generate frequency tables and perform cross tabulations with ease. The package is designed to work seamlessly with the  <alert>tidyverse</alert>. Here we show four examples.</p>
+
+          <p>Spreadsheets often use names that are not compatible with programming. The most common problem is column names with spaces. The <c>clean_names()</c> function attempts to fix this and other common problems. By default it forces variable names to be lower case and with underscore instead of space. In this example we change the variable names of the object <c>dat</c> created in the previous section and then demonstrate how this function works:</p>
+
+          <program language="r">
+            <input>
+library(janitor)
+names(dat) &lt;- c("Country", "Year", "Fertility",  "Life Expectancy")
+clean_names(dat) |&gt; names()
+            </input>
+          </program>
+
+          <p>Another very common challenging reality is that numeric matrices are saved in spreadsheets and include a column with characters defining the row names. To fix this we have to remove the first column, but only after assigning them as vector that we will use to define rownames after converting the data frame to a matrix. The function <c>column_to_rows</c> does these operations for us and all we have to do is specify which column contains the rownames:</p>
+
+          <program language="r">
+            <input>
+data.frame(ids = letters[1:3], x = 1:3, y = 4:6) |&gt; 
+  column_to_rownames("ids") |&gt;
+  as.matrix() 
+            </input>
+          </program>
+
+          <p>Another common challenge is that spreadsheets include the column names as a first row. To quickly fix this we can <c>row_to_names</c>:</p>
+
+          <program language="r">
+            <input>
+x &lt;- read.csv(file.path(path, "murders.csv"), header = FALSE) |&gt; 
+  row_to_names(1)
+names(x)
+            </input>
+          </program>
+
+          <p>Our final example relates to finding duplicates. A very common error in the creation of spreadsheets is that rows are duplicated. The <c>get_dups</c> function finds and reports duplicate records. By default it considers all variables, but you can also specify which ones to use.</p>
+
+          <program language="r">
+            <input>
+x &lt;- bind_rows(x, x[1,])
+get_dupes(x)
+            </input>
+          </program>
+
+        </section>
+
+        <section xml:id="sec-reshaping-data-exercises">
+          <title>Exercises</title>
+
+          <ol>
+            <li><p>Run the following command to define the <c>co2_wide</c> object:</p></li>
+          <program language="r">
+            <input>
+co2_wide &lt;- data.frame(matrix(co2, ncol = 12, byrow = TRUE)) |&gt; 
+  setNames(1:12) |&gt;
+  mutate(year = as.character(1959:1997))
+            </input>
+          </program>
+
+          </ol>
+
+          <p>Use the <c>pivot_longer</c> function to wrangle this into a tidy dataset. Call the column with the CO2 measurements <c>co2</c> and call the month column <c>month</c>. Call the resulting object <c>co2_tidy</c>.</p>
+
+          <ol>
+            <li><p>Plot CO2 versus month with a different curve for each year using this code:</p></li>
+          <program language="r">
+            <input>
+co2_tidy |&gt; ggplot(aes(month, co2, color = year)) + geom_line()
+            </input>
+          </program>
+
+          </ol>
+
+          <p>If the expected plot is not made, it is probably because <c>co2_tidy$month</c> is not numeric:</p>
+
+          <program language="r">
+            <input>
+class(co2_tidy$month)
+            </input>
+          </program>
+
+          <p>Rewrite your code to make sure the month column is numeric. Then make the plot.</p>
+
+          <ol>
+            <li><p>What do we learn from this plot?</p></li>
+          </ol>
+
+          <p>a.  CO2 measures increase monotonically from 1959 to 1997. b.  CO2 measures are higher in the summer and the yearly average increased from 1959 to 1997. c.  CO2 measures appear constant and random variability explains the differences. d.  CO2 measures do not have a seasonal trend.</p>
+
+          <ol>
+            <li><p>Now load the <c>admissions</c> data set, which contains admission information for men and women across six majors and keep only the admitted percentage column:</p></li>
+          <program language="r">
+            <input>
+load(admissions)
+dat &lt;- admissions |&gt; select(-applicants)
+            </input>
+          </program>
+
+          </ol>
+
+          <p>If we think of an observation as a major, and that each observation has two variables (men admitted percentage and women admitted percentage) then this is not tidy. Use the <c>pivot_wider</c> function to wrangle into tidy shape: one row for each major.</p>
+
+          <ol>
+            <li><p>Now we will try a more advanced wrangling challenge. We want to wrangle the admissions data so that for each major we have 4 observations: <c>admitted_men</c>, <c>admitted_women</c>, <c>applicants_men</c> and <c>applicants_women</c>. The <em>trick</em> we perform here is actually quite common: first use <c>pivot_longer</c> to generate an intermediate data frame and then <c>pivot_wider</c> to obtain the tidy data we want. We will go step by step in this and the next two exercises.</p></li>
+          </ol>
+
+          <p>Use the <c>pivot_longer</c> function to create a <c>tmp</c> data frame with a column containing the type of observation: <c>admitted</c> or <c>applicants</c>. Call the new columns <c>name</c> and <c>value</c>.</p>
+
+          <ol>
+            <li><p>Now you have an object <c>tmp</c> with columns <c>major</c>, <c>gender</c>, <c>name</c> and <c>value</c>. Note that if you combine the <c>name</c> and <c>gender</c>, we get the column names we want: <c>admitted_men</c>, <c>admitted_women</c>, <c>applicants_men</c> and <c>applicants_women</c>. Use the function <c>unite</c> to create a new column called <c>column_name</c>.</p></li>
+            <li><p>Now use the <c>pivot_wider</c> function to generate the tidy data with four variables for each major.</p></li>
+            <li><p>Now use the pipe to write a line of code that turns <c>admissions</c> to the table produced in the previous exercise.</p></li>
+          </ol>
+
+        </section>
+        
       </chapter>
 
       <chapter xml:id="ch-joining-tables">
         <title>Joining tables</title>
-        <p>Content will be added here.</p>
+        
+          <p>The information we need for a given analysis may not be just in one table. Here we use a simple examples to illustrate the general challenge of combining tables.</p>
+
+          <p>Suppose we want to explore the relationship between population size for US states and electoral votes. We have the population size in this table:</p>
+
+          <program language="r">
+            <input>
+library(tidyverse)
+library(dslabs)
+head(murders)
+            </input>
+          </program>
+
+          <p>and electoral votes in this one:</p>
+
+          <program language="r">
+            <input>
+head(results_us_election_2016)
+            </input>
+          </program>
+
+          <p>Just concatenating these two tables together will not work since the order of the states is not the same.</p>
+
+          <program language="r">
+            <input>
+identical(results_us_election_2016$state, murders$state)
+            </input>
+          </program>
+
+          <p>The <em>join</em> functions, described below, are designed to handle this challenge.</p>
+
+        <section xml:id="sec-joins">
+          <title>Joins</title>
+
+          <p>The <em>join</em> functions in the __dplyr__ package make sure that the tables are combined so that matching rows are together. If you know SQL, you will see that the approach and syntax is very similar. The general idea is that one needs to identify one or more columns that will serve to match the two tables. Then a new table with the combined information is returned. Notice what happens if we join the two tables above by state using <c>left_join</c> (we will remove the <c>others</c> column and rename <c>electoral_votes</c> so that the tables fit on the page):</p>
+
+          <program language="r">
+            <input>
+tab &lt;- left_join(murders, results_us_election_2016, by = "state") |&gt;
+  select(-others) |&gt; rename(ev = electoral_votes)
+head(tab)
+            </input>
+          </program>
+
+          <p>The data has been successfully joined and we can now, for example, make a plot to explore the relationship:</p>
+
+          <program language="r">
+            <input>
+library(ggrepel)
+tab |&gt; ggplot(aes(population/10^6, ev, label = abb)) +
+  geom_point() +
+  scale_x_log10() + scale_y_log10() +
+  geom_text_repel() + 
+  geom_smooth(method = "lm", se = FALSE)
+            </input>
+          </program>
+
+          <p>We see the relationship is close to linear with about 2 electoral votes for every million persons, but with very small states getting higher ratios.</p>
+
+          <p>In practice, it is not always the case that each row in one table has a matching row in the other. For this reason, we have several versions of join. To illustrate this challenge, we will take subsets of the tables above. We create the tables <c>tab1</c> and <c>tab2</c> so that they have some states in common but not all:</p>
+
+          <program language="r">
+            <input>
+tab_1 &lt;- slice(murders, 1:6) |&gt; select(state, population)
+tab_2 &lt;- results_us_election_2016 |&gt; 
+  filter(state %in% c("Alabama", "Alaska", "Arizona", 
+                    "California", "Connecticut", "Delaware")) |&gt; 
+  select(state, electoral_votes) |&gt; rename(ev = electoral_votes)
+            </input>
+          </program>
+
+          <p>We will use these two tables as examples in the next sections.</p>
+
+          <subsection xml:id="subsec-left-join">
+            <title>Left join</title>
+
+            <p>Suppose we want a table like <c>tab_1</c>, but adding electoral votes to whatever states we have available. For this, we use <c>left_join</c> with <c>tab_1</c> as the first argument. We specify which column to use to match with the <c>by</c> argument.</p>
+
+            <program language="r">
+              <input>
+left_join(tab_1, tab_2, by = "state")
+              </input>
+            </program>
+
+            <p>Note that <c>NA</c>s are added to the two states not appearing in <c>tab_2</c>. Also, notice that this function, as well as all the other joins, can receive the first arguments through the pipe:</p>
+
+            <program language="r">
+              <input>
+tab_1 |&gt; left_join(tab_2, by = "state")
+              </input>
+            </program>
+
+          </subsection>
+
+          <subsection xml:id="subsec-right-join">
+            <title>Right join</title>
+
+            <p>If instead of a table with the same rows as first table, we want one with the same rows as second table, we can use <c>right_join</c>:</p>
+
+            <program language="r">
+              <input>
+tab_1 |&gt; right_join(tab_2, by = "state")
+              </input>
+            </program>
+
+            <p>Now the NAs are in the column coming from <c>tab_1</c>.</p>
+
+          </subsection>
+
+          <subsection xml:id="subsec-inner-join">
+            <title>Inner join</title>
+
+            <p>If we want to keep only the rows that have information in both tables, we use <c>inner_join</c>. You can think of this as an intersection:</p>
+
+            <program language="r">
+              <input>
+inner_join(tab_1, tab_2, by = "state")
+              </input>
+            </program>
+
+          </subsection>
+
+          <subsection xml:id="subsec-full-join">
+            <title>Full join</title>
+
+            <p>If we want to keep all the rows and fill the missing parts with NAs, we can use <c>full_join</c>. You can think of this as a union:</p>
+
+            <program language="r">
+              <input>
+full_join(tab_1, tab_2, by = "state")
+              </input>
+            </program>
+
+          </subsection>
+
+          <subsection xml:id="subsec-semi-join">
+            <title>Semi join</title>
+
+            <p>The <c>semi_join</c> function lets us keep the part of first table for which we have information in the second. It does not add the columns of the second:</p>
+
+            <program language="r">
+              <input>
+semi_join(tab_1, tab_2, by = "state")
+              </input>
+            </program>
+
+          </subsection>
+
+          <subsection xml:id="subsec-anti-join">
+            <title>Anti join</title>
+
+            <p>The function <c>anti_join</c> is the opposite of <c>semi_join</c>. It keeps the elements of the first table for which there is no information in the second:</p>
+
+            <program language="r">
+              <input>
+anti_join(tab_1, tab_2, by = "state")
+              </input>
+            </program>
+
+            <p>The following diagram summarizes the above joins:</p>
+
+            <figure>
+              <image source="dataviz/img/joins.png"/>
+            </figure>
+
+            <p>(Image courtesy of RStudio. CC-BY-4.0 license. Cropped from original.)</p>
+
+          </subsection>
+
+        </section>
+
+        <section xml:id="sec-binding">
+          <title>Binding</title>
+
+          <p>Although we have yet to use it in this book, another common way in which datasets are combined is by <em>binding</em> them. Unlike the join function, the binding functions do not try to match by a variable, but instead simply combine datasets. If the datasets don't match by the appropriate dimensions, one obtains an error.</p>
+
+          <subsection xml:id="subsec-binding-columns">
+            <title>Binding columns</title>
+
+            <p>The __dplyr__ function _bind_cols_ binds two objects by making them columns in a tibble. For example, we quickly want to make a data frame consisting of numbers we can use</p>
+
+            <program language="r">
+              <input>
+bind_cols(a = 1:3, b = 4:6)
+              </input>
+            </program>
+
+            <p>This function requires that we assign names to the columns. Here we chose <c>a</c> and <c>b</c>.</p>
+
+            <p>Note that there is an R-base function <c>cbind</c> with the exact same functionality. An important difference is that <c>cbind</c> can create different types of objects, while <c>bind_cols</c> always produces a data frame.</p>
+
+            <p><c>bind_cols</c> can also bind two different data frames. For example, here we break up the <c>tab</c> data frame and then bind them back together:</p>
+
+            <program language="r">
+              <input>
+tab_1 &lt;- tab[, 1:3]
+tab_2 &lt;- tab[, 4:6]
+tab_3 &lt;- tab[, 7:8]
+new_tab &lt;- bind_cols(tab_1, tab_2, tab_3)
+head(new_tab)
+              </input>
+            </program>
+
+          </subsection>
+
+          <subsection xml:id="subsec-binding-by-rows">
+            <title>Binding by rows</title>
+
+            <p>The <c>bind_rows</c> function is similar to <c>bind_cols</c>, but binds rows instead of columns:</p>
+
+            <program language="r">
+              <input>
+tab_1 &lt;- tab[1:2,]
+tab_2 &lt;- tab[3:4,]
+bind_rows(tab_1, tab_2)
+              </input>
+            </program>
+
+            <p>This is based on an R-base function <c>rbind</c>.</p>
+
+          </subsection>
+
+        </section>
+
+        <section xml:id="sec-set-operators">
+          <title>Set operators</title>
+
+          <p>Another set of commands useful for combining datasets are the set operators. When applied to vectors, these behave as their names suggest. Examples are <c>intersect</c>, <c>union</c>, <c>setdiff</c>, and <c>setequal</c>. However, if the __tidyverse__, or  more specifically __dplyr__, is loaded, these functions can be used on data frames as opposed to just on vectors.</p>
+
+          <subsection xml:id="subsec-intersect">
+            <title>Intersect</title>
+
+            <p>You can take intersections of vectors of any type, such as numeric:</p>
+
+            <program language="r">
+              <input>
+intersect(1:10, 6:15)
+              </input>
+            </program>
+
+            <p>or characters:</p>
+
+            <program language="r">
+              <input>
+intersect(c("a","b","c"), c("b","c","d"))
+              </input>
+            </program>
+
+            <p>The __dplyr__ package includes an <c>intersect</c> function that can be applied to tables with the same column names. This function returns the rows in common between two tables. To make sure we use the __dplyr__ version of <c>intersect</c> rather than the base R version, we can use <c>dplyr::intersect</c> like this:</p>
+
+            <program language="r">
+              <input>
+tab_1 &lt;- tab[1:5,]
+tab_2 &lt;- tab[3:7,]
+dplyr::intersect(tab_1, tab_2)
+              </input>
+            </program>
+
+          </subsection>
+
+          <subsection xml:id="subsec-union">
+            <title>Union</title>
+
+            <p>Similarly <em>union</em> takes the union of vectors. For example:</p>
+
+            <program language="r">
+              <input>
+union(1:10, 6:15)
+union(c("a","b","c"), c("b","c","d"))
+              </input>
+            </program>
+
+            <p>The __dplyr__ package includes a version of <c>union</c> that combines all the rows of two tables with the same column names.</p>
+
+            <program language="r">
+              <input>
+tab_1 &lt;- tab[1:5,]
+tab_2 &lt;- tab[3:7,]
+dplyr::union(tab_1, tab_2) 
+              </input>
+            </program>
+
+          </subsection>
+
+          <subsection xml:id="subsec-setdiff">
+            <title>`setdiff`</title>
+
+            <p>The set difference between a first and second argument can be obtained with <c>setdiff</c>. Unlike <c>intersect</c> and <c>union</c>, this function is not symmetric:</p>
+
+            <program language="r">
+              <input>
+setdiff(1:10, 6:15)
+setdiff(6:15, 1:10)
+              </input>
+            </program>
+
+            <p>As with the functions shown above, __dplyr__ has a version for data frames:</p>
+
+            <program language="r">
+              <input>
+tab_1 &lt;- tab[1:5,]
+tab_2 &lt;- tab[3:7,]
+dplyr::setdiff(tab_1, tab_2)
+              </input>
+            </program>
+
+          </subsection>
+
+          <subsection xml:id="subsec-setequal">
+            <title>`setequal`</title>
+
+            <p>Finally, the function <c>setequal</c> tells us if two sets are the same, regardless of order. So notice that:</p>
+
+            <program language="r">
+              <input>
+setequal(1:5, 1:6)
+              </input>
+            </program>
+
+            <p>but:</p>
+
+            <program language="r">
+              <input>
+setequal(1:5, 5:1)
+              </input>
+            </program>
+
+            <p>The __dplyr__ version checks whether data frames are equal, regardless of order of rows <em>or</em> columns:</p>
+
+            <program language="r">
+              <input>
+dplyr::setequal(tab_1, tab_2)
+              </input>
+            </program>
+
+          </subsection>
+
+        </section>
+
+        <section xml:id="sec-joining-with-data-table">
+          <title>Joining with data.table</title>
+
+          <p>The <alert>data.table</alert> package includes <c>merge</c>, a very efficient function for joining tables.</p>
+
+          <p>In <alert>tidyverse</alert> we joined two tables with <c>left_join</c>:</p>
+
+          <program language="r">
+            <input>
+tab &lt;- left_join(murders, results_us_election_2016, by = "state") 
+            </input>
+          </program>
+
+          <p>In <alert>data.table</alert> the <c>merge</c> functions works similarly:</p>
+
+          <program language="r">
+            <input>
+#| message: false
+#| warning: false
+library(data.table)
+tab &lt;- merge(murders, results_us_election_2016, by = "state", all.x = TRUE)
+            </input>
+          </program>
+
+          <p>Instead of defining different functions for the different type of joins, <c>merge</c> uses the the logical arguments <c>all</c> (full join), <c>all.x</c> (left join), and <c>all.y</c> (right join).</p>
+
+        </section>
+
+        <section xml:id="sec-joining-tables-exercises">
+          <title>Exercises</title>
+
+          <ol>
+            <li><p>Install and load the __Lahman__ library. This database includes data related to baseball teams. It includes summary statistics about how the players performed on offense and defense for several years. It also includes personal information about the players.</p></li>
+          </ol>
+
+          <p>The <c>Batting</c> data frame contains the offensive statistics for all players for many years. You can see, for example, the top 10 hitters by running this code:</p>
+
+          <program language="r">
+            <input>
+library(Lahman)
+
+top &lt;- Batting |&gt; 
+  filter(yearID == 2016) |&gt;
+  arrange(desc(HR)) |&gt;
+  slice(1:10)
+
+top |&gt; as_tibble()
+            </input>
+          </program>
+
+          <p>But who are these players? We see an ID, but not the names. The player names are in this table</p>
+
+          <program language="r">
+            <input>
+People |&gt; as_tibble()
+            </input>
+          </program>
+
+          <p>We can see column names <c>nameFirst</c> and <c>nameLast</c>. Use the <c>left_join</c> function to create a table of the top home run hitters. The table should have <c>playerID</c>, first name, last name, and number of home runs (HR).  Rewrite the object <c>top</c> with this new table.</p>
+
+          <ol>
+            <li><p>Now use the <c>Salaries</c> data frame to add each player's salary to the table you created in exercise 1. Note that salaries are different every year so make sure to filter for the year 2016, then use <c>right_join</c>. This time show first name, last name, team, HR, and salary.</p></li>
+            <li><p>In a previous exercise, we created a tidy version of the <c>co2</c> dataset:</p></li>
+          <program language="r">
+            <input>
+co2_wide &lt;- data.frame(matrix(co2, ncol = 12, byrow = TRUE)) |&gt; 
+  setNames(1:12) |&gt;
+  mutate(year = 1959:1997) |&gt;
+  pivot_longer(-year, names_to = "month", values_to = "co2") |&gt;
+  mutate(month = as.numeric(month))
+            </input>
+          </program>
+
+          </ol>
+
+          <p>We want to see if the monthly trend is changing, so we are going to remove the year effects and then plot the results. We will first compute the year averages. Use the <c>group_by</c> and <c>summarize</c> to compute the average co2 for each year. Save in an object called <c>yearly_avg</c>.</p>
+
+          <ol>
+            <li><p>Now use the <c>left_join</c> function to add the yearly average to the <c>co2_wide</c> dataset. Then compute the residuals: observed co2 measure - yearly average.</p></li>
+            <li><p>Make a plot of the seasonal trends by year but only after removing the year effect.</p></li>
+          </ol>
+
+        </section>
+        
       </chapter>
 
       <chapter xml:id="ch-parsing-dates-and-times">
