@@ -1086,7 +1086,7 @@ installed.packages()
       country &lt;- c('italy', 'canada', 'egypt')
       </input></program>
       
-      <p>But be careful not to confuse the single quote ' with the <em>back quote</em> &#96;.</p>
+      <p>But be careful not to confuse the single quote ' with the <em>backtick</em> &#96;.</p>
       
       <p>By now you should know that if you type:</p>
       
@@ -1273,7 +1273,7 @@ installed.packages()
       sort(murders$total)
       </input></program>
       
-      <p>However, this does not give us information about which states have which murder totals. For example, we don't know which state had <c>r max(murders$total)</c>.</p>
+      <p>However, this does not give us information about which states have which murder totals. For example, we don't know which state had the maximum number of murders.</p>
       
       </subsection>
       
@@ -1380,7 +1380,7 @@ installed.packages()
       murders$state[which.max(murders$population)]
       </input></program>
       
-      <p>with over <c>r floor(max(murders$population)/10^6)</c> million inhabitants. It is therefore unfair to compare the totals if we are interested in learning how safe the state is. What we really should be computing is the murders per capita. The reports we describe in the motivating section used murders per 100,000 as the unit. To compute this quantity, the powerful vector arithmetic capabilities of R come in handy.</p>
+      <p>with over 37 million inhabitants. It is therefore unfair to compare the totals if we are interested in learning how safe the state is. What we really should be computing is the murders per capita. The reports we describe in the motivating section used murders per 100,000 as the unit. To compute this quantity, the powerful vector arithmetic capabilities of R come in handy.</p>
       
       <subsection xml:id="rescaling-a-vector"><title>Rescaling a vector</title>
       
