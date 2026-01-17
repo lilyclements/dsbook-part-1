@@ -73,7 +73,89 @@
     <!-- Introduction -->
     <chapter xml:id="introduction">
       <title>Introduction</title>
-      <p>Content will be added here.</p>
+      
+      <p>
+        The demand for skilled data science practitioners in industry, academia, and government is rapidly growing. This book introduces skills that can help you tackle real-world data analysis challenges. These include R programming, data wrangling with <term>dplyr</term>, data visualization with <term>ggplot2</term>, file organization with UNIX/Linux shell, version control with Git and GitHub, and reproducible document preparation with Quarto and <term>knitr</term>. The book is divided into four parts: <term>R</term>, <term>Data Visualization</term>, <term>Data Wrangling</term>, and <term>Productivity Tools</term>. Each part has several chapters meant to be presented as one lecture and includes dozens of exercises distributed across chapters.
+      </p>
+      
+      <section xml:id="case-studies">
+        <title>Case studies</title>
+        
+        <p>
+          Throughout the book, we use motivating case studies. In each case study, we try to realistically mimic a data scientist's experience. For each of the skills covered, we start by asking specific questions and answer these through data analysis. We learn the concepts as a means to answer the questions. Examples of the case studies included in the book are:
+        </p>
+        
+        <table xml:id="table-case-studies">
+          <title>Case Studies in the Book</title>
+          <tabular>
+            <row header="yes">
+              <cell>Case Study</cell>
+              <cell>Concept</cell>
+            </row>
+            <row>
+              <cell>US murder rates by state</cell>
+              <cell>R Basics</cell>
+            </row>
+            <row>
+              <cell>Student heights</cell>
+              <cell>Statistical Summaries</cell>
+            </row>
+            <row>
+              <cell>Trends in world health and economics</cell>
+              <cell>Data Visualization</cell>
+            </row>
+            <row>
+              <cell>The impact of vaccines on infectious disease rates</cell>
+              <cell>Data Visualization</cell>
+            </row>
+            <row>
+              <cell>Reported student heights</cell>
+              <cell>Data Wrangling</cell>
+            </row>
+          </tabular>
+        </table>
+        
+      </section>
+      
+      <section xml:id="who-will-find-useful">
+        <title>Who will find this book useful?</title>
+        
+        <p>
+          This book is meant to be a textbook for a first course in Data Science. No previous knowledge of R is necessary, although some experience with programming may be helpful. To be a successful data analyst implementing these skill requires understanding advanced statistical concepts, such as those covered in <url href="http://rafalab.dfci.harvard.edu/dsbook-part-2/">Advanced Data Science</url>. If you read and understand all the chapters and complete all the exercises in this book, and understand statistical concepts, you will be well-positioned to perform basic data analysis tasks and you will be prepared to learn the more advanced concepts and skills needed to become an expert.
+        </p>
+        
+      </section>
+      
+      <section xml:id="what-does-cover">
+        <title>What does this book cover?</title>
+        
+        <p>
+          We start by going over the <term>basics of R</term>, the <term>tidyverse</term>, and the <term>data.table</term> package. You learn R throughout the book, but in the first part we go over the building blocks needed to keep learning.
+        </p>
+        
+        <p>
+          The growing availability of informative datasets and software tools has led to increased reliance on <term>data visualizations</term> in many fields. In the second part we demonstrate how to use <term>ggplot2</term> to generate graphs and describe important data visualization principles.
+        </p>
+        
+        <p>
+          The third part uses several examples to familiarize the reader with <term>data wrangling</term>. Among the specific skills we learn are web scraping, using regular expressions, and joining and reshaping data tables. We do this using <term>tidyverse</term> tools.
+        </p>
+        
+        <p>
+          In the final part, we provide a brief introduction to the <term>productivity tools</term> we use on a day-to-day basis in data science projects. These are RStudio, UNIX/Linux shell, Git and GitHub, Quarto, and <term>knitr</term>.
+        </p>
+        
+      </section>
+      
+      <section xml:id="what-not-covered">
+        <title>What is not covered by this book?</title>
+        
+        <p>
+          This book focuses on the computing skills necessary for the data analysis aspects of data science. As mentioned, we do not cover statistical concepts. We also do not cover aspects related to data management or engineering. Although R programming is an essential part of the book, we do not teach more advanced computer science topics such as data structures, optimization, and algorithm theory. Similarly, we do not cover topics such as web services, interactive graphics, parallel computing, and data streaming processing.
+        </p>
+        
+      </section>
+      
     </chapter>
 
     <!-- Part 1: R -->
