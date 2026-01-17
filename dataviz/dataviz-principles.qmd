@@ -58,7 +58,7 @@ browsers |> ggplot(aes(x = 2, y = Percentage, fill = Browser)) +
 
 To see how hard it is to quantify angles and area, note that the rankings and all the percentages in the plots above changed from 2000 to 2015. Can you determine the actual percentages and rank the browsers' popularity? Can you see how the percentages changed from 2000 to 2015? It is not easy to tell from the plot. 
 
-In this case, simply showing the numbers is not only clearer, but would also saves on printing costs if printing a paper copy:
+In this case, simply showing the numbers is not only clearer, but would also save on printing costs if printing a paper copy:
 
 ```{r, echo=FALSE}
 if(knitr::is_html_output()){
@@ -434,7 +434,7 @@ p <- data.frame(Value = c(1 / c(10, 5, 2), c(1, 2, 5, 10))) |>
   geom_hline(yintercept = 1, linetype = 2, color = "grey") +
   xlab("Arbitrary index") + 
   theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())  
-grid.arrange(p +  scale_y_continuous(expand = expansion(mult = c(0.10, 0.05))) + ggtitle("Liner scale y-axis"),  
+grid.arrange(p +  scale_y_continuous(expand = expansion(mult = c(0.10, 0.05))) + ggtitle("Linear scale y-axis"),  
              p + scale_y_log10(expand = expansion(mult = c(0.10, 0.05))) + ggtitle("Log transformed y-axis"), nrow = 1)
 ```
 
