@@ -4012,12 +4012,1096 @@ names(dat)
 
       <chapter xml:id="ch-visualizing-data-distributions">
         <title>Visualizing data distributions</title>
-        <p>Content will be added here.</p>
+        
+        <introduction>
+          <p>Summarizing complex datasets is crucial in data analysis, allowing us to share insights drawn from the data more effectively. One common method is to use the <em>average</em> value to summarize a list of numbers. For instance, a high school's quality might be represented by the average score in a standardized test. Sometimes, an additional value, the <em>standard deviation</em>, is added. So, a report might say the scores were 680 <m>\pm</m> 50, boiling down a full set of scores to just two numbers. But is this enough? Are we overlooking crucial information by relying solely on these summaries instead of the complete data?</p>
+          
+          <p>Our first data visualization building block is learning to summarize lists of numbers or categories. More often than not, the best way to share or explore these summaries is through data visualization. The most basic statistical summary of a list of objects or numbers is its distribution. Once data has been summarized as a distribution, there are several data visualization techniques to effectively relay this information. For this reason, it is important to have a deep understanding of the concept of a distribution.</p>
+          
+          <p>In this chapter, we discuss properties of a variety of distributions and how to visualize distributions using a motivating example of student heights.</p>
+        </introduction>
+        
+        <section xml:id="sec-variable-types">
+          <title>Variable types</title>
+          
+          <p>The two main variables types are <em>categorical</em> and <em>numeric</em>. Each can be divided into two other groups: categorical can be ordinal or not, whereas numerical variables can be discrete or continuous. When entries in a dataset represent groups rather than numbers we refer to the data as <em>categorical data</em>. Two simple examples are sex (male or female) and US regions (Northeast, South, North Central, West). Some categorical data can be ordered even if they are not numbers per se, such as spiciness (mild, medium, hot). In statistics, ordered categorical data are referred to as <em>ordinal</em> data. Examples of numerical data are population sizes, murder rates, and heights. We can further divide numerical data into continuous and discrete. Continuous variables are those that can take any value, such as heights, if measured with enough precision. For example, a pair of twins may be 68.12 and 68.11 inches, respectively. Counts, such as population sizes, are discrete because they have to be round numbers.</p>
+          
+          <p>Keep in mind that discrete numeric data can be considered ordinal. Although this is technically true, we usually reserve the term ordinal data for variables belonging to a small number of different groups, with each group having many members. In contrast, when we have many groups with few cases in each group, we typically refer to them as discrete numerical variables. So, for example, the number of packs of cigarettes a person smokes a day, rounded to the closest pack, would be considered ordinal, while the actual number of cigarettes would be considered a numerical variable. But, indeed, there are examples that can be considered both numerical and ordinal when it comes to visualizing data.</p>
+          
+          <p>Here we focus on numeric variables because visualizing this data type is substantially more complex. However, we start by describing data visualization and summarization approaches for categorical data.</p>
+        </section>
+        
+        <section xml:id="sec-case-study-heights">
+          <title>Case study: describing student heights</title>
+          
+          <p>We introduce a new motivating problem. It is an artificial one, but it will help us illustrate the concepts needed to understand distributions.</p>
+          
+          <p>Pretend that we have to describe the heights of our classmates to ET, an extraterrestrial that has never seen humans. As a first step, we need to collect data. To do this, we ask students to report their heights in inches. We ask them to provide sex information because we know there are two different height distributions by sex. We collect the data and save it in the <c>heights</c> data frame:</p>
+          
+          <program language="r">
+            <input>
+library(tidyverse)
+library(dslabs)
+head(heights)
+            </input>
+          </program>
+          
+          <p>One way to convey the heights to ET is to simply send him this list of 1,050 heights. But there are much more effective ways to convey this information, and understanding the concept of a distribution will be key. To simplify the explanation, we first focus on male heights. We examine the female height data later in this chapter.</p>
+        </section>
+        
+        <section xml:id="sec-distributions">
+          <title>Distributions</title>
+          
+          <p>The most basic statistical summary of a list of objects or numbers is its <em>distribution</em>. The simplest way to think of a distribution is as a compact description of a list with many entries. This concept should not be new for readers of this book. For example, with categorical data, the distribution simply describes the proportion of each unique category. The sex represented in the heights dataset is:</p>
+          
+          <program language="r">
+            <input>
+prop.table(table(heights$sex))
+            </input>
+          </program>
+          
+          <p>This two-category <em>frequency table</em> is the simplest form of a distribution. We don't really need to visualize it since one number describes everything we need to know: 23% are females and the rest are males. When there are more categories, then a simple barplot describes the distribution. Here is an example with US state regions:</p>
+          
+          <program language="r">
+            <input>
+murders |> group_by(region) |>
+  summarize(n = n()) |>
+  mutate(Proportion = n/sum(n), 
+         region = reorder(region, Proportion)) |>
+  ggplot(aes(x=region, y=Proportion, fill=region)) + 
+  geom_bar(stat = "identity", show.legend = FALSE) + 
+  xlab("")
+            </input>
+          </program>
+          
+          <p>This particular plot simply shows us four numbers, one for each category. We usually use barplots to display a few numbers. Although this particular plot does not provide much more insight than a frequency table itself, it is a first example of how we convert a vector into a plot that succinctly summarizes all the information in the vector. When the data is numerical, the task of displaying distributions is more challenging.</p>
+          
+          <subsection xml:id="subsec-histograms">
+            <title>Histograms</title>
+            
+            <p>Numerical data that are not categorical also have distributions. However, in general, when data is not categorical, reporting the frequency of each entry, as we did for categorical data, is not an effective summary since most entries are unique. For example, in our case study, while several students reported a height of 68 inches, only one student reported a height of 68.503937007874 inches and only one student reported a height 68.8976377952756 inches. We assume that they converted from 174 and 175 centimeters, respectively.</p>
+            
+            <p>Statistics textbooks teach us that a more useful way to define a distribution for numeric data is to define a function that reports the proportion of the data below <m>a</m> for all possible values of <m>a</m>. This function is called the empirical cumulative distribution function (eCDF), it can be plotted, and it provides a full description of the distribution of our data. Here is the eCDF for male student heights:</p>
+            
+            <program language="r">
+              <input>
+ds_theme_set()
+heights |> filter(sex=="Male") |> 
+  ggplot(aes(height)) + 
+  stat_ecdf() +
+  ylab("Proportion of heights less than or equal to a") + 
+  xlab("a")
+              </input>
+            </program>
+            
+            <p>However, summarizing data by plotting the eCDF is actually not very popular in practice. The main reason is that it does not easily convey characteristics of interest such as: at what value is the distribution centered? Is the distribution symmetric? What ranges contain 95% of the values?</p>
+            
+            <p><em>Histograms</em> are much preferred because they greatly facilitate answering such questions. Histograms sacrifice just a bit of information to produce plots that are much easier to interpret. The simplest way to make a histogram is to divide the span of our data into non-overlapping bins of the same size. Then, for each bin, we count the number of values that fall in that interval. The histogram plots these counts as bars with the base of the bar defined by the intervals. Here is the histogram for the height data splitting the range of values into one inch intervals: <m>(49.5, 50.5]</m>, <m>(50.5, 51.5]</m>, <m>(51.5,52.5]</m>, <m>(52.5,53.5]</m>, <m>...</m>, <m>(82.5,83.5]</m>.</p>
+            
+            <program language="r">
+              <input>
+heights |> 
+  filter(sex=="Male") |> 
+  ggplot(aes(height)) + 
+  geom_histogram(binwidth = 1, color = "black")
+              </input>
+            </program>
+            
+            <p>As you can see in the figure above, a histogram is similar to a barplot, but it differs in that the x-axis is numerical, not categorical.</p>
+            
+            <p>If we send this plot to ET, he will immediately learn some important properties about our data. First, the range of the data is from 50 to 84 with the majority (more than 95%) between 63 and 75 inches. Second, the heights are close to symmetric around 69 inches. Also, by adding up counts, ET could obtain a very good approximation of the proportion of the data in any interval. Therefore, the histogram above is not only easy to interpret, but also provides almost all the information contained in the raw list of 812 male heights with about 30 bins.</p>
+            
+            <p>What information do we lose? Note that all values in each interval are treated the same when computing bin heights. So, for example, the histogram does not distinguish between 64, 64.1, and 64.2 inches. Given that these differences are almost unnoticeable to the eye, the practical implications are negligible and we were able to summarize the data to just 23 numbers.</p>
+            
+            <p>We discuss how to code histograms later in this chapter.</p>
+          </subsection>
+          
+          <subsection xml:id="subsec-smoothed-density">
+            <title>Smoothed density</title>
+            
+            <p><em>Smooth density</em> plots relay the same information as a histogram but are aesthetically more appealing. Here is what a smooth density plot looks like for our male heights data:</p>
+            
+            <program language="r">
+              <input>
+heights |> 
+  filter(sex=="Male") |> 
+  ggplot(aes(height)) + 
+  geom_density(alpha = .2, fill= "#00BFC4", color = 0)  +
+  geom_line(stat='density')
+              </input>
+            </program>
+            
+            <p>In this plot, we no longer have sharp edges at the interval boundaries and many of the local peaks have been removed. Also, the scale of the y-axis changed from counts to <em>density</em>. To fully understand smooth densities, we have to understand <em>estimates</em>, a topic covered in statistics our advanced data science textbooks. Here we simply describe them as making the histograms prettier by drawing a curve that goes through the top of the histogram bars and then removing the bars. The values shown y-axis are chosen so that the area under the curve adds up to 1. This implies that for any interval, the area under the curve for that interval gives us an approximation of how what proportion of the data is in the interval.</p>
+            
+            <p>An advantage of smooth densities over histograms for visualization purposes is that densities make it easier to compare two distributions. This is in large part because the jagged edges of the histogram add clutter. Here is an example comparing male and female heights:</p>
+            
+            <program language="r">
+              <input>
+heights |> 
+  ggplot(aes(height, fill=sex)) + 
+  geom_density(alpha = 0.2, color = 0) +
+  geom_line(stat='density')
+              </input>
+            </program>
+            
+            <p>With the right argument, <c>ggplot</c> automatically shades the intersecting region with a different color. We will show examples of <alert>ggplot2</alert> code for densities later in this book.</p>
+          </subsection>
+          
+          <subsection xml:id="subsec-normal-distribution">
+            <title>The normal distribution</title>
+            
+            <p>Histograms and density plots provide excellent summaries of a distribution. But can we summarize even further? We often see the average and standard deviation used as summary statistics: a two-number summary! To understand what these summaries are and why they are so widely used, we need to understand the normal distribution.</p>
+            
+            <p>The normal distribution, also known as the bell curve and as the Gaussian distribution. Here is what the normal distribution looks like:</p>
+            
+            <program language="r">
+              <input>
+mu &lt;- 0; s &lt;- 1
+norm_dist &lt;- data.frame(x=seq(-4,4,len=50)*s+mu) |> mutate(density=dnorm(x,mu,s))
+norm_dist |> ggplot(aes(x,density)) + geom_line()
+              </input>
+            </program>
+            
+            <p>The normal distribution is one of the most famous mathematical concepts in history. A reason for this is that the distribution of many datasets can be approximated with normal distributions. These include gambling winnings, heights, weights, blood pressure, standardized test scores, and experimental measurement errors. Statistical textbooks offer explanations for why this is the case. But how can the same distribution approximate datasets with completely different ranges for values, for example heights and weights? A second important characteristic of the normal distribution is that it can be adapted to different datasets by just adjusting two numbers, referred to as the <em>average</em> or <em>mean</em> and the <em>standard deviation</em> (SD). The normal distribution is symmetric, centered at what we refer to as the average, and most values (about 95%) are within 2 SDs from the average. The plot above shows a normal distribution with average 0 and SD 1, often referred to as a <em>standard normal</em>. Note that the fact that only two numbers are needed to adapt the normal distribution to a dataset implies that if our data distribution is approximated by a normal distribution, all the information needed to describe the distribution can be encoded by just two numbers. We now define these values for an arbitrary list of numbers.</p>
+            
+            <p>Once we are convinced that our data, say it is stored in the vector <c>x</c>, has a distribution that is <em>approximately normal</em>, we can find the specific one that matches our data by matching the average and SD of the data to the average and SD of the normal distribution, respectively. For a list of numbers contained in a vector <c>x</c>:</p>
+            
+            <program language="r">
+              <input>
+index &lt;- heights$sex == "Male"
+x &lt;- heights$height[index]
+              </input>
+            </program>
+            
+            <p>the average is defined as</p>
+            
+            <program language="r">
+              <input>
+m &lt;- sum(x) / length(x)
+              </input>
+            </program>
+            
+            <p>and the SD is defined as</p>
+            
+            <program language="r">
+              <input>
+s &lt;- sqrt(sum((x - mu)^2) / length(x))
+              </input>
+            </program>
+            
+            <p>which can be interpreted as the average distance between values and their average.</p>
+            
+            <p>The pre-built functions <c>mean</c> and <c>sd</c> (note that, for reasons explained in statistics textbooks, <c>sd</c> divides by <c>length(x)-1</c> rather than <c>length(x)</c>) can be used here:</p>
+            
+            <program language="r">
+              <input>
+m &lt;- mean(x)
+s &lt;- sd(x)
+c(average = m, sd = s)
+              </input>
+            </program>
+            
+            <p>Here is a plot of our student height smooth density in blue and the normal distribution with mean = 69.3 and SD = 3.6 plotted as a black line:</p>
+            
+            <program language="r">
+              <input>
+norm_dist &lt;- data.frame(x = seq(-4, 4, len = 50)*s + m) |> 
+  mutate(density = dnorm(x, m, s))
+
+heights |> filter(sex == "Male") |> ggplot(aes(height)) +
+  geom_density(fill = "#0099FF") +
+  geom_line(aes(x, density),  data = norm_dist, lwd = 1.5)
+              </input>
+            </program>
+          </subsection>
+        </section>
+        
+        <section xml:id="sec-boxplots">
+          <title>Boxplots</title>
+          
+          <p>To understand boxplots we need to define some terms that are commonly used in exploratory data analysis.</p>
+          
+          <p>The <em>percentiles</em> are the values for which <m>p = 0.01, 0.02, ..., 0.99</m> of the data are less then or equal to that value, respectively. We call, for example, the case of <m>p=0.10</m> the 10th percentile, which gives us a number for which 10% of the data is below. The most famous percentile is the 50th, also known as the <em>median</em>. Another special case that receives a name are the <em>quartiles</em>, which are obtained when setting <m>p=0.25,0.50</m>, and <m>0.75</m>, which are used by the boxplot.</p>
+          
+          <p>To motivate boxplots we will go back to the US murder data. Suppose we want to summarize the murder rate distribution. Using the data visualization technique we have learned, we can quickly see that the normal approximation does not apply here:</p>
+          
+          <program language="r">
+            <input>
+murders &lt;- murders |> mutate(rate = total/population*100000)
+murders |> ggplot(aes(x = rate)) + geom_histogram(binwidth = 0.5, color = "black") + ggtitle("Histogram")
+            </input>
+          </program>
+          
+          <p>In this case, the histogram above or a smooth density plot would serve as a relatively succinct summary.</p>
+          
+          <p>Now suppose those used to receiving just two numbers as summaries ask us for a more compact numerical summary.</p>
+          
+          <p>The <em>boxplot</em> provides a five-number summary composed of the range (the minimum and maximum) along with the <em>quartiles</em> (the 25th, 50th, and 75th percentiles). The R implementation of boxplots ignore <em>outliers</em> when computing the range and instead plot these as independent points. The help file provides a specific definition of outliers. The boxplot shows these numbers as a "box" with "whiskers"</p>
+          
+          <program language="r">
+            <input>
+murders |> ggplot(aes("",rate)) + geom_boxplot() +
+  coord_cartesian(xlim = c(0, 2)) + xlab("")
+            </input>
+          </program>
+          
+          <p>with the box defined by the 25% and 75% percentile and the whiskers showing the range. The distance between the 25% and 75% percentile is called the <em>interquartile</em> range. The two points are outliers according to the R implementation. The median is shown with a horizontal line.</p>
+          
+          <p>From just this simple plot, we know that the median is about 2.5, that the distribution is not symmetric, and that the range is 0 to 5 for the great majority of states with two exceptions.</p>
+          
+          <p>We discuss how to make boxplots later in this chapter.</p>
+        </section>
+        
+        <section xml:id="sec-dataviz-stratification">
+          <title>Stratification</title>
+          
+          <p>In data analysis we often divide observations into groups based on the values of one or more variables associated with those observations. For example in the next section we divide the height values into groups based on a sex variable: females and males. We call this procedure <em>stratification</em> and refer to the resulting groups as <em>strata</em>.</p>
+          
+          <p>Stratification is common in data visualization because we are often interested in how the distributions of variables differ across different subgroups. We will see several examples throughout this part of the book, starting with the next section.</p>
+        </section>
+        
+        <section xml:id="sec-student-height-cont">
+          <title>Case study continued</title>
+          
+          <p>If we are convinced that the male height data is well approximated with a normal distribution we can report back to ET a very succinct summary: male heights follow a normal distribution with an average of 69.3 inches and a SD of 3.6 inches. With this information, ET will have a good idea of what to expect when he meets our male students. However, to provide a complete picture we need to also provide a summary of the female heights.</p>
+          
+          <p>Boxplots are useful when we want to quickly compare two or more distributions. Here are the heights for men and women:</p>
+          
+          <program language="r">
+            <input>
+heights |> ggplot(aes(x = sex, y = height, fill = sex)) +
+  geom_boxplot()
+            </input>
+          </program>
+          
+          <p>The plot immediately reveals that males are, on average, taller than females. The  interquartile ranges appear to be similar. But does the normal approximation also work for the female height data collected by the survey? We expect that they will follow a normal distribution, just like males. However, exploratory plots reveal that the approximation is not as useful:</p>
+          
+          <program language="r">
+            <input>
+heights |> filter(sex == "Female") |>
+  ggplot(aes(height)) +
+  geom_density(fill = "#F8766D")
+            </input>
+          </program>
+          
+          <p>We see something we did not see for the males: the density plot has a second "bump". Also, the highest points tend to be taller than expected by the normal than expected heights for a normal distribution. When reporting back to ET, we might need to provide a histogram rather than just the average and standard deviation for the female heights.</p>
+          
+          <p>However, go back and read Tukey's quote. We have noticed what we didn't expect to see. If we look at other female height distributions, we do find that they are well approximated with a normal distribution. So why are our female students different? Is our class a requirement for the female basketball team? Are small proportions of females claiming to be taller than they are? Another, perhaps more likely, explanation is that in the form students used to enter their heights, <c>FEMALE</c> was the default sex and some males entered their heights, but forgot to change the sex variable. In any case, data visualization has helped discover a potential flaw in our data.</p>
+          
+          <p>Regarding the five smallest values, note that these values are:</p>
+          
+          <program language="r">
+            <input>
+heights |> filter(sex == "Female") |> 
+  slice_min(height, n = 5) |>
+  pull(height)
+            </input>
+          </program>
+          
+          <p>Because these are reported heights, a possibility is that the student meant to enter 5'1", 5'2", 5'3" or 5'5".</p>
+        </section>
+        
+        <section xml:id="sec-distributions-exercises">
+          <title>Exercises</title>
+          
+          <ol>
+            <li>
+              <p>Define variables containing the heights of males and females like this:</p>
+              
+              <program language="r">
+                <input>
+library(dslabs)
+male &lt;- heights$height[heights$sex == "Male"]
+female &lt;- heights$height[heights$sex == "Female"]
+                </input>
+              </program>
+              
+              <p>How many measurements do we have for each?</p>
+            </li>
+            
+            <li><p>Suppose we can't make a plot and want to compare the distributions side by side. We can't just list all the numbers. Instead, we will look at the percentiles. Create a five row table showing <c>female_percentiles</c> and <c>male_percentiles</c> with the 10th, 30th, 50th, 70th, &amp; 90th percentiles for each sex. Then create a data frame with these two as columns.</p></li>
+            
+            <li>
+              <p>Study the following boxplots showing population sizes by country:</p>
+              
+              <program language="r">
+                <input>
+library(tidyverse)
+library(dslabs)
+ds_theme_set()
+tab &lt;- gapminder |> filter(year == 2010) |> group_by(continent) |> select(continent, population)  
+tab |> ggplot(aes(x = continent, y = population/10^6)) + 
+  geom_boxplot() + 
+  scale_y_continuous(trans = "log10", breaks = c(1,10,100,1000)) + ylab("Population in millions")
+                </input>
+              </program>
+              
+              <p>Which continent has the country with the biggest population size?</p>
+            </li>
+            
+            <li><p>What continent has the largest median population size?</p></li>
+            
+            <li><p>What is median population size for Africa to the nearest million?</p></li>
+            
+            <li>
+              <p>What proportion of countries in Europe have populations below 14 million?</p>
+              
+              <p>a.  0.99<br/>
+              b.  0.75<br/>
+              c.  0.50<br/>
+              d.  0.25</p>
+            </li>
+            
+            <li><p>If we use a log transformation, which continent shown above has the largest interquartile range?</p></li>
+            
+            <li>
+              <p>Load the height data set and create a vector <c>x</c> with just the male heights:</p>
+              
+              <program language="r">
+                <input>
+library(dslabs)
+x &lt;- heights$height[heights$sex=="Male"]
+                </input>
+              </program>
+              
+              <p>What proportion of the data is between 69 and 72 inches (taller than 69, but shorter or equal to 72)? Hint: use a logical operator and <c>mean</c>.</p>
+            </li>
+          </ol>
+        </section>
       </chapter>
 
       <chapter xml:id="ch-ggplot2">
         <title>ggplot2</title>
-        <p>Content will be added here.</p>
+        
+        <introduction>
+          <p>Exploratory data visualization is perhaps the greatest strength of R. One can quickly go from idea to data to plot with a unique balance of flexibility and ease. For example, Excel may be easier than R for some plots, but it is nowhere near as flexible. D3.js may be more flexible and powerful than R, but it takes much longer to generate a plot.</p>
+          
+          <p>Throughout the book, we will be creating plots using the <alert>ggplot2</alert> package.</p>
+          
+          <program language="r">
+            <input>
+library(dplyr)
+library(ggplot2)
+            </input>
+          </program>
+          
+          <p>Many other approaches are available for creating plots in R. In fact, the plotting capabilities that come with a basic installation of R are already quite powerful. There are also other packages for creating graphics such as <alert>grid</alert> and <alert>lattice</alert>. We chose to use <alert>ggplot2</alert> in this book because it breaks plots into components in a way that permits beginners to create relatively complex and aesthetically pleasing plots using syntax that is intuitive and comparatively easy to remember.</p>
+          
+          <p>One reason <alert>ggplot2</alert> is generally more intuitive for beginners is that it uses a grammar of graphics, the <em>gg</em> in <alert>ggplot2</alert>. This is analogous to the way learning grammar can help a beginner construct hundreds of different sentences by learning just a handful of verbs, nouns, and adjectives without having to memorize each specific sentence. Similarly, by learning a handful of <alert>ggplot2</alert> building blocks and its grammar, you will be able to create hundreds of different plots.</p>
+          
+          <p>Another reason <alert>ggplot2</alert> is easy for beginners is that its default behavior is carefully chosen to satisfy the great majority of cases and is visually pleasing. As a result, it is possible to create informative and elegant graphs with relatively simple and readable code.</p>
+          
+          <p>One limitation is that <alert>ggplot2</alert> is designed to work exclusively with data tables in tidy format. However, a substantial percentage of datasets that beginners work with are in, or can be converted into, this format. An advantage of this approach is that, assuming that our data is tidy, <alert>ggplot2</alert> simplifies plotting code and the learning of grammar for a variety of plots.</p>
+          
+          <p>To use <alert>ggplot2</alert> you will have to learn several functions and arguments. These are hard to memorize, so we highly recommend you have the ggplot2 cheat sheet handy. You can get a copy from Posit's website or simply perform an internet search for "ggplot2 cheat sheet".</p>
+        </introduction>
+        
+        <section xml:id="sec-components-of-graph">
+          <title>The components of a graph</title>
+          
+          <p>We will construct a graph that summarizes the US murders dataset that looks like this:</p>
+          
+          <program language="r">
+            <input>
+library(dslabs)
+library(ggthemes)
+library(ggrepel)
+
+r &lt;- murders |> 
+  summarize(pop = sum(population), tot = sum(total)) |> 
+  mutate(rate = tot/pop*10^6) |> pull(rate)
+
+murders |> ggplot(aes(x = population/10^6, y = total, label = abb)) +  
+  geom_abline(intercept = log10(r), lty = 2, col = "darkgrey") +
+  geom_point(aes(color = region), size = 3) +
+  geom_text_repel() + 
+  scale_x_log10() +
+  scale_y_log10() +
+  xlab("Populations in millions (log scale)") + 
+  ylab("Total number of murders (log scale)") +
+  ggtitle("US Gun Murders in 2010") +
+  scale_color_discrete(name = "Region") +
+  theme_economist()
+            </input>
+          </program>
+          
+          <p>We can clearly see how much states vary across population size and the total number of murders. Not surprisingly, we also see a clear relationship between murder totals and population size. A state falling on the dashed grey line has the same murder rate as the US average. The four geographic regions are denoted with color, which depicts how most southern states have murder rates above the average.</p>
+          
+          <p>This data visualization shows us pretty much all the information in the data frame The code needed to make this plot is relatively simple. We will learn to create the plot part by part.</p>
+          
+          <p>The first step in learning <alert>ggplot2</alert> is to be able to break a graph apart into components. Let's break down the plot above and introduce some of the <alert>ggplot2</alert> terminology. The main three components to note are:</p>
+          
+          <ul>
+            <li><p><alert>Data</alert>: The US murders data frame is being summarized. We refer to this as the <alert>data</alert> component.</p></li>
+            
+            <li><p><alert>Geometry</alert>: The plot above is a scatterplot. This is referred to as the <alert>geometry</alert> component. Other possible geometries include barplot, histogram, smooth densities, qqplot, and boxplot. We will learn more about these later in this chapter.</p></li>
+            
+            <li><p><alert>Aesthetic mapping</alert>: The plot uses several visual cues to represent the information provided by the dataset. The two most important cues in this plot are the point positions on the x-axis and y-axis, which represent population size and the total number of murders, respectively. Each point represents a different observation, and we <em>map</em> data about these observations to visual cues like x- and y-scale. Color is another visual cue that we map to region. We refer to this as the <alert>aesthetic mapping</alert> component. How we define the mapping depends on what <alert>geometry</alert> we are using.</p></li>
+          </ul>
+          
+          <p>We also note that:</p>
+          
+          <ul>
+            <li><p>The points are labeled with the state abbreviations.</p></li>
+            <li><p>The range of the x-axis and y-axis appears to be defined by the range of the data. They are both on log-scales.</p></li>
+            <li><p>There are labels, a title, a legend, and we use the style of The Economist magazine.</p></li>
+          </ul>
+          
+          <p>The general approach in <alert>ggplot2</alert> is to construct the plot part by part by adding <em>layers</em> to a <c>ggplot</c> object, created by the <c>ggplot</c> function. Layers can define geometries, compute summary statistics, define what scales to use, or change styles. To add layers, we use the symbol <c>+</c>. In general, a line of code will look like this:</p>
+          
+          <blockquote>
+            <p>DATA |&gt; <c>ggplot()</c> + LAYER 1 + LAYER 2 + ... + LAYER N</p>
+          </blockquote>
+          
+          <p>We will now illustrate the basics of ggplot2 by dissecting how we construct the plot above.</p>
+        </section>
+        
+        <section xml:id="sec-initializing-object">
+          <title>Initializing an object with data</title>
+          
+          <p>We start by loading the relevant dataset which is in the <alert>dslabs package</alert>:</p>
+          
+          <program language="r">
+            <input>
+library(dslabs)
+            </input>
+          </program>
+          
+          <p>The first step in creating a <alert>ggplot2</alert> graph is to define a <c>ggplot</c> object. Typically most or all the layers will be mapping variables from the same dataset, so we associate this object with the relevant data frame</p>
+          
+          <program language="r">
+            <input>
+ggplot(data = murders)
+            </input>
+          </program>
+          
+          <p>or equivalently</p>
+          
+          <program language="r">
+            <input>
+murders |> ggplot()
+            </input>
+          </program>
+          
+          <p>Both these lines of code render a plot, in this case a blank slate since no geometry has been defined. The only style choice we see is a grey background, the default. We see a plot because an object was created and not assigned to a variable, it was automatically evaluated and printed. But we can assign our plot to an object in the usual way:</p>
+          
+          <program language="r">
+            <input>
+p &lt;- ggplot(data = murders)
+            </input>
+          </program>
+          
+          <p>To render the plot associated with this object, we simply print the object <c>p</c>. The following two lines of code each produce the same plot we see above:</p>
+          
+          <program language="r">
+            <input>
+print(p)
+p
+            </input>
+          </program>
+          
+          <p>To summarize, <c>p</c> is a <c>ggplot</c> object with the <c>murders</c> data frame as its data component.</p>
+        </section>
+        
+        <section xml:id="sec-adding-geometry">
+          <title>Adding a geometry</title>
+          
+          <p>A common first step is to let <alert>ggplot2</alert> know what geometry to use. We often add multiple geometries, but we at least need one. In our example, we want to make a scatterplot. Geometries are added using functions. Taking a quick look at the cheat sheet, we see that we should use the function <c>geom_point</c>.</p>
+          
+          <p>Note that geometry function names follow the pattern: <c>geom_X</c> where X is the name of the geometry. Some examples include <c>geom_histogram</c>, <c>geom_boxplot</c>, and <c>geom_col</c>. We will discuss these further later in this chapter.</p>
+          
+          <p>For <c>geom_point</c> to run properly we need to provide data and a mapping. We have already assigned the <c>murders</c> data table to the object <c>p</c>. Next we need to add the layer <c>geom_point</c> to define the geometry. To find out what mappings are expected by this function, we read the <alert>Aesthetics</alert> section of the <c>geom_point</c> help file:</p>
+          
+          <blockquote>
+            <p><alert>Aesthetics</alert><br/>
+            geom_point() understands the following aesthetics (required aesthetics are in bold):</p>
+            
+            <ul>
+              <li><p><alert>x</alert></p></li>
+              <li><p><alert>y</alert></p></li>
+              <li><p>alpha</p></li>
+              <li><p>colour</p></li>
+            </ul>
+          </blockquote>
+          
+          <p>We see that at least two arguments are required: <c>x</c> and <c>y</c>. Next we explain how to map values from the dataset to the plot.</p>
+        </section>
+        
+        <section xml:id="sec-aesthetic-mappings">
+          <title>Aesthetic mappings</title>
+          
+          <p><em>Aesthetic mappings</em> describe how properties of the data connect with features of the graph, such as distance along an axis, size, or color. The <c>aes</c> function connects data with what we see on the graph by defining aesthetic mappings and will be one of the functions you use most often when plotting. This example produces a scatterplot of total murders versus population in millions:</p>
+          
+          <program language="r">
+            <input>
+murders |> ggplot() + geom_point(aes(population/10^6, total))
+            </input>
+          </program>
+          
+          <p>We didn't use the <c>x</c> and <c>y</c> to define the arguments because the help file showed these are the first and second expected arguments.</p>
+          
+          <p>The scale and labels are defined by default when adding this layer. Like <alert>dplyr</alert> functions, <c>aes</c> also uses the variable names from the data component: we can use <c>population</c> and <c>total</c> without having to call them as <c>murders$population</c> and <c>murders$total</c>. The behavior of recognizing the variables from the data component is specific to <c>aes</c>. With <alert>ggplot2</alert> functions other than <c>aes</c>, if you try to access the values of <c>population</c> or <c>total</c>, you receive an error.</p>
+        </section>
+        
+        <section xml:id="sec-other-layers">
+          <title>Other layers</title>
+          
+          <p>To shape the plot into its final form, we continue to add layers. A second layer in the plot we wish to make involves adding a label to each point to identify the state. The <c>geom_label</c> and <c>geom_text</c> functions permit us to add text to the plot with and without a rectangle behind the text, respectively.</p>
+          
+          <p>Because each point (each state in this case) has a label, we need an aesthetic mapping to make the connection between points and labels. By reading the help file, we learn that we supply the mapping between point and label through the <c>label</c> argument of <c>aes</c>. So the code looks like this:</p>
+          
+          <program language="r">
+            <input>
+murders |> ggplot() + 
+  geom_point(aes(population/10^6, total)) +
+  geom_text(aes(population/10^6, total, label = abb))
+            </input>
+          </program>
+          
+          <p>As an example of the unique behavior of <c>aes</c> related to variable names, note that if the added layer was <c>geom_text(aes(population/10^6, total), label = abb)</c>, we would result in an error since <c>abb</c> is now outside the call to <c>aes</c> and it is not an object in our workspace, it is a variable name in the data component of the <c>ggplot</c> object.</p>
+        </section>
+        
+        <section xml:id="sec-global-aesthetic-mappings">
+          <title>Global aesthetic mappings</title>
+          
+          <p>In the previous lines of code, we define the mapping <c>aes(population/10^6, total)</c> twice, once in each layer. We can avoid this by using a <em>global</em> aesthetic mapping. We can do this when we define the blank slate <c>ggplot</c> object. Remember that the <c>mapping</c> argument of <c>ggplot</c> function permits us to define aesthetic mappings. If we define a mapping in <c>ggplot</c>, all the geometries that are added as layers will default to this mapping. So we can simply write the following code to produce the previous plot:</p>
+          
+          <program language="r">
+            <input>
+murders |> ggplot(aes(population/10^6, total)) +
+  geom_point() +
+  geom_text(aes(label = abb))
+            </input>
+          </program>
+          
+          <p>Note that the mapping for <c>label</c> is only defined in <c>geom_text</c> because <c>geom_point</c> does not use this argument.</p>
+          
+          <p>If necessary, we can override the global mapping by defining a new mapping within each layer. These <em>local</em> definitions override the <em>global</em>. Here is an example:</p>
+          
+          <program language="r">
+            <input>
+murders |> ggplot(aes(population/10^6, total)) +
+  geom_point() +
+  geom_text(aes(x = 10, y = 800, label = "Hello there!"))
+            </input>
+          </program>
+          
+          <p>Clearly, the second call to <c>geom_text</c> does not use <c>population</c> and <c>total</c>.</p>
+        </section>
+        
+        <section xml:id="sec-non-aesthetic-arguments">
+          <title>Non-aesthetic arguments</title>
+          
+          <p>Each geometry function has arguments other than <c>aes</c> and <c>data</c>. They tend to be specific to the function and are not mapped to variables in the data. For example, in the plot we wish to make, the points are larger than the default size. As another example, to avoid putting the text on top of the point, we can use the <c>nudge_x</c> argument in <c>geom_text</c>. The code, with the arguments, looks like this:</p>
+          
+          <program language="r">
+            <input>
+murders |> ggplot(aes(population/10^6, total)) +
+  geom_point(size = 3) +
+  geom_text(aes(label = abb), nudge_x = 1.5)
+            </input>
+          </program>
+          
+          <p>Later in this chapter we learn a better way of assuring we can see the points and the labels.</p>
+        </section>
+        
+        <section xml:id="sec-categories-as-colors">
+          <title>Categories as colors</title>
+          
+          <p>For the final plot, we want each region to have a different color. Because this information comes from the data, it is a aesthetic mapping. For our example, we can map color to categories using the <c>color</c> mapping in the <c>geom_point</c> function as follows:</p>
+          
+          <program language="r">
+            <input>
+murders |> ggplot(aes(population/10^6, total)) +
+  geom_point(aes(color = region), size = 3)
+            </input>
+          </program>
+          
+          <p>Note the <c>geom_point</c> automatically assigns a different color to each category and also adds a legend! Legends are usually desired, but to avoid adding a legend we can set the <c>geom_point</c> argument <c>show.legend = FALSE</c>.</p>
+          
+          <p>Note that <c>color</c> is also a non-aesthetic argument in several <alert>ggplot2</alert> functions, including <c>geom_point</c>. This argument is not used to map colors to categories, but to change the color of all the points. For example, if we wanted all the points to be blue we would change the layer to <c>geom_point(col = "blue", size = 3)</c>.</p>
+          
+          <program language="r">
+            <input>
+murders |> ggplot(aes(population/10^6, total)) +
+  geom_point(color = "blue", size = 3)
+            </input>
+          </program>
+        </section>
+        
+        <section xml:id="sec-updating-ggplot-objects">
+          <title>Updating ggplot objects</title>
+          
+          <p>In <alert>ggplot2</alert> we build plots by parts. A useful feature of the package is that we can update existing <c>ggplot</c> objects by adding layers. For example, we can start by initializing an object with a dataset and a global aesthetic</p>
+          
+          <program language="r">
+            <input>
+p0 &lt;- murders |> ggplot(aes(population/10^6, total))
+            </input>
+          </program>
+          
+          <p>and then start adding layers. For example, we start by adding the scatter plot</p>
+          
+          <program language="r">
+            <input>
+p1 &lt;- p0 +  geom_point(aes(color = region), size = 3)
+            </input>
+          </program>
+          
+          <p>and labels:</p>
+          
+          <program language="r">
+            <input>
+p2 &lt;- p1 + geom_text(aes(label = abb), nudge_x = 0.1)
+            </input>
+          </program>
+          
+          <p>In the next few sections, we will be building on objects created in previous sections using this approach. This facilitates improving plots as well as testing options. Note that we changed the <c>nudge_x</c> from 1.5 to 0.1 because in the next section we will apply a log transformation and a smaller value is more appropriate.</p>
+        </section>
+        
+        <section xml:id="sec-scales">
+          <title>Scales</title>
+          
+          <p>One of the strengths of <alert>ggplot2</alert> is that the default behavior often is good enough to achieve our visualization goals. However, it also offers ways in which we can change these defaults. Many of these are changed through the <c>scales</c> functions.</p>
+          
+          <p>Two examples, are the <c>scale_x_continuous</c> and <c>scale_y_continuous</c> functions which lets us make adjustments to the x-axis and y-axis, respectively. In the final plot we are trying to produce scales in log-scale and this can be achieved by assigning the argument <c>trans = "log10"</c> in these functions. However, because this operation is so common, <alert>ggplot2</alert> includes <c>scale_x_log10</c> and <c>scale_y_log10</c> functions. We can achieve the desired transformation by adding these layers:</p>
+          
+          <program language="r">
+            <input>
+p3 &lt;- p2 + scale_x_log10() + scale_y_log10() 
+p3
+            </input>
+          </program>
+          
+          <p>Be aware that <alert>ggplot2</alert> offers immense flexibility, particularly through the scales functions. We've introduced just one of the many available. In subsequent chapters of this book, we'll provide examples as they become pertinent to our visualizations. However, to familiarize yourself with these functions, we recommend consulting the ggplot2 cheat sheet or conducting internet searches as specific needs arise.</p>
+        </section>
+        
+        <section xml:id="sec-annotations">
+          <title>Annotations</title>
+          
+          <p>We often want to add annotations to figures that are not derived directly from the aesthetic mapping. Examples of annotation functions are <c>labs</c>, <c>annotate</c>, and <c>geom_abline</c>. The <c>labs</c> function permits adding a title, subtitle, caption, and other labels. Note these can also be defined individually using the functions such as <c>xlab</c>, <c>ylab</c> and <c>ggtitle</c>.</p>
+          
+          <p>The <c>labs</c> function also allows another change needed for our desired plot: changing the legend title. Because the legend for the color mapping, this is achieved with the <c>color = "NEW_TITLE"</c> argument:</p>
+          
+          <program language="r">
+            <input>
+p4 &lt;- p3 + labs(title = "US Gun Murders in 2010",
+                x = "Populations in millions (log scale)", 
+                y = "Total number of murders (log scale)",
+                color = "Region")
+p4
+            </input>
+          </program>
+          
+          <p>Our desired final plot includes a line that represents the average murder rate for the entire country. Once we determine the per million rate to be <m>r</m>, the desired line is defined by the formula: <m>y = r x</m>, with <m>y</m> and <m>x</m> our axes: total murders and population in millions, respectively. In the log-scale this line turns into: <m>\log(y) = \log(r) + \log(x)</m>, a line with slope 1 and intercept <m>\log(r)</m>. We can compute <c>r</c> using:</p>
+          
+          <program language="r">
+            <input>
+r &lt;- murders |> 
+  summarize(rate = sum(total)/sum(population)*10^6) |> 
+  pull(rate)
+            </input>
+          </program>
+          
+          <p>To add a line we use the <c>geom_abline</c> function. The <c>ab</c> in the name reminds us we are supplying the intercept (<c>a</c>) and slope (<c>b</c>). The default line has slope 1 and intercept 0 so we only have to define the intercept. Note that the final plot has a dashed line type and is grey and these can be changed through the <c>lty</c> (line type) and <c>color</c> non aesthetic arguments. We add the layer like this:</p>
+          
+          <program language="r">
+            <input>
+p5 &lt;- p4 + 
+  geom_abline(intercept = log10(r), lty = 2, color = "darkgrey") 
+p5
+            </input>
+          </program>
+          
+          <p>Note that <c>geom_abline</c> does not use any mappings from the data object, once we have the slope.</p>
+          
+          <p>We are almost there! All we have to do is add optional changes to the style.</p>
+        </section>
+        
+        <section xml:id="sec-add-on-packages">
+          <title>Add-on packages</title>
+          
+          <p>The power of <alert>ggplot2</alert> is augmented further due to the availability of add-on packages. The remaining changes needed to put the finishing touches on our plot require the <alert>ggthemes</alert> and <alert>ggrepel</alert> packages.</p>
+          
+          <p>The style of a <alert>ggplot2</alert> graph can be changed using the <c>theme</c> functions. Several themes are included as part of the <alert>ggplot2</alert> package. In fact, for most of the plots in this book, we use a function in the <alert>dslabs</alert> package that automatically sets a default theme:</p>
+          
+          <program language="r">
+            <input>
+ds_theme_set()
+            </input>
+          </program>
+          
+          <p>Many other themes are added by the package <alert>ggthemes</alert>. Among those is the <c>theme_economist</c> theme that we use here. After installing the package, you can change the style by adding a layer like this:</p>
+          
+          <program language="r">
+            <input>
+library(ggthemes)
+p6 &lt;- p5 + theme_economist()
+            </input>
+          </program>
+          
+          <p>You can see how some of the other themes look by simply changing the function. For instance, you might try the <c>theme_fivethirtyeight()</c> theme instead.</p>
+          
+          <p>The final change is to better position of the labels to avoid crowding; currently, some of the labels fall on top of each other. The add-on package <alert>ggrepel</alert> includes a geometry that adds labels while ensuring that they don't fall on top of each other. We simply change <c>geom_text</c> to <c>geom_text_repel</c>.</p>
+        </section>
+        
+        <section xml:id="sec-putting-it-all-together">
+          <title>Putting it all together</title>
+          
+          <p>Now that we are done testing, we can write one line of code that produces our desired plot from scratch.</p>
+          
+          <program language="r">
+            <input>
+library(ggthemes)
+library(ggrepel)
+
+r &lt;- murders |> 
+  summarize(rate = sum(total) /  sum(population) * 10^6) |>
+  pull(rate)
+
+murders |> 
+  ggplot(aes(population/10^6, total)) +   
+  geom_abline(intercept = log10(r), lty = 2, color = "darkgrey") +
+  geom_point(aes(col = region), size = 3) +
+  geom_text_repel(aes(label = abb)) + 
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(title = "US Gun Murders in 2010",
+                x = "Populations in millions (log scale)", 
+                y = "Total number of murders (log scale)",
+                color = "Region") +
+  theme_economist()
+            </input>
+          </program>
+        </section>
+        
+        <section xml:id="sec-other-geometries">
+          <title>Geometries</title>
+          
+          <p>In our illustrative example we introduced the scatterplot geometry <c>geom_point</c>. However, <alert>ggplot2</alert> has many others and here we demonstrate how to generate plots related to distributions, specifically the plots shown in <xref ref="ch-visualizing-data-distributions"/>.</p>
+          
+          <subsection xml:id="subsec-barplots">
+            <title>Barplots</title>
+            
+            <p>To generate a barplot we can use the <c>geom_bar</c> geometry. The default is to count the number of each category and draw a bar. Here is the plot for the regions of the US.</p>
+            
+            <program language="r">
+              <input>
+murders |> ggplot(aes(region)) + geom_bar()
+              </input>
+            </program>
+            
+            <p>However, we often already have a table with the numbers we want to present as a barplot. Here is an example of such a table:</p>
+            
+            <program language="r">
+              <input>
+tab &lt;- murders |> 
+  count(region) |> 
+  mutate(proportion = n/sum(n))
+              </input>
+            </program>
+            
+            <p>In this case, we use <c>geom_col</c> instead of <c>geom_bar</c>:</p>
+            
+            <program language="r">
+              <input>
+tab |> ggplot(aes(region, proportion)) + geom_col()
+              </input>
+            </program>
+          </subsection>
+          
+          <subsection xml:id="subsec-histograms-geom">
+            <title>Histograms</title>
+            
+            <p>To generate histograms we use <c>geom_histogram</c>. By looking at the help file for this function, we learn that the only required argument is <c>x</c>, the variable for which we will construct a histogram. We dropped the <c>x</c> because we know it is the first argument. The code looks like this:</p>
+            
+            <program language="r">
+              <input>
+heights |> filter(sex == "Female") |> 
+  ggplot(aes(height)) + 
+  geom_histogram(binwidth = 1, fill = "blue", col = "black")
+              </input>
+            </program>
+            
+            <p>Note that we use the optional arguments <c>binwidth = 1</c> to change the bin size to 1 inch. The default is to create 30 bins. We also use the optional arguments <c>fill = "blue"</c> and <c>col = "black"</c> to fill the bars with colors and use a different color to outline the bars.</p>
+          </subsection>
+          
+          <subsection xml:id="subsec-density-plots-geom">
+            <title>Density plots</title>
+            
+            <p>To create a smooth density, we use the <c>geom_density</c>. To make a smooth density plot with the data previously shown as a histogram we can use this code:</p>
+            
+            <program language="r">
+              <input>
+heights |> 
+  filter(sex == "Female") |>
+  ggplot(aes(height)) +
+  geom_density(fill = "blue")
+              </input>
+            </program>
+            
+            <p>Note that we use the optional argument <c>fill</c> to change the color. To change the smoothness of the density, we use the <c>adjust</c> argument to multiply the default value by that <c>adjust</c>. For example, if we want the bandwidth to be twice as big we use:</p>
+            
+            <program language="r">
+              <input>
+heights |> 
+  filter(sex == "Female") |>
+  ggplot(aes(height)) +
+  geom_density(fill="blue", adjust = 2)
+              </input>
+            </program>
+          </subsection>
+          
+          <subsection xml:id="subsec-boxplots-geom">
+            <title>Boxplots</title>
+            
+            <p>The geometry for boxplot is <c>geom_boxplot</c>. As discussed, boxplots are useful for comparing distributions. For example, below are the previously shown heights for women, but compared to men. For this geometry, we need arguments <c>x</c> as the categories, and <c>y</c> as the values.</p>
+            
+            <program language="r">
+              <input>
+heights |> ggplot(aes(sex, height)) +
+  geom_boxplot()
+              </input>
+            </program>
+          </subsection>
+          
+          <subsection xml:id="subsec-images">
+            <title>Images</title>
+            
+            <p>Images were not needed for the concepts described in this chapter, but we will use images in future chapters, so we introduce the two geometries used to plot images: <c>geom_tile</c> and <c>geom_raster</c>. They behave similarly; to see how they differ, please consult the help file. To create an image in <alert>ggplot2</alert> we need a data frame with the x and y coordinates as well as the values associated with each of these. Here is a data frame.</p>
+            
+            <program language="r">
+              <input>
+x &lt;- expand.grid(x = 1:12, y = 1:10) |> mutate(z = 1:120)
+              </input>
+            </program>
+            
+            <p>Note that this is the tidy version of a matrix, <c>matrix(1:120, 12, 10)</c>. To plot the image we use the following code:</p>
+            
+            <program language="r">
+              <input>
+x |> ggplot(aes(x, y, fill = z)) + geom_raster()
+              </input>
+            </program>
+            
+            <p>With these images you will often want to change the color scale. This can be done through the <c>scale_fill_gradientn</c> layer.</p>
+            
+            <program language="r">
+              <input>
+x |> ggplot(aes(x, y, fill = z)) + 
+  geom_raster() + 
+  scale_fill_gradientn(colors =  terrain.colors(10, 1))
+              </input>
+            </program>
+          </subsection>
+        </section>
+        
+        <section xml:id="sec-grids-of-plots">
+          <title>Grids of plots</title>
+          
+          <p>There are often reasons to graph plots next to each other. The <alert>gridExtra</alert> package permits us to do that. Here are the graphs <c>p5</c> and <c>p6</c> created in the previous sections:</p>
+          
+          <program language="r">
+            <input>
+library(gridExtra)
+grid.arrange(p5, p6, ncol = 2)
+            </input>
+          </program>
+        </section>
+        
+        <section xml:id="sec-ggplot2-exercises">
+          <title>Exercises</title>
+          
+          <p>Start by loading the <alert>dplyr</alert> and <alert>ggplot2</alert> library as well as the <c>murders</c> and <c>heights</c> data.</p>
+          
+          <program language="r">
+            <input>
+library(dplyr)
+library(ggplot2)
+library(dslabs)
+            </input>
+          </program>
+          
+          <ol>
+            <li>
+              <p>With <alert>ggplot2</alert>, plots can be saved as objects. For example we can associate a dataset with a plot object like this</p>
+              
+              <program language="r">
+                <input>
+p &lt;- ggplot(data = murders)
+                </input>
+              </program>
+              
+              <p>Because <c>data</c> is the first argument we don't need to spell it out</p>
+              
+              <program language="r">
+                <input>
+p &lt;- ggplot(murders)
+                </input>
+              </program>
+              
+              <p>and we can also use the pipe:</p>
+              
+              <program language="r">
+                <input>
+p &lt;- murders |> ggplot()
+                </input>
+              </program>
+              
+              <p>What is class of the object <c>p</c>?</p>
+            </li>
+            
+            <li>
+              <p>Remember that to print an object you can use the command <c>print</c> or simply type the object. Print the object <c>p</c> defined in exercise one and describe what you see.</p>
+              
+              <p>a.  Nothing happens.<br/>
+              b.  A blank slate plot.<br/>
+              c.  A scatterplot.<br/>
+              d.  A histogram.</p>
+            </li>
+            
+            <li><p>Using the pipe <c>|&gt;</c>, create an object <c>p</c> but this time associated with the <c>heights</c> dataset instead of the <c>murders</c> dataset.</p></li>
+            
+            <li><p>What is the class of the object <c>p</c> you have just created?</p></li>
+            
+            <li>
+              <p>Now we are going to add a layer and the corresponding aesthetic mappings. For the murders data we plotted total murders versus population sizes. Explore the <c>murders</c> data frame to remind yourself what are the names for these two variables and select the correct answer. <alert>Hint</alert>: Look at <c>?murders</c>.</p>
+              
+              <p>a.  <c>state</c> and <c>abb</c>.<br/>
+              b.  <c>total_murders</c> and <c>population_size</c>.<br/>
+              c.  <c>total</c> and <c>population</c>.<br/>
+              d.  <c>murders</c> and <c>size</c>.</p>
+            </li>
+            
+            <li>
+              <p>To create the scatterplot we add a layer with <c>geom_point</c>. The aesthetic mappings require us to define the x-axis and y-axis variables, respectively. So the code looks like this:</p>
+              
+              <program language="r">
+                <input>
+murders |> ggplot(aes(x = , y = )) +
+  geom_point()
+                </input>
+              </program>
+              
+              <p>except we have to define the two variables <c>x</c> and <c>y</c>. Fill this out with the correct variable names.</p>
+            </li>
+            
+            <li>
+              <p>Note that if we don't use argument names, we can obtain the same plot by making sure we enter the variable names in the right order like this:</p>
+              
+              <program language="r">
+                <input>
+murders |> ggplot(aes(population, total)) +
+  geom_point()
+                </input>
+              </program>
+              
+              <p>Remake the plot but now with total in the x-axis and population in the y-axis.</p>
+            </li>
+            
+            <li>
+              <p>If instead of points we want to add text, we can use the <c>geom_text()</c> or <c>geom_label()</c> geometries. The following code</p>
+              
+              <program language="r">
+                <input>
+murders |> ggplot(aes(population, total)) + geom_label()
+                </input>
+              </program>
+              
+              <p>will give us the error message: <c>Error: geom_label requires the following missing aesthetics: label</c></p>
+              
+              <p>Why is this?</p>
+              
+              <p>a.  We need to map a character to each point through the label argument in aes.<br/>
+              b.  We need to let <c>geom_label</c> know what character to use in the plot.<br/>
+              c.  The <c>geom_label</c> geometry does not require x-axis and y-axis values.<br/>
+              d.  <c>geom_label</c> is not a ggplot2 command.</p>
+            </li>
+            
+            <li><p>Rewrite the code above to use abbreviation as the label through <c>aes</c></p></li>
+            
+            <li>
+              <p>Change the color of the labels to blue. How will we do this?</p>
+              
+              <p>a.  Adding a column called <c>blue</c> to <c>murders</c>.<br/>
+              b.  Because each label needs a different color, we map the colors through <c>aes</c>.<br/>
+              c.  Use the <c>color</c> argument in <c>ggplot</c>.<br/>
+              d.  Because we want all labels to be blue, we do not need to map colors, just use the color argument in <c>geom_label</c>.</p>
+            </li>
+            
+            <li><p>Rewrite the code above to make the labels blue.</p></li>
+            
+            <li>
+              <p>Now suppose we want to use color to represent the different regions. In this case which of the following is most appropriate:</p>
+              
+              <p>a.  Adding a column called <c>color</c> to <c>murders</c> with the color we want to use.<br/>
+              b.  Because each label needs a different color, we map the colors through the color argument of <c>aes</c> .<br/>
+              c.  Use the <c>color</c> argument in <c>ggplot</c>.<br/>
+              d.  Because we want all colors to be blue, we do not need to map colors, just use the color argument in <c>geom_label</c>.</p>
+            </li>
+            
+            <li><p>Rewrite the code above to make the labels' colors be determined by the state's region.</p></li>
+            
+            <li>
+              <p>Now we are going to change the x-axis to a log scale to account for the fact the distribution of population is skewed. Let's start by defining an object <c>p</c> holding the plot we have made up to now</p>
+              
+              <program language="r">
+                <input>
+p &lt;- murders |> 
+  ggplot(aes(population, total, label = abb, color = region)) +
+  geom_label()
+                </input>
+              </program>
+              
+              <p>To change the y-axis to a log scale we learned about the <c>scale_x_log10()</c> function. Add this layer to the object <c>p</c> to change the scale and render the plot.</p>
+            </li>
+            
+            <li><p>Repeat the previous exercise but now change both axes to be in the log scale.</p></li>
+            
+            <li><p>Now edit the code above to add the title "Gun murder data" to the plot. Hint: use the <c>ggtitle</c> function.</p></li>
+            
+            <li>
+              <p>Now we are going to use the <c>geom_histogram</c> function to make a histogram of the heights in the <c>height</c> data frame. When reading the documentation for this function we see that it requires just one mapping, the values to be used for the histogram. Make a histogram of all the plots.</p>
+              
+              <p>What is the variable containing the heights?</p>
+              
+              <p>a.  <c>sex</c><br/>
+              b.  <c>heights</c><br/>
+              c.  <c>height</c><br/>
+              d.  <c>heights$height</c></p>
+            </li>
+            
+            <li><p>Now create a ggplot object using the pipe to assign the heights data to a ggplot object. Assign <c>height</c> to the x values through the <c>aes</c> function.</p></li>
+            
+            <li><p>Now we are ready to add a layer to actually make the histogram. Use the object created in the previous exercise and the <c>geom_histogram</c> function to make the histogram.</p></li>
+            
+            <li>
+              <p>Note that when we run the code in the previous exercise we get the warning: <c>stat_bin()</c> using <c>bins = 30</c>. Pick better value with <c>binwidth</c>.</p>
+              
+              <p>Use the <c>binwidth</c> argument to change the histogram made in the previous exercise to use bins of size 1 inch.</p>
+            </li>
+            
+            <li><p>Instead of a histogram, we are going to make a smooth density plot. In this case we will not make an object, but instead render the plot with one line of code. Change the geometry in the code previously used to make a smooth density instead of a histogram.</p></li>
+            
+            <li><p>Now we are going to make a density plot for males and females separately. We can do this using the <c>group</c> argument. We assign groups via the aesthetic mapping as each point needs to a group before making the calculations needed to estimate a density.</p></li>
+            
+            <li><p>We can also assign groups through the <c>color</c> argument. This has the added benefit that it uses colors to distinguish the groups. Change the code above to use color.</p></li>
+            
+            <li>
+              <p>We can also assign groups through the <c>fill</c> argument. This has the added benefit that it uses colors to distinguish the groups, like this:</p>
+              
+              <program language="r">
+                <input>
+heights |> 
+  ggplot(aes(height, fill = sex)) + 
+  geom_density()
+                </input>
+              </program>
+              
+              <p>However, here the second density is drawn over the other. We can make the curves more visible by using alpha blending to add transparency. Set the alpha parameter to 0.2 in the <c>geom_density</c> function to make this change.</p>
+            </li>
+          </ol>
+        </section>
       </chapter>
 
       <chapter xml:id="ch-data-visualization-principles">

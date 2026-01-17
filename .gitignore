@@ -25,3 +25,4 @@ output/
 logs/
 .error_schema.log
 .cache/
+build_output.log
