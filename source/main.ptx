@@ -13,8 +13,62 @@
     <!-- Preface -->
     <preface xml:id="preface">
       <title>Preface</title>
-      <p>Content will be added here.</p>
+      
+      <p>
+        This is the website for the <em>Data Wrangling and Visualization with R</em> part of <em>Introduction to Data Science</em>.
+      </p>
+      
+      <p>
+        The website for the <em>Statistics and Prediction Algorithms Through Case Studies</em> part is <url href="http://rafalab.dfci.harvard.edu/dsbook-part-2/">here</url>.
+      </p>
+      
+      <p>
+        We make announcements related to the book on Twitter. For updates follow <url href="https://twitter.com/rafalab">@rafalab</url>.
+      </p>
+      
+      <p>
+        This book started out as the class notes used in the HarvardX <url href="https://www.edx.org/professional-certificate/harvardx-data-science">Data Science Series</url>.
+      </p>
+      
+      <p>
+        The Quarto files used to generate the book are available on <url href="https://github.com/rafalab/dsbook-part-1">GitHub</url>. Note that, the graphical theme used for plots throughout the book can be recreated using the <c>ds_theme_set()</c> function from the <c>dslabs</c> package.
+      </p>
+      
+      <p>
+        This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International <url href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</url>.
+      </p>
+      
+      <p>
+        A hardcopy version of the book is available from <url href="https://www.routledge.com/Introduction-to-Data-Science-Data-Wrangling-and-Visualization-with-R/Irizarry/p/book/9781032116556">CRC Press</url>.
+      </p>
+      
+      <p>
+        A free PDF of the October 24, 2019 version of the book is available from <url href="https://leanpub.com/datasciencebook">Leanpub</url>.
+      </p>
+      
     </preface>
+    
+    <!-- Acknowledgments -->
+    <acknowledgement xml:id="acknowledgments">
+      <title>Acknowledgments</title>
+      
+      <p>
+        This book is dedicated to all the people involved in building and maintaining R and the R packages we use in this book. A special thanks to the developers and maintainers of base R, the tidyverse, data.table, and the caret package.
+      </p>
+      
+      <p>
+        A special thanks to Jenna Landy for her careful editing and helpful advice on this book; to David Robinson for generously answering many questions about the tidyverse and aiding in my understanding of it; and to Amy Gill for dozens of comments, edits, and suggestions. Also, many thanks to Stephanie Hicks who twice served as a co-instructor in my data science classes and Yihui Xie who patiently put up with my many questions related to markdown. Thanks also to Karl Broman, from whom I borrowed ideas for the Data Visualization and Productivity Tools parts. Thanks to Peter Aldhous from whom I borrowed ideas for the principles of data visualization section and Jenny Bryan for writing <em>Happy Git and GitHub for the useR</em>, which influenced our Git chapters. Also, many thanks to Jeff Leek, Roger Peng, and Brian Caffo, whose online classes inspired the way this book is divided, to Garrett Grolemund and Hadley Wickham for making the markdown code for their R for Data Science book open, and the editors, John Kimmel and Lara Spieker, for their support. Finally, thanks to Alex Nones for proofreading the manuscript during its various stages.
+      </p>
+      
+      <p>
+        This book was conceived during the teaching of several applied statistics courses, starting over fifteen years ago. The teaching assistants working with me throughout the years made important indirect contributions to this book. The material was further refined during a HarvardX series coordinated by Heather Sternshein and Zofia Gajdos. We thank them for their contributions. We are also grateful to all the students whose questions and comments helped us improve the book. The courses were partially funded by NIH grant R25GM114818. We are very grateful to the National Institutes of Health for its support.
+      </p>
+      
+      <p>
+        A special thanks goes to all those who edited the book via GitHub pull requests or made suggestions by creating an <em>issue</em> or sending an email: <c>nickyfoto</c> (Huang Qiang), <c>desautm</c> (Marc-André Désautels), <c>michaschwab</c> (Michail Schwab), <c>alvarolarreategui</c> (Alvaro Larreategui), <c>jakevc</c> (Jake VanCampen), <c>omerta</c> (Guillermo Lengemann), <c>espinielli</c> (Enrico Spinielli), <c>asimumba</c> (Aaron Simumba), <c>braunschweig</c> (Maldewar), <c>gwierzchowski</c> (Grzegorz Wierzchowski), <c>technocrat</c> (Richard Careaga), <c>atzakas</c>, <c>defeit</c> (David Emerson Feit), <c>shiraamitchell</c> (Shira Mitchell), <c>Nathalie-S</c>, <c>andreashandel</c> (Andreas Handel), <c>berkowitze</c> (Elias Berkowitz), <c>Dean-Webb</c> (Dean Webber), <c>mohayusuf</c>, <c>jimrothstein</c>, <c>mPloenzke</c> (Matthew Ploenzke), <c>NicholasDowand</c> (Nicholas Dow), <c>kant</c> (Darío Hereñú), <c>debbieyuster</c> (Debbie Yuster), <c>tuanchauict</c> (Tuan Chau), <c>phzeller</c>, <c>BTJ01</c> (BradJ), <c>glsnow</c> (Greg Snow), <c>mberlanda</c> (Mauro Berlanda), <c>wfan9</c>, <c>larswestvang</c> (Lars Westvang), <c>jj999</c> (Jan Andrejkovic), <c>Kriegslustig</c> (Luca Nils Schmid), <c>odahhani</c>, <c>aidanhorn</c> (Aidan Horn), <c>atraxler</c> (Adrienne Traxler), <c>alvegorova</c>, <c>wycheong</c> (Won Young Cheong), <c>med-hat</c> (Medhat Khalil), <c>kengustafson</c>, <c>Yowza63</c>, <c>ryan-heslin</c> (Ryan Heslin), <c>raffaem</c>, <c>tim8west</c>, <c>jooleer</c>, <c>pauluhn</c> (Paul), <c>tci1</c>, <c>beanb2</c> (Brennan Bean), <c>edasdemirlab</c> (Erdi Dasdemir), <c>jimnicholls</c> (Jim Nicholls), <c>JimKay1941</c> (Jim Kay), <c>devpowerplatform</c> (QuantScripter), <c>carvalhais</c> (André Carvalhais), <c>hbmaclean</c>, <c>GENHEN</c>, <c>whatchalookingat</c>, David D. Kane, El Mustapha El Abbassi, Vadim Zipunnikov, Anna Quaglieri, Chris Dong, Bowen Gu, Rick Schoenberg, and Robert Gentleman.
+      </p>
+      
+    </acknowledgement>
 
     <!-- Introduction -->
     <chapter xml:id="introduction">
