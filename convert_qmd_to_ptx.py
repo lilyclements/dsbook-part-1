@@ -409,57 +409,71 @@ if __name__ == '__main__':
     import os
     
     try:
-        # Check if source files exist
-        ch9_path = 'dataviz/dataviz-principles.qmd'
-        ch10_path = 'dataviz/dataviz-in-practice.qmd'
+        # Define chapters to convert
+        chapters = [
+            {
+                'path': 'dataviz/dataviz-principles.qmd',
+                'id': 'ch-data-visualization-principles',
+                'title': 'Data visualization principles',
+                'output': '/tmp/chapter9.ptx',
+                'number': 9
+            },
+            {
+                'path': 'dataviz/dataviz-in-practice.qmd',
+                'id': 'ch-data-visualization-in-practice',
+                'title': 'Data visualization in practice',
+                'output': '/tmp/chapter10.ptx',
+                'number': 10
+            },
+            {
+                'path': 'wrangling/dates-and-times.qmd',
+                'id': 'ch-parsing-dates-and-times',
+                'title': 'Parsing dates and times',
+                'output': '/tmp/chapter13.ptx',
+                'number': 13
+            },
+            {
+                'path': 'wrangling/locales.qmd',
+                'id': 'ch-locales',
+                'title': 'Locales',
+                'output': '/tmp/chapter14.ptx',
+                'number': 14
+            },
+            {
+                'path': 'wrangling/web-scraping.qmd',
+                'id': 'ch-extracting-data-from-the-web',
+                'title': 'Extracting data from the web',
+                'output': '/tmp/chapter15.ptx',
+                'number': 15
+            }
+        ]
         
-        if not os.path.exists(ch9_path):
-            print(f"Error: Source file not found: {ch9_path}", file=sys.stderr)
-            sys.exit(1)
+        # Convert each chapter
+        for chapter in chapters:
+            # Check if source file exists
+            if not os.path.exists(chapter['path']):
+                print(f"Error: Source file not found: {chapter['path']}", file=sys.stderr)
+                sys.exit(1)
+            
+            # Read and convert
+            try:
+                with open(chapter['path'], 'r') as f:
+                    content = f.read()
+            except IOError as e:
+                print(f"Error reading {chapter['path']}: {e}", file=sys.stderr)
+                sys.exit(1)
+            
+            ptx_content = convert_qmd_to_ptx(content, chapter['id'], chapter['title'])
+            
+            try:
+                with open(chapter['output'], 'w') as f:
+                    f.write(ptx_content)
+            except IOError as e:
+                print(f"Error writing {chapter['output']}: {e}", file=sys.stderr)
+                sys.exit(1)
+            
+            print(f"Chapter {chapter['number']} converted, length: {len(ptx_content)}")
         
-        if not os.path.exists(ch10_path):
-            print(f"Error: Source file not found: {ch10_path}", file=sys.stderr)
-            sys.exit(1)
-        
-        # Read and convert chapter 9
-        try:
-            with open(ch9_path, 'r') as f:
-                ch9_content = f.read()
-        except IOError as e:
-            print(f"Error reading {ch9_path}: {e}", file=sys.stderr)
-            sys.exit(1)
-        
-        ch9_ptx = convert_qmd_to_ptx(ch9_content, 'ch-data-visualization-principles', 
-                                      'Data visualization principles')
-        
-        try:
-            with open('/tmp/chapter9.ptx', 'w') as f:
-                f.write(ch9_ptx)
-        except IOError as e:
-            print(f"Error writing /tmp/chapter9.ptx: {e}", file=sys.stderr)
-            sys.exit(1)
-        
-        print("Chapter 9 converted, length:", len(ch9_ptx))
-        
-        # Read and convert chapter 10
-        try:
-            with open(ch10_path, 'r') as f:
-                ch10_content = f.read()
-        except IOError as e:
-            print(f"Error reading {ch10_path}: {e}", file=sys.stderr)
-            sys.exit(1)
-        
-        ch10_ptx = convert_qmd_to_ptx(ch10_content, 'ch-data-visualization-in-practice',
-                                       'Data visualization in practice')
-        
-        try:
-            with open('/tmp/chapter10.ptx', 'w') as f:
-                f.write(ch10_ptx)
-        except IOError as e:
-            print(f"Error writing /tmp/chapter10.ptx: {e}", file=sys.stderr)
-            sys.exit(1)
-        
-        print("Chapter 10 converted, length:", len(ch10_ptx))
         print("\nConversion complete!")
         
     except Exception as e:

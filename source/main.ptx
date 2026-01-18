@@ -7996,17 +7996,908 @@ co2_wide &lt;- data.frame(matrix(co2, ncol = 12, byrow = TRUE)) |&gt;
 
       <chapter xml:id="ch-parsing-dates-and-times">
         <title>Parsing dates and times</title>
-        <p>Content will be added here.</p>
+        
+          <p>We have described three main types of vectors: numeric, character, and logical. When analyzing data, we often encounter variables that are dates. Although we can represent a date with a string, for example <c>November 2, 2017</c>, once we pick a reference day, referred to as the <em>epoch</em> by computer programmers, they can be converted to numbers by calculating the number of days since the epoch. In R and Unix, the epoch is defined as January 1, 1970. So, for example, January 2, 1970 is day 1, December 31, 1969 is day -1, and November 2, 2017, is day 17,204.</p>
+
+          <p>Now how should we represent dates and times when analyzing data in R? We could just use days since the epoch, but then it is almost impossible to interpret. If I tell you it's November 2, 2017, you know what this means immediately. If I tell you it's day 17,204, you will be quite confused. Similar problems arise with times and even more complications can appear due to time zones. For this reason, R defines a data type just for dates and times.</p>
+
+        <section xml:id="sec-the-date-data-type">
+          <title>The date data type</title>
+
+          <p>We can see an example of the data type R uses for data here:</p>
+
+          <program language="r">
+            <input>
+library(tidyverse)
+library(dslabs)
+polls_us_election_2016$startdate |&gt; head()
+            </input>
+          </program>
+
+          <p>The dates look like strings, but they are not:</p>
+
+          <program language="r">
+            <input>
+class(polls_us_election_2016$startdate)
+            </input>
+          </program>
+
+          <p>Look at what happens when we convert them to numbers:</p>
+
+          <program language="r">
+            <input>
+as.numeric(polls_us_election_2016$startdate) |&gt; head()
+            </input>
+          </program>
+
+          <p>It turns them into days since the epoch. The <c>as.Date</c> function can convert a character into a date. So to see that the epoch is day 0 we can type</p>
+
+          <program language="r">
+            <input>
+as.Date("1970-01-01") |&gt; as.numeric()
+            </input>
+          </program>
+
+          <p>Plotting functions, such as those in ggplot, are aware of the date format. This means that, for example, a scatterplot can use the numeric representation to decide on the position of the point, but include the string in the labels:</p>
+
+          <program language="r">
+            <input>
+polls_us_election_2016 |&gt; filter(pollster == "Ipsos" &amp; state == "U.S.") |&gt;
+  ggplot(aes(startdate, rawpoll_trump)) +
+  geom_line()
+            </input>
+          </program>
+
+          <p>Note in particular that the month names are displayed, a very convenient feature.</p>
+
+        </section>
+
+        <section xml:id="sec-lubridate">
+          <title>The lubridate package</title>
+
+          <p>The __lubridate__ package provides tools to work with date and times.</p>
+
+          <program language="r">
+            <input>
+library(lubridate)
+            </input>
+          </program>
+
+          <p>We will take a random sample of dates to show some of the useful things one can do:</p>
+
+          <program language="r">
+            <input>
+set.seed(2002)
+dates &lt;- sample(polls_us_election_2016$startdate, 10) |&gt; sort()
+dates
+            </input>
+          </program>
+
+          <p>The functions <c>year</c>, <c>month</c> and <c>day</c> extract those values:</p>
+
+          <program language="r">
+            <input>
+tibble(date = dates, month = month(dates), day = day(dates), year = year(dates))
+            </input>
+          </program>
+
+          <p>We can also extract the month labels:</p>
+
+          <program language="r">
+            <input>
+month(dates, label = TRUE)
+            </input>
+          </program>
+
+          <program language="r">
+            <input>
+lubridate::month(dates, label = TRUE)
+            </input>
+          </program>
+
+          <p>Another useful set of functions are the <em>parsers</em> that convert strings into dates. The function <c>ymd</c> assumes the dates are in the format YYYY-MM-DD and tries to parse as well as possible.</p>
+
+          <program language="r">
+            <input>
+x &lt;- c(20090101, "2009-01-02", "2009 01 03", "2009-1-4",
+       "2009-1, 5", "Created on 2009 1 6", "200901 !!! 07")
+ymd(x)
+            </input>
+          </program>
+
+          <p>A further complication comes from the fact that dates often come in different formats in which the order of year, month, and day are different. The preferred format is to show year (with all four digits), month (two digits), and then day, or what is called the ISO 8601. Specifically we use YYYY-MM-DD so that if we order the string, it will be ordered by date. You can see the function <c>ymd</c> returns them in this format.</p>
+
+          <p>But, what if you encounter dates such as "09/01/02"? This could be September 1, 2002 or January 2, 2009 or January 9, 2002. In these cases, examining the entire vector of dates will help you determine what format it is by process of elimination. Once you know, you can use the many parses provided by __lubridate__.</p>
+
+          <p>For example, if the string is:</p>
+
+          <program language="r">
+            <input>
+x &lt;- "09/01/02"
+            </input>
+          </program>
+
+          <p>The <c>ymd</c> function assumes the first entry is the year, the second is the month, and the third is the day, so it converts it to:</p>
+
+          <program language="r">
+            <input>
+ymd(x)
+            </input>
+          </program>
+
+          <p>The <c>mdy</c> function assumes the first entry is the month, then the day, then the year:</p>
+
+          <program language="r">
+            <input>
+mdy(x)
+            </input>
+          </program>
+
+          <p>The <em>lubridate</em> package provides a function for every possibility. Here is the other common one:</p>
+
+          <program language="r">
+            <input>
+dmy(x)
+            </input>
+          </program>
+
+          <p>The __lubridate__ package is also useful for dealing with times. In base R, you can get the current time typing <c>Sys.time()</c>. The __lubridate__ package provides a slightly more advanced function, <c>now</c>, that permits you to define the time zone:</p>
+
+          <program language="r">
+            <input>
+now()
+now("GMT")
+            </input>
+          </program>
+
+          <p>You can see all the available time zones with <c>OlsonNames()</c> function.</p>
+
+          <p>We can also extract hours, minutes, and seconds:</p>
+
+          <program language="r">
+            <input>
+now() |&gt; hour()
+now() |&gt; minute()
+now() |&gt; second()
+            </input>
+          </program>
+
+          <p>The package also includes a function to parse strings into times as well as parsers for time objects that include dates:</p>
+
+          <program language="r">
+            <input>
+x &lt;- c("12:34:56")
+hms(x)
+x &lt;- "Nov/2/2012 12:34:56"
+mdy_hms(x)
+            </input>
+          </program>
+
+          <p>This package has many other useful functions. We describe two of these here that we find particularly useful.</p>
+
+          <p>The <c>make_date</c> function can be used to quickly create a date object. It can take up to seven arguments: year, month, day, hour, minute, seconds, and time zone defaulting to the epoch values on UTC time. To create an date object representing, for example, July 6, 2019 we write:</p>
+
+          <program language="r">
+            <input>
+make_date(2019, 7, 6)
+            </input>
+          </program>
+
+          <p>To make a vector of January 1 for the 80s we write:</p>
+
+          <program language="r">
+            <input>
+make_date(1980:1989)
+            </input>
+          </program>
+
+          <p>Another very useful function is <c>round_date</c>. It can be used to <em>round</em> dates to nearest year, quarter,  month, week, day, hour, minutes, or seconds. So if we want to group all the polls by week of the year we can do the following:</p>
+
+          <program language="r">
+            <input>
+polls_us_election_2016 |&gt; 
+  mutate(week = round_date(startdate, "week")) |&gt;
+  group_by(week) |&gt;
+  summarize(margin = mean(rawpoll_clinton - rawpoll_trump)) |&gt;
+  ggplot(aes(week, margin)) +
+  geom_point()
+            </input>
+          </program>
+
+          <p>Finally, you should be aware the there are useful function for computing operations on time such a <c>difftime</c>, <c>time_length</c>, and <c>interval</c>.</p>
+
+        </section>
+
+        <section xml:id="sec-dates-and-times-with-data-table">
+          <title>Dates and times with data.table</title>
+
+          <p>The <alert>data.table</alert> package includes some of the same functionality as <alert>lubridate</alert>. For example, it includes the <c>month</c>, and <c>year</c> functions that are the same as those in <alert>lubridate</alert>. The equilvalent of <alert>lubridate</alert>'s <c>day</c> is <c>mday</c>:</p>
+
+          <program language="r">
+            <input>
+library(data.table)
+st &lt;- as.Date("2024-03-04")
+day(st)
+mday(st)
+            </input>
+          </program>
+
+          <p>Other similar functions included in <alert>data.table</alert> are <c>second</c>, <c>minute</c>, <c>hour</c>, <c>yday</c>, <c>wday</c>, <c>week</c>, <c>isoweek</c> and <c>quarter</c>.</p>
+
+          <p>The package also includes the classes <c>IDate</c> and <c>ITime</c>, which store dates and times more efficiently that <c>lubridate</c> and base R. This convenient for large files with date stamps. You can convert dates in the usual R format: using <c>as.IDate</c> and <c>as.ITime</c>. You can see this by using the <c>object.size</c> function:</p>
+
+          <program language="r">
+            <input>
+object.size(polls_us_election_2016$startdate)
+object.size(as.IDate(polls_us_election_2016$startdate))
+            </input>
+          </program>
+
+        </section>
+
+        <section xml:id="sec-exercises">
+          <title>Exercises</title>
+
+          <p>For these exercises we will use the following dataset:</p>
+
+          <program language="r">
+            <input>
+#| eval: false
+library(dslabs)
+head(pr_death_counts)
+            </input>
+          </program>
+
+          <ol>
+            <li><p>We want to make a plot of death counts versus date. Confirm that the <c>date</c> variable are in fact dates and not strings.</p></li>
+            <li><p>Plot deaths versus date. </p></li>
+            <li><p>What time period is represented in these data?</p></li>
+            <li><p>Note that after May 31, 2018, the deaths are all 0. The data is probably not entered yet. We also see a drop off starting around May 1. Redefine <c>dat</c> to exclude observations taken on or after May 1, 2018. Then, remake the plot.</p></li>
+            <li><p>Repeat the plot but use the day of the year on the x-axis instead of date.</p></li>
+            <li><p>Compute the deaths per day by month.</p></li>
+            <li><p>Show the deaths per days for July and for September. What do you notice?</p></li>
+            <li><p>Compute deaths per week and make a plot.</p></li>
+          </ol>
+
+        </section>
+        
       </chapter>
 
       <chapter xml:id="ch-locales">
         <title>Locales</title>
-        <p>Content will be added here.</p>
+        
+          <p>Computer settings change depending on language and location, and being unaware of this possibility can make certain data wrangling challenges difficult to overcome.</p>
+
+          <p>The purpose of <em>locales</em> is to group together common settings that can affect:</p>
+
+          <ol>
+            <li><p>Month and day names, which are necessary for interpreting dates.</p></li>
+            <li><p>The standard date format, also necessary for interpreting dates.</p></li>
+            <li><p>The default time zone, essential for interpreting date-times.</p></li>
+            <li><p>Character encoding, vital for reading non-ASCII characters. </p></li>
+            <li><p>The symbols for decimals and number groupings, important for interpreting numerical values.</p></li>
+          </ol>
+
+          <p>In R, a <em>locale</em> refers to a suite of settings that dictate how the system should behave with respect to cultural conventions. These settings affect the way data is formatted and presented, encompassing details such as date formatting, currency symbols, decimal separators, and other related aspects.</p>
+
+          <p>Locales in R affect several areas, including how character vectors are sorted, and date, number, and currency formatting. Additionally,  errors, warnings, and other messages might be translated into languages other than English based on the locale.</p>
+
+        <section xml:id="sec-locales-in-r">
+          <title>Locales in R</title>
+
+          <p>To access the current locale settings in R, you can use the <c>Sys.getlocale()</c> function:</p>
+
+          <program language="r">
+            <input>
+Sys.getlocale()
+            </input>
+          </program>
+
+          <p>To set a specific locale, use the <c>Sys.setlocale()</c> function. For example, to set the locale to US English:</p>
+
+          <program language="r">
+            <input>
+Sys.setlocale("LC_ALL", "en_US.UTF-8")
+            </input>
+          </program>
+
+          <p>The exact string to use for setting the locale (like "en_US.UTF-8") can depend on your operating system and its configuration.</p>
+
+          <p>The <c>LC_ALL</c> used in the above code refers to all locale categories. R, like many systems, breaks down the locale into categories, each responsible for different aspects listed below.</p>
+
+          <p>- <c>LC_COLLATE</c>: for string collation - <c>LC_TIME</c>: date and time formatting - <c>LC_MONETARY</c>: currency formatting. - <c>LC_MESSAGES</c>: system message translations. - <c>LC_NUMERIC</c>: number formatting.</p>
+
+          <p>You can set the locale for each category individually if you don't want to change everything with <c>LC_ALL</c>.</p>
+
+          <p>We have shown tools to control locales. These settings are important because they affect how your data looks and behaves. However, not all of these settings are available on every computer; their availability depends on what kind of computer you have and how it's set up.</p>
+
+          <p>Changing these settings, especially <c>LC_NUMERIC</c>, can lead to unexpected problems when you're working with numbers in R. For example, if you're used to using a period as a decimal point, but your locale uses a comma, this disparity can create issues when importing data.</p>
+
+          <p>It is important to remember that these locale settings only last as long as one R session. If you change them while you're working, they will revert to the default settings when you close R and open it again.</p>
+
+        </section>
+
+        <section xml:id="sec-the-locale-function">
+          <title>The `locale` function</title>
+
+          <p>The <alert>readr</alert> package includes a <c>locale()</c> function that can be used to learn or change the current locale from within R:</p>
+
+          <program language="r">
+            <input>
+library(readr)
+locale()
+            </input>
+          </program>
+
+          <program language="r">
+            <input>
+#| echo: false
+options(readr.show_col_types = FALSE)
+            </input>
+          </program>
+
+          <p>You can see all the locales available on your system by typing:</p>
+
+          <program language="r">
+            <input>
+#| eval: false
+system("locale -a")
+            </input>
+          </program>
+
+          <p>Here is what you obtain if you change the dates locale to Spanish:</p>
+
+          <program language="r">
+            <input>
+locale(date_names = "es")
+            </input>
+          </program>
+
+        </section>
+
+        <section xml:id="sec-example-wrangling-a-spanish-dataset">
+          <title>Example: wrangling a Spanish dataset</title>
+
+          <p>In <xref ref="sec-reader"/>, we noted that reading the file:</p>
+
+          <program language="r">
+            <input>
+fn &lt;- file.path(system.file("extdata", package = "dslabs"), "calificaciones.csv")
+            </input>
+          </program>
+
+          <p>had a encoding different than UTF-8, the default. We used <c>guess_encoding</c> to determine the correct one:</p>
+
+          <program language="r">
+            <input>
+guess_encoding(fn)$encoding[1]
+            </input>
+          </program>
+
+          <p>and used the <c>locale</c> function to change this and read in this encoding instead:</p>
+
+          <program language="r">
+            <input>
+#| eval: false
+dat &lt;- read_csv(fn, locale = locale(encoding = "ISO-8859-1"))
+            </input>
+          </program>
+
+          <p>This file provides homework assignment scores for seven students. The columns represent the student name, their date of birth, the time they submitted their assignment, and the score they obtained, respectively. You can see the entire file using <c>read_lines</c>:</p>
+
+          <program language="r">
+            <input>
+read_lines(fn, locale = locale(encoding = "ISO-8859-1"))
+            </input>
+          </program>
+
+          <p>As an illustrative example, we will write code to compute the students age and check if they turned in their assignment by the deadline of September 21, 2023, before midnight.</p>
+
+          <p>We can read in the file with correct encoding like this:</p>
+
+          <program language="r">
+            <input>
+dat &lt;- read_csv(fn, locale = locale(encoding = "ISO-8859-1"))
+            </input>
+          </program>
+
+          <p>However, notice that the last column, which is supposed to contain exam scores between 0 and 100, shows numbers larger than 800:</p>
+
+          <program language="r">
+            <input>
+dat$puntuación
+            </input>
+          </program>
+
+          <p>This happens because the scores in the file use the European decimal point, which confuses <c>read_csv</c>.</p>
+
+          <p>To address this issue, we can also change the encoding to use European decimals, which fixes the problem:</p>
+
+          <program language="r">
+            <input>
+dat &lt;- read_csv(fn, locale = locale(decimal_mark = ",",
+                                    encoding = "ISO-8859-1"))
+dat$puntuación
+            </input>
+          </program>
+
+          <p>Now, to compute the student ages, let's try changing the submission times to date format:</p>
+
+          <program language="r">
+            <input>
+library(lubridate)
+dmy(dat$f.n.)
+            </input>
+          </program>
+
+          <p>Nothing gets converted correctly. This is because the dates are in Spanish. We can change the locale to use Spanish as the language for dates:</p>
+
+          <program language="r">
+            <input>
+parse_date(dat$f.n., format = "%d de %B de %Y", locale = locale(date_names = "es"))
+            </input>
+          </program>
+
+          <p>We can also reread the file using the correct locales:</p>
+
+          <program language="r">
+            <input>
+dat &lt;- read_csv(fn, locale = locale(date_names = "es",
+                                    date_format = "%d de %B de %Y",
+                                    decimal_mark = ",",
+                                    encoding = "ISO-8859-1"))
+            </input>
+          </program>
+
+          <p>Computing the students' ages is now straightforward:</p>
+
+          <program language="r">
+            <input>
+time_length(today() - dat$f.n., unit = "years") |&gt; floor()
+            </input>
+          </program>
+
+          <p>Finally, let's check which students turned in their homework past the deadline of September 22:</p>
+
+          <program language="r">
+            <input>
+dat$estampa &gt;= make_date(2023, 9, 22)
+            </input>
+          </program>
+
+          <p>We see that two students where late. However, with times we have to be particularly careful as some functions default to the UTC timezone:</p>
+
+          <program language="r">
+            <input>
+tz(dat$estampa)
+            </input>
+          </program>
+
+          <p>If we change to the timezone to Eastern Standard Time (EST), we see no one was late:</p>
+
+          <program language="r">
+            <input>
+with_tz(dat$estampa, tz =  "EST") &gt;= make_date(2023, 9, 22)
+            </input>
+          </program>
+
+        </section>
+
+        <section xml:id="sec-exercises">
+          <title>Exercises</title>
+
+          <ol>
+            <li><p>Load the <alert>lubridate</alert> package and set the locale to French for this exercise. </p></li>
+            <li><p>Create a numeric vector containing the following numbers: 12345.67, 9876.54, 3456.78, and 5432.10.</p></li>
+            <li><p>Use the <c>format()</c> function to format the numeric vector as currency, displaying the values in Euros. Ensure that the decimal point is represented correctly according to the French locale. Print the formatted currency values.</p></li>
+            <li><p>Create a date vector with three dates: July 14, 1789, January 1, 1803, and July 5, 1962. Use the <c>format()</c> function to format the date vector in the "dd Month yyyy" format, where "Month" should be displayed in the French language. Ensure that the month names are correctly translated according to the French locale. Print the formatted date values.</p></li>
+            <li><p>Reset the locale to the default setting (e.g., "C" or "en_US.UTF-8") to revert to the standard formatting.</p></li>
+            <li><p>Repeat steps 2-4 for the numeric vector, and steps 5-7 for the date vector to observe the standard formatting.</p></li>
+          </ol>
+
+        </section>
+        
       </chapter>
 
       <chapter xml:id="ch-extracting-data-from-the-web">
         <title>Extracting data from the web</title>
-        <p>Content will be added here.</p>
+        
+          <p>In today's digital age, the internet serves as a treasure trove of data. This chapter describes approaches for retrieving this data and preparing for data analysis. We focus on two primary methodologies: scraping html and API integration. Scraping html allows us to programmatically navigate and extract data from web pages, transforming the unstructured content of the HTML pages into structured data ready for analysis. On the other hand, APIs provide a more direct and efficient and structured access to data provided by web services. This chapter aims to introduce the basics needed to starting leveraging the web's vast data resources.</p>
+
+        <section xml:id="sec-scraping-html">
+          <title>Scraping HTML</title>
+
+          <p>The data we need to answer a question is not always in a spreadsheet ready for us to read. For example, the US murders dataset we used in the R Basics chapter originally comes from this Wikipedia page:</p>
+
+          <program language="r">
+            <input>
+url &lt;- paste0("https://en.wikipedia.org/w/index.php?title=",
+              "Gun_violence_in_the_United_States_by_state",
+              "&amp;direction=prev&amp;oldid=810166167")
+            </input>
+          </program>
+
+          <p>You can see the data table when you visit the webpage:</p>
+
+          <figure>
+            <image source="dataviz/img/murders-data-wiki-page.png"/>
+          </figure>
+
+          <p>(Web page courtesy of Wikipedia. CC-BY-SA-3.0 license. Screenshot of part of the page.)</p>
+
+          <p><em>Web scraping</em>, or <em>web harvesting</em>, is the term we use to describe the process of extracting data from a website. The reason we can do this is because the information used by a browser to render webpages is received as a text file from a server. The text is code written in hyper text markup language (HTML). Every browser has a way to show the html source code for a page, each one different. On Chrome, you can use Control-U on a PC and command+alt+U on a Mac. You will see something like this:</p>
+
+          <figure>
+            <image source="dataviz/img/html-code.png"/>
+          </figure>
+
+          <subsection xml:id="subsec-html">
+            <title>HTML</title>
+
+            <p>Because this code is accessible, we can download the HTML file, import it into R, and then write programs to extract the information we need from the page. However, once we look at HTML code, this might seem like a daunting task. But we will show you some convenient tools to facilitate the process. To get an idea of how it works, here are a few lines of code from the Wikipedia page that provides the US murders data:</p>
+
+            <program language="r">
+              <input>
+&lt;table class="wikitable sortable"&gt;
+&lt;tr&gt;
+&lt;th&gt;State&lt;/th&gt;
+&lt;th&gt;&lt;a href="/wiki/List_of_U.S._states_and_territories_by_population" 
+title="List of U.S. states and territories by population"&gt;Population&lt;/a&gt;&lt;br /&gt;
+&lt;small&gt;(total inhabitants)&lt;/small&gt;&lt;br /&gt;
+&lt;small&gt;(2015)&lt;/small&gt; &lt;sup id="cite_ref-1" class="reference"&gt;
+&lt;a href="#cite_note-1"&gt;[1]&lt;/a&gt;&lt;/sup&gt;&lt;/th&gt;
+&lt;th&gt;Murders and Nonnegligent
+&lt;p&gt;Manslaughter&lt;br /&gt;
+&lt;small&gt;(total deaths)&lt;/small&gt;&lt;br /&gt;
+&lt;small&gt;(2015)&lt;/small&gt; &lt;sup id="cite_ref-2" class="reference"&gt;
+&lt;a href="#cite_note-2"&gt;[2]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;/th&gt;
+&lt;th&gt;Murder and Nonnegligent
+&lt;p&gt;Manslaughter Rate&lt;br /&gt;
+&lt;small&gt;(per 100,000 inhabitants)&lt;/small&gt;&lt;br /&gt;
+&lt;small&gt;(2015)&lt;/small&gt;&lt;/p&gt;
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a href="/wiki/Alabama" title="Alabama"&gt;Alabama&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;4,853,875&lt;/td&gt;
+&lt;td&gt;348&lt;/td&gt;
+&lt;td&gt;7.2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a href="/wiki/Alaska" title="Alaska"&gt;Alaska&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;737,709&lt;/td&gt;
+&lt;td&gt;59&lt;/td&gt;
+&lt;td&gt;8.0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+              </input>
+            </program>
+
+            <p>You can actually see the data, except data values are surrounded by html code such as <c>&lt;td&gt;</c>. We can also see a pattern of how it is stored. If you know HTML, you can write programs that leverage knowledge of these patterns to extract what we want. We also take advantage of a language widely used to make webpages look "pretty" called Cascading Style Sheets (CSS). We say more about this in <xref ref="sec-css-selectors"/>.</p>
+
+            <p>Although we provide tools that make it possible to scrape data without knowing HTML, it is useful to learn some HTML and CSS. Not only does this improve your scraping skills, but it might come in handy if you are creating a webpage to showcase your work. There are plenty of online courses and tutorials for learning these. Two examples are Codeacademy and W3schools.</p>
+
+          </subsection>
+
+          <subsection xml:id="subsec-the-rvest-package">
+            <title>The rvest package</title>
+
+            <p>The __tidyverse__ provides a web harvesting package called __rvest__. The first step using this package is to import the webpage into R. The package makes this quite simple:</p>
+
+            <program language="r">
+              <input>
+library(tidyverse)
+library(rvest)
+h &lt;- read_html(url)
+              </input>
+            </program>
+
+            <p>Note that the entire Murders in the US Wikipedia webpage is now contained in <c>h</c>. The class of this object is:</p>
+
+            <program language="r">
+              <input>
+class(h)
+              </input>
+            </program>
+
+            <p>The __rvest__ package is actually more general; it handles XML documents. XML is a general markup language (that's what the ML stands for) that can be used to represent any kind of data. HTML is a specific type of XML specifically developed for representing webpages. Here we focus on HTML documents.</p>
+
+            <p>Now, how do we extract the table from the object <c>h</c>? If you were to print <c>h</c>,  we would see information about the object that is not very informative. We can see all the code that defines the downloaded webpage using the <c>html_text</c> function like this:</p>
+
+            <program language="r">
+              <input>
+html_text(h)
+              </input>
+            </program>
+
+            <p>We don't show the output here because it includes thousands of characters. But if we look at it, we can see the data we are after are stored in an HTML table: you can see this in this line of the HTML code above <c>&lt;table class="wikitable sortable"&gt;</c>. The different parts of an HTML document, often defined with a message in between  <c>&lt;</c> and <c>&gt;</c>  are referred to as <em>nodes</em>. The __rvest__ package includes functions to extract nodes of an HTML document: <c>html_nodes</c> extracts all nodes of different types and <c>html_node</c> extracts the first one. To extract the tables from the html code we use:</p>
+
+            <program language="r">
+              <input>
+tab &lt;- h |&gt; html_nodes("table")
+              </input>
+            </program>
+
+            <p>Now, instead of the entire webpage, we just have the html code for the tables in the page:</p>
+
+            <program language="r">
+              <input>
+tab
+              </input>
+            </program>
+
+            <p>The table we are interested is the first one:</p>
+
+            <program language="r">
+              <input>
+tab[[1]]
+              </input>
+            </program>
+
+            <p>This is clearly not a tidy dataset, not even a data frame. In the code above, you can definitely see a pattern and writing code to extract just the data is very doable. In fact, __rvest__ includes a function just for converting HTML tables into data frames:</p>
+
+            <program language="r">
+              <input>
+tab &lt;- tab[[1]] |&gt; html_table()
+class(tab)
+              </input>
+            </program>
+
+            <p>We are now much closer to having a usable data table:</p>
+
+            <program language="r">
+              <input>
+tab &lt;- tab |&gt; setNames(c("state", "population", "total", "murder_rate")) 
+head(tab)
+              </input>
+            </program>
+
+            <p>We still have some wrangling to do. For example, we need to remove the commas and turn characters into numbers. Before continuing with this, we will learn a more general approach to extracting information from web sites.</p>
+
+          </subsection>
+
+          <subsection xml:id="sec-css-selectors">
+            <title>CSS selectors</title>
+
+            <p>The default look of a webpage made with the most basic HTML is quite unattractive. The aesthetically pleasing pages we see today are made using CSS to define the look and style of webpages. The fact that all pages for a company have the same style usually results from their use of the same CSS file to define the style. The general way these CSS files work is by defining how each of the elements of a webpage will look. The title, headings, itemized lists, tables, and links, for example, each receive their own style including font, color, size, and distance from the margin. CSS does this by leveraging patterns used to define these elements, referred to as <em>selectors</em>. An example of such a pattern, which we used above, is <c>table</c>, but there are many, many more.</p>
+
+            <p>If we want to grab data from a webpage and we happen to know a selector that is unique to the part of the page containing this data, we can use the <c>html_nodes</c> function. However, knowing which selector can be quite complicated. In fact, the complexity of webpages has been increasing as they become more sophisticated. For some of the more advanced ones, it seems almost impossible to find the nodes that define a particular piece of data. However, selector gadgets actually make this possible.</p>
+
+            <p>SelectorGadget is piece of software that allows you to interactively determine what CSS selector you need to extract specific components from the webpage. If you plan on scraping data other than tables from html pages, we highly recommend you install it. A Chrome extension is available which permits you to turn on the gadget and then, as you click through the page, it highlights parts and shows you the selector you need to extract these parts. There are various demos of how to do this including __rvest__ author Hadley Wickham's vignette and other tutorials based on the vignette.</p>
+
+          </subsection>
+
+        </section>
+
+        <section xml:id="sec-json">
+          <title>JSON</title>
+
+          <p>Sharing data on the internet has become more and more common. Unfortunately, providers use different formats, which makes it harder for data analysts to wrangle data into R. Yet there are some standards that are also becoming more common. Currently, a format that is widely being adopted is the JavaScript Object Notation or JSON. Because this format is very general, it is nothing like a spreadsheet. This JSON file looks more like the code you use to define a list. Here is an example of information stored in a JSON format:</p>
+
+          <program language="r">
+            <input>
+library(jsonlite)
+example &lt;- data.frame(name = c("Miguel", "Sofia", "Aya", "Cheng"), 
+                      student_id = 1:4, exam_1 = c(85, 94, 87, 90), exam_2 = c(86, 93, 88, 91))
+json &lt;- toJSON(example, pretty = TRUE) 
+json
+            </input>
+          </program>
+
+          <p>The file above actually represents a data frame. To read it, we can use the function <c>fromJSON</c> from the __jsonlite__ package. Note that JSON files are often made available via the internet. Several organizations provide a JSON API or a web service that you can connect directly to and obtain data. Here is an example providing information Nobel prize winners:</p>
+
+          <program language="r">
+            <input>
+library(jsonlite)
+nobel &lt;- fromJSON("http://api.nobelprize.org/v1/prize.json")
+            </input>
+          </program>
+
+          <p>This downloads a list. The first argument, named "prizes" is a table with information about Nobel prize winners. Each row holds corresponds to a particular year and category. The "laureates" column holds a list with a data frame for each winner with columns for id, firstname, surname, and motivation.</p>
+
+          <program language="r">
+            <input>
+nobel$prizes |&gt;
+  filter(category == "literature" &amp; year == "1971") |&gt; 
+  pull(laureates) |&gt;
+  first() |&gt;
+  select(id, firstname, surname)
+            </input>
+          </program>
+
+          <p>You can learn much more by examining tutorials and help files from the __jsonlite__ package. This package is intended for relatively simple tasks such as converting data into tables. For more flexibility, we recommend the __rjson__ package.</p>
+
+        </section>
+
+        <section xml:id="sec-data-apis">
+          <title>Data APIs</title>
+
+          <p>An Application Programming Interface (API) is a set of rules and protocols that allows different software entities to communicate with each other. It defines methods and data formats that software components should use when requesting and exchanging information. APIs play a crucial role in enabling the integration that make today's software so interconnected and versatile.</p>
+
+          <subsection xml:id="subsec-api-types-and-concepts">
+            <title>API types and concepts</title>
+
+            <p>There are several types of APIs. The main ones related to retrieving data are:</p>
+
+            <p>* <alert>Web Services</alert> - Often built using protocols like HTTP/HTTPS. Commonly used to enable applications to communicate with each other over the web. For instance, a weather application for a smartphone may use a web API to request weather data from a remote server.</p>
+
+            <p>* <alert>Database APIs</alert> - Enable communication between an application and a database, SQL-based calls for example.</p>
+
+            <p>Some key concepts associated with APIs:</p>
+
+            <p>- <alert>Endpoints</alert>: Specific functions available through the API. For web APIs, an endpoint is usually a specific URL where the API can be accessed.</p>
+
+            <p>- <alert>Methods</alert>: Actions that can be performed. In web APIs, these often correspond to HTTP methods like GET, POST, PUT, or DELETE.</p>
+
+            <p>- <alert>Requests and Responses</alert>: The act of asking the API to perform its function is a <em>request</em>. The data it returns is the <em>response</em>.</p>
+
+            <p>- <alert>Rate Limits</alert>: Restrictions on how often you can call the API, often used to prevent abuse or overloading of the service.</p>
+
+            <p>- <alert>Authentication and Authorization</alert>: Mechanisms to ensure that only approved users or applications can use the API. Common methods include <em>API keys</em>, <em>OAuth</em>, or <em>Jason Web Tokens</em> (JWT).</p>
+
+            <p>- <alert>Data Formats</alert>: Many web APIs exchange data in a specific format, often JSON or CSV.</p>
+
+            <p>Here now describe the <alert>httr2</alert> package that facilitates interacionts between R and HTTP web services.</p>
+
+          </subsection>
+
+          <subsection xml:id="subsec-the-httr2-package">
+            <title>The httr2 package</title>
+
+            <p>HTTP is the most widely used protocol for data sharing through the internet. The <alert>httr2</alert> package provides functions to work with HTTP requests. One of the core functions in this package is <c>request</c>, which is used to form request to send to web services. The <c>req_perform</c> function sends the request.</p>
+
+            <p>This <c>request</c> function forms an HTTP GET request to the specified URL. Typically, HTTP GET requests are used to retrieve information from a server based on the provided URL.</p>
+
+            <p>The function returns an object of class <c>response</c>. This object contains all the details of the server's response, including status code, headers, and content. You can then use other <alert>httr2</alert> functions to extract or interpret information from this response.</p>
+
+            <p>Let's say you want to retrieve COVID-19 deaths by state from the CDC. By visiting their data catalog you can search for datasets and find that the data is provided through this API:</p>
+
+            <program language="r">
+              <input>
+url &lt;- "https://data.cdc.gov/resource/muzy-jte6.csv"
+              </input>
+            </program>
+
+            <p>We can then make create and perform a request like this:</p>
+
+            <program language="r">
+              <input>
+library(httr2)
+response &lt;- request(url) |&gt; req_perform()
+              </input>
+            </program>
+
+            <p>We can see the results of the request by looking at the returned object.</p>
+
+            <program language="r">
+              <input>
+response
+              </input>
+            </program>
+
+            <p>To extract the body, which is where the data are, we can use <c>resp_body_string</c> and send the result, a comma delimited string, to <c>read_csv</c></p>
+
+            <program language="r">
+              <input>
+#| message: false
+library(readr)
+tab &lt;- response |&gt; resp_body_string() |&gt; read_csv()
+              </input>
+            </program>
+
+            <p>We note that the returned object is only <c>nrow(tab)</c> entries. API often limit how much you can download. The documentation for this API explains that we can change this limit through the <c>$limit</c> parameters. We can use the <c>req_url_query</c> to add this to our request:</p>
+
+            <program language="r">
+              <input>
+response &lt;- request(url) |&gt; 
+  req_url_query(`$limit` = 100000) |&gt;
+  req_perform() 
+              </input>
+            </program>
+
+            <p>The CDC service returns data in csv format but a more common format used by web services is JSON. The CDC also provides data in json format through a the url:</p>
+
+            <program language="r">
+              <input>
+url &lt;- "https://data.cdc.gov/resource/muzy-jte6.json"
+              </input>
+            </program>
+
+            <p>To extract the data table we use the <c>fromJSON</c> function from the <alert>jsonlite</alert> package.</p>
+
+            <program language="r">
+              <input>
+tab &lt;- request(url) |&gt; 
+   req_perform() |&gt; 
+   resp_body_string() |&gt; 
+   fromJSON(flatten = TRUE)
+              </input>
+            </program>
+
+            <p>When working with APIs, it's essential to check the API's documentation for rate limits, required headers, or authentication methods. The <c>httr2</c> package provides tools to handle these requirements, such as setting headers or authentication parameters.</p>
+
+          </subsection>
+
+        </section>
+
+        <section xml:id="sec-exercises">
+          <title>Exercises</title>
+
+          <ol>
+            <li><p>Visit the following web page: <url href="https://web.archive.org/web/20181024132313/http://www.stevetheump.com/Payrolls.htm">https://web.archive.org/web/20181024132313/http://www.stevetheump.com/Payrolls.htm</url></p></li>
+          </ol>
+
+          <p>Notice there are several tables. Say we are interested in comparing the payrolls of teams across the years. The next few exercises take us through the steps needed to do this.</p>
+
+          <p>Start by applying what you learned to read in the website into an object called <c>h</c>.</p>
+
+          <ol>
+            <li><p>Note that, although not very useful, we can actually see the content of the page by typing:</p></li>
+          <program language="r">
+            <input>
+html_text(h)
+            </input>
+          </program>
+
+          </ol>
+
+          <p>The next step is to extract the tables. For this, we can use the <c>html_nodes</c> function. We learned that tables in html are associated with the <c>table</c> node.  Use the <c>html_nodes</c> function to extract all tables. Store it in an object <c>nodes</c>.</p>
+
+          <ol>
+            <li><p>The <c>html_nodes</c> function returns a list of objects of class <c>xml_node</c>. We can see the content of each one using, for example, the <c>html_text</c> function. You can see the content for an arbitrarily picked component like this:</p></li>
+          <program language="r">
+            <input>
+html_text(nodes[[8]])
+            </input>
+          </program>
+
+          </ol>
+
+          <p>If the content of this object is an html table, we can use the <c>html_table</c> function to convert it to a data frame. Use the <c>html_table</c> function to convert the 8th entry of <c>nodes</c> into a table.</p>
+
+          <ol>
+            <li><p>Repeat the above for the first 4 components of <c>nodes</c>. Which of the following are payroll tables:</p></li>
+          </ol>
+
+          <p>a. All of them. b. 1 c. 2 d. 2-4</p>
+
+          <ol>
+            <li><p>Repeat the above for the first __last__ 3 components of <c>nodes</c>. Which of the following is true:</p></li>
+          </ol>
+
+          <p>a. The last entry in <c>nodes</c> shows the average across all teams through time, not payroll per team. b. All three are payroll per team tables. c. All three are like the first entry, not a payroll table. d. All of the above.</p>
+
+          <ol>
+            <li><p>We have learned that the first and last entries of <c>nodes</c> are not payroll tables. Redefine <c>nodes</c> so that these two are removed.</p></li>
+            <li><p>We saw in the previous analysis that the first table node is not actually a table. This happens sometimes in html because tables are used to make text look a certain way, as opposed to storing numeric values. </p></li>
+          </ol>
+
+          <p>Remove the first component and then use <c>sapply</c> and <c>html_table</c> to convert each node in <c>nodes</c> into a table. Note that in this case, <c>sapply</c> will return a list of tables. You can also use <c>lapply</c> to assure that a list is applied.</p>
+
+          <ol>
+            <li><p>Look through the resulting tables. Are they all the same? Could we just join them with <c>bind_rows</c>? </p></li>
+            <li><p>Create two tables, call them <c>tab_1</c> and <c>tab_2</c> using the 10th and 19th tables in <c>nodes</c>.</p></li>
+            <li><p>Use a <c>full_join</c> function to combine these two tables. Before you do this you will have to fix the missing header problem. You will also need to make the names match.</p></li>
+            <li><p>After joining the tables, you see several <c>NA</c>s. This is because some teams are in one table and not the other. Use the <c>anti_join</c> function to get a better idea of why this is happening.</p></li>
+            <li><p>We see see that one of the problems is that Yankees are listed as both <em>N.Y. Yankees</em> and <em>NY Yankees</em>. In the next section, we will learn efficient approaches to fixing problems like this. Here we can do it "by hand" as follows:</p></li>
+          <program language="r">
+            <input>
+tab_1 &lt;- tab_1 |&gt;
+  mutate(Team = ifelse(Team == "N.Y. Yankees", "NY Yankees", Team))
+            </input>
+          </program>
+
+          </ol>
+
+          <p>Now join the tables and show only Oakland and the Yankees and the payroll columns.</p>
+
+          <ol>
+            <li><p>Advanced: extract the titles of the movies that won Best Picture from IMDB.</p></li>
+          </ol>
+
+        </section>
+        
       </chapter>
 
       <chapter xml:id="ch-string-processing">
