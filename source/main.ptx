@@ -8358,7 +8358,7 @@ locale(date_names = "es")
         <section xml:id="sec-example-wrangling-a-spanish-dataset">
           <title>Example: wrangling a Spanish dataset</title>
 
-          <p>In <xref ref="sec-reader"/>, we noted that reading the file:</p>
+          <p>When reading the file:</p>
 
           <program language="r">
             <input>
@@ -8366,7 +8366,7 @@ fn &lt;- file.path(system.file("extdata", package = "dslabs"), "calificaciones.c
             </input>
           </program>
 
-          <p>had a encoding different than UTF-8, the default. We used <c>guess_encoding</c> to determine the correct one:</p>
+          <p>we note that it has an encoding different than UTF-8, the default. We can use <c>guess_encoding</c> to determine the correct one:</p>
 
           <program language="r">
             <input>
