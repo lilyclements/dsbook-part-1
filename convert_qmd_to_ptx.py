@@ -459,6 +459,27 @@ if __name__ == '__main__':
                 'title': 'Text analysis',
                 'output': '/tmp/chapter17.ptx',
                 'number': 17
+            },
+            {
+                'path': 'productivity/unix.qmd',
+                'id': 'ch-organizing-with-unix',
+                'title': 'Organizing with Unix',
+                'output': '/tmp/chapter18.ptx',
+                'number': 18
+            },
+            {
+                'path': 'productivity/git.qmd',
+                'id': 'ch-git-and-github',
+                'title': 'Git and GitHub',
+                'output': '/tmp/chapter19.ptx',
+                'number': 19
+            },
+            {
+                'path': 'productivity/reproducible-projects.qmd',
+                'id': 'ch-reproducible-projects',
+                'title': 'Reproducible projects',
+                'output': '/tmp/chapter20.ptx',
+                'number': 20
             }
         ]
         

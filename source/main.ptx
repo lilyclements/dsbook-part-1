@@ -10641,17 +10641,1936 @@ gutenberg_metadata
 
       <chapter xml:id="ch-organizing-with-unix">
         <title>Organizing with Unix</title>
-        <p>Content will be added here.</p>
+        
+                <p>Unix is the operating system of choice in data science. We will introduce you to the Unix way of thinking using an example: how to keep a data analysis project organized. We will learn some of the most commonly used commands along the way. However, we won't go into advanced details. We highly encourage you to learn more, especially when you find yourself using the mouse or performing a repetitive task often. In those cases, there is probably a more efficient way to do it in Unix. Here are some basic courses to get you started:</p>
+
+                <p>-   "Learn the Command Line" through Codecademy -   "LinuxFoundationX: Introduction to Linux" through edX -   "The Unix Workbench" through Coursera</p>
+
+                <p>There are many reference books as well. Bite Size Linux and Bite Size Command Line are two particularly clear, succinct, and complete examples.</p>
+
+                <p>When searching for Unix resources, keep in mind that other terms used to describe what we will learn here are <em>Linux</em>, <em>the shell</em>, and <em>the command line</em>. Basically, what we are learning is a series of commands and a way of thinking that facilitates the organization of files without using the mouse.</p>
+
+                <p>To serve as motivation, we are going to start constructing a directory using Unix tools and RStudio.</p>
+
+              <section xml:id="sec-naming-convention">
+                <title>Naming convention</title>
+
+                <p>Before you start organizing projects with Unix you want to pick a name convention that you will use to systematically name your files and directories. This will help you find files and know what is in them.</p>
+
+                <p>In general you want to name your files in a way that is related to their contents and specifies how they relate to other files. The Smithsonian Data Management Best Practices has "five precepts of file naming and organization" and they are:</p>
+
+                <blockquote>
+                  <p>-   Have a distinctive, human-readable name that gives an indication of the content.</p>
+                </blockquote>
+
+                <blockquote>
+                  <p>-   Follow a consistent pattern that is machine-friendly.</p>
+                </blockquote>
+
+                <blockquote>
+                  <p>-   Organize files into directories (when necessary) that follow a consistent pattern.</p>
+                </blockquote>
+
+                <blockquote>
+                  <p>-   Avoid repetition of semantic elements among file and directory names.</p>
+                </blockquote>
+
+                <blockquote>
+                  <p>-   Have a file extension that matches the file format (no changing extensions!)</p>
+                </blockquote>
+
+                <p>For specific recommendations we highly recommend you follow The Tidyverse Style Guide.</p>
+
+              </section>
+
+              <section xml:id="sec-the-terminal">
+                <title>The terminal</title>
+
+                <p>Instead of clicking, dragging, and dropping to organize our files and folders, we will be typing Unix commands into the terminal. The way we do this is similar to how we type commands into the R console, but instead of generating plots and statistical summaries, we will be organizing files on our system.</p>
+
+                <p>The terminal is integrated into Mac and Linux systems, but Windows users will have to install an <em>emulator</em>. Once you have a terminal open, you can start typing commands. You should see a blinking cursor at the spot where what you type will show up. This position is called the <em>command line</em>. Once you type something and hit enter on Windows or return on the Mac, Unix will try to execute this command. If you want to try out an example, type this command:</p>
+
+                <program language="r">
+                  <input>
+      echo "hello world"
+                  </input>
+                </program>
+
+                <p>The command <c>echo</c> is similar to <c>cat</c> in R. Executing this line should print out <c>hello world</c>, then return back to the command line.</p>
+
+                <p>Notice that you can't use the mouse to move around in the terminal. You have to use the keyboard. To go back to a command you previously typed, you can use the up arrow.</p>
+
+                <p>Note that above we included a chunk of code showing Unix commands in the same way we have previously shown R commands. We will make sure to distinguish when the command is meant for R and when it is meant for Unix.</p>
+
+              </section>
+
+              <section xml:id="sec-filesystem">
+                <title>The filesystem</title>
+
+                <p>We refer to all the files, folders, and programs on your computer as <em>the filesystem</em>. Keep in mind that folders and programs are also files, but this is a technicality we rarely think about and ignore in this book. We will focus on files and folders for now and discuss programs, or <em>executables</em>, in a later section.</p>
+
+                <subsection xml:id="subsec-directories-and-subdirectories">
+                  <title>Directories and subdirectories</title>
+
+                  <p>The first concept you need to grasp to become a Unix user is how your filesystem is organized. You should think of it as a series of nested folders, each containing files, folders, and executables.</p>
+
+                  <p>Here is a visual representation of the structure we are describing:</p>
+
+                  <figure>
+                    <image source="dataviz/img/unix/filesystem.png"/>
+                  </figure>
+
+                  <p>In Unix, we refer to folders as <em>directories</em>. Directories that are inside other directories are often referred to as <em>subdirectories</em>. So, for example, in the figure above, the directory <em>docs</em> has two subdirectories: <em>reports</em> and <em>resumes</em>, and <em>docs</em> is a subdirectory of <em>home</em>.</p>
+
+                </subsection>
+
+                <subsection xml:id="subsec-the-home-directory">
+                  <title>The home directory</title>
+
+                  <p>The <em>home</em> directory is where all your stuff is kept, as opposed to the system files that come with your computer, which are kept elsewhere. In the figure above, the directory called <em>home</em> represents your home directory, but that is rarely the name used. On your system, the name of your home directory is likely the same as your username on that system. Below are an example on Windows and Mac showing a home directory, in this case, named <em>rafa</em>:</p>
+
+                  <figure>
+                    <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_53_13.png"/>
+                  </figure>
+
+                  <figure>
+                    <image source="dataviz/img/mac-screenshots/Screen-Shot-2018-04-13-at-4.34.01-PM.png"/>
+                  </figure>
+
+                  <p>Now, look back at the figure showing a filesystem. Suppose you are using a point-and-click system and you want to remove the file <em>cv.tex</em>. Imagine that on your screen you can see the <em>home</em> directory. To erase this file, you would double click on the <em>home</em> directory, then <em>docs</em>, then <em>resumes</em>, and then drag <em>cv.tex</em> to the trash. Here you are experiencing the hierarchical nature of the system: <em>cv.tex</em> is a file inside the <em>resumes</em> directory, which is a subdirectory inside the <em>docs</em> directory, which is a subdirectory of the <em>home</em> directory.</p>
+
+                  <p>Now suppose you can't see your home directory on your screen. You would somehow need to make it appear on your screen. One way to do this is to navigate from what is called the <em>root</em> directory all the way to your home directory. Any filesystem will have what is called a <em>root</em> directory, which is the directory that contains all directories. The <em>home</em> directory shown in the figure above will usually be two or more levels from the root. On Windows, you will have a structure like this:</p>
+
+                  <figure>
+                    <image source="dataviz/img/unix/windows-filesystem-from-root.png"/>
+                  </figure>
+
+                  <p>while on the Mac, it will be like this:</p>
+
+                  <figure>
+                    <image source="dataviz/img/unix/mac-filesystem-from-root.png"/>
+                  </figure>
+
+                  <p>On Windows, the typical R installation will make your <em>Documents</em> directory your home directory in R. This will likely be different from your home directory in Git Bash. Generally, when we discuss home directories, we refer to the Unix home directory which for Windows, in this book, is the Git Bash Unix directory.</p>
+
+                </subsection>
+
+                <subsection xml:id="sec-working-directory">
+                  <title>Working directory</title>
+
+                  <p>The concept of a <em>current location</em> is part of the point-and-click experience: at any given moment we are <em>in a folder</em> and see the content of that folder. As you search for a file, as we did above, you are experiencing the concept of a current location: once you double click on a directory, you change locations and are now <em>in that folder</em>, as opposed to the folder you were in before.</p>
+
+                  <p>In Unix, we don't have the same visual cues, but the concept of a <em>current location</em> is indispensable. We refer to this as the <em>working directory</em>. Each terminal window you have open has a working directory associated with it.</p>
+
+                  <p>How do we know what is our working directory? To answer this, we learn our next Unix command: <c>pwd</c>, which stands for <em>print working directory</em>. This command returns the working directory.</p>
+
+                  <p>Open a terminal and type:</p>
+
+                  <program language="r">
+                    <input>
+      pwd
+                    </input>
+                  </program>
+
+                  <p>We do not show the result of running this command because it will be quite different on your system compared to others. If you open a terminal and type <c>pwd</c> as your first command, you should see something like <c>/Users/yourusername</c> on a Mac or something like <c>/c/Users/yourusername</c> on Windows. The character string returned by calling <c>pwd</c> represents your working directory. When we first open a terminal, it will start in our home directory so in this case the working directory is the home directory.</p>
+
+                  <p>Notice that the forward slashes <c>/</c> in the strings above separate directories. So, for example, the location <c>/c/Users/rafa</c> implies that our working directory is called <c>rafa</c> and it is a subdirectory of <c>Users</c>, which is a subdirectory of <c>c</c>, which is a subdirectory of the root directory. The root directory is therefore represented by just a forward slash: <c>/</c>.</p>
+
+                </subsection>
+
+                <subsection xml:id="sec-paths">
+                  <title>Paths</title>
+
+                  <p>We refer to the string returned by <c>pwd</c> as the <em>full path</em> of the working directory. The name comes from the fact that this string spells out the <em>path</em> you need to follow to get to the directory in question from the root directory. Every directory has a full path. Later, we will about <em>relative paths</em>, which tell us how to get to a directory from the working directory.</p>
+
+                  <p>In Unix, we use the shorthand <c>~</c> as a nickname for your home directory. So, for example, if <c>docs</c> is a directory in your home directory, the full path for <em>docs</em> can be written like this <c>~/docs</c>.</p>
+
+                  <p>Most terminals will show the path to your working directory right on the command line. If you are using default settings and open a terminal on the Mac, you will see that right at the command line you have something like <c>computername:~ username</c> with <c>~</c> representing your working directory, which in this example is the home directory <c>~</c>. The same is true for the Git Bash terminal where you will see something like <c>username@computername MINGW64 ~</c>, with the working directory at the end. When we change directories, we will see this change on both Macs and Windows.</p>
+
+                </subsection>
+
+              </section>
+
+              <section xml:id="sec-unix-commands">
+                <title>Unix commands</title>
+
+                <p>We will now learn a series of Unix commands that will permit us to prepare a directory for a data science project. We also provide examples of commands that, if you type into your terminal, will return an error. This is because we are assuming the filesystem in the earlier diagram. Your filesystem is different. In the next section, we will provide examples that you can type in.</p>
+
+                <subsection xml:id="subsec-ls-listing-directory-content">
+                  <title>`ls`: Listing directory content</title>
+
+                  <p>In a point-and-click system, we know what is in a directory because we see it. In the terminal, we do not see the icons. Instead, we use the command <c>ls</c> to list the directory content.</p>
+
+                  <p>To see the content of your home directory, open a terminal and type:</p>
+
+                  <program language="r">
+                    <input>
+      ls
+                    </input>
+                  </program>
+
+                  <p>We will see more examples soon.</p>
+
+                </subsection>
+
+                <subsection xml:id="subsec-mkdir-and-rmdir-make-and-remove-a-directory">
+                  <title>`mkdir` and `rmdir`: make and remove a directory</title>
+
+                  <p>When we are preparing for a data science project, we will need to create directories. In Unix, we can do this with the command <c>mkdir</c>, which stands for <em>make directory</em>.</p>
+
+                  <p>Because you will soon be working on several projects, we highly recommend creating a directory called <em>projects</em> in your home directory.</p>
+
+                  <p>You can try this particular example on your system. Open a terminal and type:</p>
+
+                  <program language="r">
+                    <input>
+      mkdir projects
+                    </input>
+                  </program>
+
+                  <p>If you do this correctly, nothing will happen: no news is good news. If the directory already exists, you will get an error message and the existing directory will remain untouched.</p>
+
+                  <p>To confirm that you created the directory, you can list the contents of the current working directory:</p>
+
+                  <program language="r">
+                    <input>
+      ls
+                    </input>
+                  </program>
+
+                  <p>You should see the directory we just created listed. Perhaps you can also see many other directories that were already on your computer.</p>
+
+                  <p>For illustrative purposes, let's make a few more directories. You can list more than one directory name like this:</p>
+
+                  <program language="r">
+                    <input>
+      mkdir docs teaching
+                    </input>
+                  </program>
+
+                  <p>You can check to see if the three directories were created:</p>
+
+                  <program language="r">
+                    <input>
+      ls
+                    </input>
+                  </program>
+
+                  <p>If you made a mistake and need to remove the directory, you can use the command <c>rmdir</c> to remove it.</p>
+
+                  <program language="r">
+                    <input>
+      mkdir junk
+      rmdir junk
+                    </input>
+                  </program>
+
+                  <p>This will remove the directory as long as it is empty. If it is not empty, you will get an error message and the directory will remain untouched. To remove directories that are not empty, we will learn about the command <c>rm</c> later.</p>
+
+                </subsection>
+
+                <subsection xml:id="subsec-cd-navigating-the-filesystem-by-changing-directories">
+                  <title>`cd`: navigating the filesystem by changing directories</title>
+
+                  <p>Next we want to create directories inside directories that we have already created. We also want to avoid pointing and clicking our way through the filesystem. We explain how to do this in Unix, using the command line.</p>
+
+                  <p>Suppose we open a terminal and our working directory is our home directory. We want to change our working directory to <c>projects</c>. We do this using the <c>cd</c> command, which stands for <em>change directory</em>:</p>
+
+                  <program language="r">
+                    <input>
+      cd projects
+                    </input>
+                  </program>
+
+                  <p>To check that the working directory changed, we can use a command we previously learned to see our location:</p>
+
+                  <program language="r">
+                    <input>
+      pwd
+                    </input>
+                  </program>
+
+                  <p>Our working directory should now be <c>~/projects</c>. Note that on your computer the home directory <c>~</c> will be spelled out to something like <c>/c/Users/yourusername</c>.</p>
+
+                  <p>In Unix you can auto-complete by hitting tab. This means that we can type <c>cd d</c> then hit tab. Unix will either auto-complete if <c>docs</c> is the only directory/file starting with <c>d</c> or show you the options. Try it out! Using Unix without auto-complete can make it unbearable.</p>
+
+                  <p>When using <c>cd</c>, we can either type a full path, which will start with <c>/</c> or <c>~</c>, or a <em>relative path</em>. In the example above, in which we typed <c>cd projects</c>, we used a relative path. If the path you type does not start with <c>/</c> or <c>~</c>, Unix will assume you are typing a relative path, meaning that it will look for the directory in your current working directory. So something like this will give you an error:</p>
+
+                  <program language="r">
+                    <input>
+      cd Users
+                    </input>
+                  </program>
+
+                  <p>because there is no <c>Users</c> directory in your working directory.</p>
+
+                  <p>Now suppose we want to move back to the directory in which <c>projects</c> is a subdirectory, referred to as the <em>parent directory</em>. We could use the full path of the parent directory, but Unix provides a shortcut for this: the parent directory of the working directory is represented with two dots: <c>..</c> so to move back we simply type:</p>
+
+                  <program language="r">
+                    <input>
+      cd ..
+                    </input>
+                  </program>
+
+                  <p>You should now be back in your home directory which you can confirm using <c>pwd</c>.</p>
+
+                  <p>Because we can use full paths with <c>cd</c>, the following command:</p>
+
+                  <program language="r">
+                    <input>
+      cd ~
+                    </input>
+                  </program>
+
+                  <p>will always take us back to the home directory, no matter where we are in the filesystem.</p>
+
+                  <p>The working directory also has a nickname, which is a single <c>.</c> so if you type</p>
+
+                  <program language="r">
+                    <input>
+      cd .
+                    </input>
+                  </program>
+
+                  <p>you will not move. Although this particular use of <c>.</c> is not useful, this nickname does come in handy sometimes. The reasons are not relevant for this section, but you should still be aware of this fact.</p>
+
+                  <p>In summary, we have learned that when using <c>cd</c> we either stay put, move to a new directory using the desired directory name, or move back to the parent directory using <c>..</c>.</p>
+
+                  <p>When typing directory names, we can concatenate directories with the forward-slashes. So if we want a command that takes us to the <c>projects</c> directory no matter where we are in the filesystem, we can type:</p>
+
+                  <program language="r">
+                    <input>
+      cd ~/projects
+                    </input>
+                  </program>
+
+                  <p>which is equivalent to writing the entire path out. For example, in Windows we would write something like</p>
+
+                  <program language="r">
+                    <input>
+      cd /c/Users/yourusername/projects
+                    </input>
+                  </program>
+
+                  <p>The last two commands are equivalent and in both cases we are typing the full path.</p>
+
+                  <p>We can also concatenate directory names for relative paths. For instance, if we want to move back to the parent directory of the parent directory of the working directory, we can type:</p>
+
+                  <program language="r">
+                    <input>
+      cd ../..
+                    </input>
+                  </program>
+
+                  <p>Here are a couple of final tips related to the <c>cd</c> command. First, you can go back to whatever directory you just left by typing:</p>
+
+                  <program language="r">
+                    <input>
+      cd -
+                    </input>
+                  </program>
+
+                  <p>This can be useful if you type a very long path and then realize you want to go back to where you were, and that too has a very long path.</p>
+
+                  <p>Second, if you just type:</p>
+
+                  <program language="r">
+                    <input>
+      cd
+                    </input>
+                  </program>
+
+                  <p>you will be returned to your home directory.</p>
+
+                </subsection>
+
+                <subsection xml:id="subsec-examples">
+                  <title>Examples</title>
+
+                  <p>Let's explore some examples of using <c>cd</c>. To help visualize, we will show the graphical representation of our filesystem vertically:</p>
+
+                  <figure>
+                    <image source="dataviz/img/unix/filesystem-vertical.png"/>
+                  </figure>
+
+                  <p>Suppose our working directory is <c>~/projects</c> and we want to move to <c>figs</c> in <c>project-1</c>.</p>
+
+                  <p>Here it is convenient to use relative paths:</p>
+
+                  <program language="r">
+                    <input>
+      cd project-1/figs
+                    </input>
+                  </program>
+
+                  <p>Now suppose our working directory is <c>~/projects</c> and we want to move to <c>reports</c> in <c>docs</c>, how can we do this?</p>
+
+                  <p>One way is to use relative paths:</p>
+
+                  <program language="r">
+                    <input>
+      cd ../docs/reports
+                    </input>
+                  </program>
+
+                  <p>Another is to use the full path:</p>
+
+                  <program language="r">
+                    <input>
+      cd ~/docs/reports
+                    </input>
+                  </program>
+
+                  <p>If you are trying this out on your system, remember to use auto-complete.</p>
+
+                  <p>Let's examine one more example. Suppose we are in <c>~/projects/project-1/figs</c> and want to change to <c>~/projects/project-2</c>. Again, there are two ways.</p>
+
+                  <p>With relative paths:</p>
+
+                  <program language="r">
+                    <input>
+      cd ../../project-2
+                    </input>
+                  </program>
+
+                  <p>and with full paths:</p>
+
+                  <program language="r">
+                    <input>
+      cd ~/projects/project-2
+                    </input>
+                  </program>
+
+                </subsection>
+
+              </section>
+
+              <section xml:id="sec-more-unix-commands">
+                <title>More Unix commands</title>
+
+                <subsection xml:id="subsec-mv-moving-files">
+                  <title>`mv`: moving files</title>
+
+                  <p>In a point-and-click system, we move files from one directory to another by dragging and dropping. In Unix, we use the <c>mv</c> command.</p>
+
+                  <p><c>mv</c> will not ask "are you sure?" if your move results in overwriting a file.</p>
+
+                  <p>Now that you know how to use full and relative paths, using <c>mv</c> is relatively straightforward. The general form is:</p>
+
+                  <program language="r">
+                    <input>
+      mv path-to-file path-to-destination-directory
+                    </input>
+                  </program>
+
+                  <p>For example, if we want to move the file <c>cv.tex</c> from <c>resumes</c> to <c>reports</c>, you could use the full paths like this:</p>
+
+                  <program language="r">
+                    <input>
+      mv ~/docs/resumes/cv.tex ~/docs/reports/
+                    </input>
+                  </program>
+
+                  <p>You can also use relative paths. You could do this:</p>
+
+                  <program language="r">
+                    <input>
+      cd ~/docs/resumes
+      mv cv.tex ../reports/
+                    </input>
+                  </program>
+
+                  <p>or this:</p>
+
+                  <program language="r">
+                    <input>
+      cd ~/docs/reports/
+      mv ../resumes/cv.tex ./
+                    </input>
+                  </program>
+
+                  <p>Notice that in the last one we used the working directory shortcut <c>.</c> to give a relative path as the destination directory.</p>
+
+                  <p>We can also use <c>mv</c> to change the name of a file. To do this, instead of the second argument being the destination directory, it also includes a filename. So, for example, to change the name from <c>cv.tex</c> to <c>resume.tex</c>, we simply type:</p>
+
+                  <program language="r">
+                    <input>
+      cd ~/docs/resumes
+      mv cv.tex resume.tex
+                    </input>
+                  </program>
+
+                  <p>We can also combine the move and a rename. For example:</p>
+
+                  <program language="r">
+                    <input>
+      cd ~/docs/resumes
+      mv cv.tex ../reports/resume.tex
+                    </input>
+                  </program>
+
+                  <p>And we can move entire directories. To move the <c>resumes</c> directory into <c>reports</c>, we do as follows:</p>
+
+                  <program language="r">
+                    <input>
+      mv ~/docs/resumes ~/docs/reports/
+                    </input>
+                  </program>
+
+                  <p>It is important to add the last <c>/</c> to make it clear you do not want to rename the <c>resumes</c> directory to <c>reports</c>, but rather move it into the <c>reports</c> directory.</p>
+
+                </subsection>
+
+                <subsection xml:id="subsec-cp-copying-files">
+                  <title>`cp`: copying files</title>
+
+                  <p>The command <c>cp</c> behaves similar to <c>mv</c> except instead of moving, we copy the file, meaning that the original file stays untouched.</p>
+
+                  <p>So in all the <c>mv</c> examples above, you can switch <c>mv</c> to <c>cp</c> and they will copy instead of move with one exception: we can't copy entire directories without learning about arguments, which we do later.</p>
+
+                </subsection>
+
+                <subsection xml:id="subsec-rm-removing-files">
+                  <title>`rm`: removing files</title>
+
+                  <p>In point-and-click systems, we remove files by dragging and dropping them into the trash or using a special click on the mouse. In Unix, we use the <c>rm</c> command.</p>
+
+                  <p>Unlike throwing files into the trash, <c>rm</c> is permanent. Be careful!</p>
+
+                  <p>The general way it works is as follows:</p>
+
+                  <program language="r">
+                    <input>
+      rm filename
+                    </input>
+                  </program>
+
+                  <p>You can actually list files as well like this:</p>
+
+                  <program language="r">
+                    <input>
+      rm filename-1 filename-2 filename-3
+                    </input>
+                  </program>
+
+                  <p>You can use full or relative paths. To remove non-empty directories, you will have to learn about arguments, which we do later.</p>
+
+                </subsection>
+
+                <subsection xml:id="subsec-less-looking-at-a-file">
+                  <title>`less`: looking at a file</title>
+
+                  <p>Often you want to quickly look at the content of a file. If this file is a text file, the quickest way to do is by using the command <c>less</c>. To look a the file <c>cv.tex</c>, you do this:</p>
+
+                  <program language="r">
+                    <input>
+      cd ~/docs/resumes
+      less cv.tex 
+                    </input>
+                  </program>
+
+                  <p>To exit the viewer, you type <c>q</c>. If the files are long, you can use the arrow keys to move up and down. There are many other keyboard commands you can use within <c>less</c> to, for example, search or jump pages.</p>
+
+                  <p>If you are wondering why the command is called <c>less</c>, it is because the original was called <c>more</c>, as in "show me more of this file". The second version was called <c>less</c> because of the saying "less is more".</p>
+
+                </subsection>
+
+              </section>
+
+              <section xml:id="sec-prep-project">
+                <title>Case study: Preparing for a project</title>
+
+                <p>We are now ready to prepare a directory for a project. We will use the US murders project as an example.</p>
+
+                <p>You should start by creating a directory where you will keep all your projects. We recommend a directory called <em>projects</em> in your home directory. To do this you would type:</p>
+
+                <program language="r">
+                  <input>
+      cd ~
+      mkdir projects
+                  </input>
+                </program>
+
+                <p>Our project relates to gun violence murders so we will call the directory for our project <c>murders</c>. It will be a subdirectory in our projects directories. In the <c>murders</c> directory, we will create two subdirectories to hold the raw data and intermediate data. We will call these <c>data</c> and <c>rda</c>, respectively.</p>
+
+                <p>Open a terminal and make sure you are in the home directory:</p>
+
+                <program language="r">
+                  <input>
+      cd ~
+                  </input>
+                </program>
+
+                <p>Now run the following commands to create the directory structure we want. At the end, we use <c>ls</c> and <c>pwd</c> to confirm we have generated the correct directories in the correct working directory:</p>
+
+                <program language="r">
+                  <input>
+      cd projects
+      mkdir murders
+      cd murders
+      mkdir data rdas 
+      ls
+      pwd
+                  </input>
+                </program>
+
+                <p>Note that the full path of our <c>murders</c> dataset is <c>~/projects/murders</c>.</p>
+
+                <p>So if we open a new terminal and want to navigate into that directory we type:</p>
+
+                <program language="r">
+                  <input>
+      cd projects/murders
+                  </input>
+                </program>
+
+                <p>In <xref ref="sec-organizing"/> we will describe how we can use RStudio to organize a data analysis project, once these directories have been created.</p>
+
+              </section>
+
+              <section xml:id="sec-advanced-unix">
+                <title>Advanced Unix</title>
+
+                <p>Most Unix implementations include a large number of powerful tools and utilities. We have just learned the very basics here. We recommend that you use Unix as your main file management tool. It will take time to become comfortable with it, but as you struggle, you will find yourself learning just by looking up solutions on the internet. In this section, we superficially cover slightly more advanced topics. The main purpose of the section is to make you aware of what is available rather than explain everything in detail.</p>
+
+                <subsection xml:id="subsec-arguments">
+                  <title>Arguments</title>
+
+                  <p>Most Unix commands can be run with arguments. Arguments are typically defined by using a dash <c>-</c> or two dashes <c>--</c> (depending on the command) followed by a letter or a word. An example of an argument is the <c>-r</c> behind <c>rm</c>. The <c>r</c> stands for recursive, and the result is that files and directories are removed recursively, which means that if you type:</p>
+
+                  <program language="r">
+                    <input>
+      rm -r directory-name
+                    </input>
+                  </program>
+
+                  <p>all files, subdirectories, files in subdirectories, subdirectories in subdirectories, and so on, will be removed. This is equivalent to throwing a folder in the trash, except you can't recover it. Once you remove it, it is deleted for good. Often, when you are removing directories, you will encounter files that are protected. In such cases, you can use the argument <c>-f</c> which stands for <c>force</c>.</p>
+
+                  <p>You can also combine arguments. For instance, to remove a directory regardless of protected files, you type:</p>
+
+                  <program language="r">
+                    <input>
+      rm -rf directory-name
+                    </input>
+                  </program>
+
+                  <p>Remember that once you remove there is no going back, so use this command very carefully.</p>
+
+                  <p>A command that is often called with argument is <c>ls</c>. Here are some examples:</p>
+
+                  <program language="r">
+                    <input>
+      ls -a 
+                    </input>
+                  </program>
+
+                  <p>The <c>a</c> stands for all. This argument makes <c>ls</c> show you all files in the directory, including hidden files. In Unix, all files starting with a <c>.</c> are hidden. Many applications create hidden directories to store important information without getting in the way of your work. An example is <c>git</c>. Once you initialize a directory as a git directory with <c>git init</c>, a hidden directory called <c>.git</c> is created. Another hidden file is the <c>.gitignore</c> file.</p>
+
+                  <p>Another example of using an argument is:</p>
+
+                  <program language="r">
+                    <input>
+      ls -l 
+                    </input>
+                  </program>
+
+                  <p>The <c>l</c> stands for long and the result is that more information about the files is shown.</p>
+
+                  <p>It is often useful to see files in chronological order. For that we use:</p>
+
+                  <program language="r">
+                    <input>
+      ls -t 
+                    </input>
+                  </program>
+
+                  <p>and to reverse the order of how files are shown you can use:</p>
+
+                  <program language="r">
+                    <input>
+      ls -r 
+                    </input>
+                  </program>
+
+                  <p>We can combine all these arguments to show more information for all files in reverse chronological order:</p>
+
+                  <program language="r">
+                    <input>
+      ls -lart 
+                    </input>
+                  </program>
+
+                  <p>Each command has a different set of arguments. In the next section, we learn how to find out what they each do.</p>
+
+                </subsection>
+
+                <subsection xml:id="subsec-getting-help">
+                  <title>Getting help</title>
+
+                  <p>As you may have noticed, Unix uses an extreme version of abbreviations. This makes it very efficient, but hard to guess how to call commands. To make up for this weakness, Unix includes complete help files or <em>man pages</em> (man is short for manual). In most systems, you can type <c>man</c> followed by the command name to get help. So for <c>ls</c>, we would type:</p>
+
+                  <program language="r">
+                    <input>
+      man ls
+                    </input>
+                  </program>
+
+                  <p>This command is not available in some of the compact implementations of Unix, such as Git Bash. An alternative way to get help that works on Git Bash is to type the command followed by <c>--help</c>. So for <c>ls</c>, it would be as follows:</p>
+
+                  <program language="r">
+                    <input>
+      ls --help
+                    </input>
+                  </program>
+
+                </subsection>
+
+                <subsection xml:id="subsec-pipes">
+                  <title>Pipes</title>
+
+                  <p>The help pages are typically long and if you type the commands above to see the help, it scrolls all the way to the end. It would be useful if we could save the help to a file and then use <c>less</c> to see it. The <c>pipe</c>, written like this <c>|</c>, does something similar. It <em>pipes</em> the results of a command to the command after the <c>pipe</c>. This is similar to the pipe <c>|&gt;</c> that we use in R. To get more help we thus can type:</p>
+
+                  <program language="r">
+                    <input>
+      man ls | less
+                    </input>
+                  </program>
+
+                  <p>or in Git Bash:</p>
+
+                  <program language="r">
+                    <input>
+      ls --help | less 
+                    </input>
+                  </program>
+
+                  <p>This is also useful when listing files with many files. We can type:</p>
+
+                  <program language="r">
+                    <input>
+      ls -lart | less 
+                    </input>
+                  </program>
+
+                </subsection>
+
+                <subsection xml:id="subsec-wild-cards">
+                  <title>Wild cards</title>
+
+                  <p>Some of the most powerful aspects of Unix are the <em>wild cards</em>. Suppose we want to remove all the temporary html files produced while trouble shooting for a project. Imagine there are dozens of files. It would be quite painful to remove them one by one. In Unix, we can actually write an expression that means all the files that end in <c>.html</c>. To do this we type <em>wild card</em>: <c>*</c>. As discussed in the data wrangling part of this book, this character means any number of any combination of characters. Specifically, to list all html files, we would type:</p>
+
+                  <program language="r">
+                    <input>
+      ls *.html
+                    </input>
+                  </program>
+
+                  <p>To remove all html files in a directory, we would type:</p>
+
+                  <program language="r">
+                    <input>
+      rm *.html
+                    </input>
+                  </program>
+
+                  <p>The other useful wild card is the <c>?</c> symbol. This means any single character. So if all the files we want to erase have the form <c>file-001.html</c> with the numbers going from 1 to 999, we can type:</p>
+
+                  <program language="r">
+                    <input>
+      rm file-???.html
+                    </input>
+                  </program>
+
+                  <p>This will only remove files with that format.</p>
+
+                  <p>We can combine wild cards. For example, to remove all files with the form <c>file-001</c> up to <c>file-999</c> regardless of suffix, we can type:</p>
+
+                  <program language="r">
+                    <input>
+      rm file-???.* 
+                    </input>
+                  </program>
+
+                  <p>Combining rm with the <c>*</c> wild card can be dangerous. There are combinations of these commands that will erase your entire filesystem without asking "are you sure?". So make sure you understand how it works before using this wild card with the <c>rm</c> command. We recommend always checking what files will match the wild card first by using the <c>ls</c> command.</p>
+
+                </subsection>
+
+                <subsection xml:id="subsec-environment-variables">
+                  <title>Environment variables</title>
+
+                  <p>Unix has settings that affect your command line <em>environment</em>. These are called environment variables. The home directory is one of them. We can actually change some of these. In Unix, variables are distinguished from other entities by adding a <c>$</c> in front. The home directory is stored in <c>$HOME</c>.</p>
+
+                  <p>Earlier we saw that <c>echo</c> is the Unix command for print. So we can see our home directory by typing:</p>
+
+                  <program language="r">
+                    <input>
+      echo $HOME 
+                    </input>
+                  </program>
+
+                  <p>You can see them all by typing:</p>
+
+                  <program language="r">
+                    <input>
+      env
+                    </input>
+                  </program>
+
+                  <p>You can change some of these environment variables. But their names vary across different <em>shells</em>. We describe shells in the next section.</p>
+
+                </subsection>
+
+                <subsection xml:id="subsec-shells">
+                  <title>Shells</title>
+
+                  <p>Much of what we use in this chapter is part of what is called the <em>Unix shell</em>. There are actually different shells, but the differences are almost unnoticeable. They are also important, although we do not cover those here. You can see what shell you are using by typing:</p>
+
+                  <program language="r">
+                    <input>
+      echo $SHELL
+                    </input>
+                  </program>
+
+                  <p>The most common one is <c>bash</c>.</p>
+
+                  <p>Once you know the shell, you can change environmental variables. In Bash Shell, we do it using <c>export variable value</c>. To change the path, described in more detail soon, you would type:</p>
+
+                  <program language="r">
+                    <input>
+      export PATH = /usr/bin/
+                    </input>
+                  </program>
+
+                  <p>Don't actually run this command though!</p>
+
+                  <p>There is a program that is run before each terminal starts where you can edit variables so they change whenever you call the terminal. This changes in different implementations, but if using bash, you can create a file called <c>.bashrc</c>, <c>.bash_profile</c>,<c>.bash_login</c>, or <c>.profile</c>. You might already have one.</p>
+
+                </subsection>
+
+                <subsection xml:id="subsec-executables">
+                  <title>Executables</title>
+
+                  <p>In Unix, all programs are files. They are called executables. So <c>ls</c>, <c>mv</c> and <c>git</c> are all files. But where are these program files? You can find out using the command <c>which</c>:</p>
+
+                  <program language="bash">
+                    <input>
+      which git
+                    </input>
+                  </program>
+
+                  <p>That directory is probably full of program files. The directory <c>/usr/bin</c> usually holds many program files. If you type:</p>
+
+                  <program language="r">
+                    <input>
+      ls /usr/bin
+                    </input>
+                  </program>
+
+                  <p>in your terminal, you will see several executable files.</p>
+
+                  <p>There are other directories that usually hold program files. The Application directory in the Mac or Program Files directory in Windows are examples.</p>
+
+                  <p>When you type <c>ls</c>, Unix knows to run a program which is an executable that is stored in some other directory. So how does Unix know where to find it? This information is included in the environmental variable <c>$PATH</c>. If you type:</p>
+
+                  <program language="r">
+                    <input>
+      echo $PATH
+                    </input>
+                  </program>
+
+                  <p>you will see a list of directories separated by <c>:</c>. The directory <c>/usr/bin</c> is probably one of the first ones on the list.</p>
+
+                  <p>Unix looks for program files in those directories in that order. Although we don't teach it here, you can actually create executables yourself. However, if you put it in your working directory and this directory is not on the path, you can't run it just by typing the command. You get around this by typing the full path. So if your command is called my-ls, you can type:</p>
+
+                  <program language="r">
+                    <input>
+      ./my-ls
+                    </input>
+                  </program>
+
+                  <p>Once you have mastered the basics of Unix, you should consider learning to write your own executables as they can help alleviate repetitive work.</p>
+
+                </subsection>
+
+                <subsection xml:id="subsec-permissions-and-file-types">
+                  <title>Permissions and file types</title>
+
+                  <p>If you type:</p>
+
+                  <program language="r">
+                    <input>
+      ls -l
+                    </input>
+                  </program>
+
+                  <p>At the beginning, you will see a series of symbols like this <c>-rw-r--r--</c>. This string indicates the type of file: regular file <c>-</c>, directory <c>d</c>, or executable <c>x</c>. This string also indicates the permission of the file: is it readable? writable? executable? Can other users on the system read the file? Can other users on the system edit the file? Can other users execute if the file is executable? This is more advanced than what we cover here, but you can learn much more in a Unix reference book.</p>
+
+                </subsection>
+
+                <subsection xml:id="subsec-commands-you-should-learn">
+                  <title>Commands you should learn</title>
+
+                  <p>There are many commands that we do not teach in this book, but we want to make you aware of them and what they do. They are:</p>
+
+                  <p>-   open/start - On the Mac, <c>open filename</c> tries to figure out the right application of the filename and open it with that application. This is a very useful command. On Git Bash, you can try <c>start filename</c>. Try opening an <c>R</c> or <c>Rmd</c> file with <c>open</c> or <c>start</c>: it should open them with RStudio.</p>
+
+                  <p>-   nano - Opens a bare-bones text editor.</p>
+
+                  <p>-   tar - Archives files and subdirectories of a directory into one file.</p>
+
+                  <p>-   ssh - Connects to another computer.</p>
+
+                  <p>-   find - Finds files by filename on your system.</p>
+
+                  <p>-   grep - Searches for patterns in a file.</p>
+
+                  <p>-   awk/sed - These are two very powerful commands that permit you to find specific strings in files and change them.</p>
+
+                  <p>-   ln - Creates a symbolic link. We do not recommend its use, but you should be familiar with it.</p>
+
+                </subsection>
+
+                <subsection xml:id="subsec-file-manipulation-in-r">
+                  <title>File manipulation in R</title>
+
+                  <p>We can also perform file management from within R. The key functions to learn about can be seen by looking at the help file for <c>?files</c>. Another useful function is <c>unlink</c>.</p>
+
+                  <p>Although not generally recommended, you can run Unix commands in R using <c>system</c>.</p>
+
+                  <program language="r">
+                    <input>
+      knitr::opts_chunk$set(out.width = NULL, out.extra = NULL)
+                    </input>
+                  </program>
+
+                </subsection>
+
+              </section>
+      
       </chapter>
 
       <chapter xml:id="ch-git-and-github">
         <title>Git and GitHub</title>
-        <p>Content will be added here.</p>
+        
+                <p>Here we provide a brief introduction Git and GitHub. We are only scratching the surface. To learn more about Git, we highly recommend the following resources:</p>
+
+                <ul>
+                  <li>"Learn Git &amp; GitHub" on Codecademy</li>
+                  <li>"Hello World" exercises GitHub Guides</li>
+                </ul>
+
+                <p>If you plan to use Git and Github frequently in conjunction with R, we highly recommend reading Happy Git and GitHub for the useR to learn about the details we don't cover here.</p>
+
+              <section xml:id="sec-why-use-git-and-github">
+                <title>Why use Git and GitHub?</title>
+
+                <p>Three primary reasons to use Git and GitHub are:</p>
+
+                <ol>
+                  <li><p><alert>Version Control:</alert> Git allows you to track changes in your code, revert to previous file versions, and work on multiple branches simultaneously. Once changes are finalized, different branches can be merged.</p></li>
+                  <li><p><alert>Collaboration:</alert> GitHub offers a central storage solution for projects and lets you add collaborators. These collaborators can make changes, keeping all versions synchronized. Moreover, the <em>pull request</em> feature on GitHub enables others to suggest modifications to your code, which you can then approve or reject.</p></li>
+                  <li><p><alert>Sharing:</alert> Beyond its powerful version control and collaboration tools, Git and GitHub serve as a platform to easily share your code with others.</p></li>
+                </ol>
+
+                <p>We primarily emphasize the sharing capabilities here. For a deeper dive into its other functionality, please refer to the provided resources above. One major advantage of hosting code on GitHub is the ease with which you can showcase it to potential employers seeking samples of your work. Given that numerous companies and organizations employ version control systems like Git for project collaboration, they may find it commendable that you possess some knowledge of the tool.</p>
+
+              </section>
+
+              <section xml:id="sec-git-overview">
+                <title>Overview of Git</title>
+
+                <p>To effectively permit version control and collaboration with Git we need to understand the concept of a <em>repository</em>, often simply called a <em>repo</em>. A repo is a digital storage space where you can save, edit, and track versions of files for a specific project. Think of it as a project folder combined with a detailed logbook. It holds all the files and directories related to the project and also records of every change made, who made it, and when. This allows multiple people to collaborate on a project without overwriting contributions from others. You can also easily revert to previous versions if needed.</p>
+
+                <p>Note that Git permits the creation of different <em>branches</em> within a repository. This permits working on files in parallel which is particularly useful for testing ideas that involve big changes before incorporating with a stable version. In this book we provide only examples with just one branch. To learn more about how to define and use multiple branches please consult the resources provided above.</p>
+
+                <p>A common practice involves hosting central <em>main branch</em>  on a GitHub repository that all collaborators can access remotely. The main branch is considered the stable official version. Each collaborator also maintains a <em>local repository</em> on their computer, allowing them to edit and test changes before committing them to the main repository.</p>
+
+                <p>We're going to explore how Git works by following these step:</p>
+
+                <ol>
+                  <li><p>First, you'll learn how to make changes on your computer in what's called the <em>working directory</em>. </p></li>
+                  <li><p>From there, you'll save these changes to your <em>local repo</em>, this is like your personal save point on your computer and will generate a new version of the repository in the log.</p></li>
+                  <li><p>After saving locally, you'll then send, or <em>push</em>, these changes to the main storage space where everyone can see them. In our examples, this main storage space is hosted on GitHub, and Git calls it the <em>upstream repo</em>.</p></li>
+                <figure>
+                  <image source="dataviz/img/git/git-layout.png"/>
+                </figure>
+
+                </ol>
+
+                <p>Now, to work with this strategy, you'll need an account on GitHub. In the next two sections, we'll guide you on how to set up an account and create repos on GitHub.</p>
+
+              </section>
+
+              <section xml:id="sec-github-accounts">
+                <title>GitHub accounts</title>
+
+                <p>Basic GitHub accounts are free. To create one, go to GitHub where you will see a box in which you can sign up.</p>
+
+                <p>You want to pick a name carefully. It should be short, easy to remember and to spell, somehow related to your name, and professional. This last one is important since you might be sending potential employers a link to your GitHub account. Your initials and last name are usually a good choice.</p>
+
+              </section>
+
+              <section xml:id="sec-github-repos">
+                <title>GitHub repositories</title>
+
+                <p>Once you have an account, you are now ready to create a GitHub repository that will serve as the main or upstream repo for a project. Collaborators you add to this project will be able to manage a local repository on their computer and push changes. Git will help you keep all the different copies synced.</p>
+
+                <p>To create a repo, first log in to your account by clicking the <em>Sign In</em> button on GitHub. You might already be signed in, in which case the <em>Sign In</em> button will not show up. If signing in, you will have to enter your username and password. We recommend you set up your browser to remember this to avoid typing it in each time.</p>
+
+                <p>Once on your account, you can click on <em>Repositories</em> and then click on <em>New</em> to create a new repo. You will be prompted for a name:</p>
+
+                <figure>
+                  <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_23_40.png"/>
+                </figure>
+
+                <figure>
+                  <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_23_42.png"/>
+                </figure>
+
+                <p>When naming your project, pick a descriptive name that clearly tells what the project is about. Keep in mind that as you work on more projects, you'll accumulate many repositories. As an illustration, we will use the name <c>homework-0</c>.</p>
+
+                <p>You will also be prompted to decide whether your repo should be public or private. To decide, know that this is the difference:</p>
+
+                <p>- <alert>Public repositories</alert>: Anyone on the internet can see these. Only collaborators can make changes.</p>
+
+                <p>- <alert>Private repositories</alert>: Only people you grant access to can view them.</p>
+
+                <p>While there are other settings to consider, we typically stick with the default options provided by GitHub.</p>
+
+                <p>After creating your repo, GitHub will show you steps to link your local repo (the one on your computer) to the new one you've set up on GitHub. They'll provide some code that you can directly copy and paste into your terminal. We will break down that code so you'll know exactly what each command does.</p>
+
+              </section>
+
+              <section xml:id="sec-connecting-git-github">
+                <title>Connecting Git and GitHub</title>
+
+                <p>When accessing GitHub you need credentials to verify your identity. There are two ways to connect: HTTPS or SSH, each requiring different credentials. We recommend using HTTPS, which uses a Personal Access Token (PAT). Note that <alert>your GitHub website password isn't your access token</alert>.</p>
+
+                <p>GitHub provides a detailed guide on obtaining an access token which can be found by searching "Managing your personal access tokens" on the GitHub Docs website. To generate a token:</p>
+
+                <ol>
+                  <li><p>Carefully follow the instructions provided by GitHub.</p></li>
+                  <li><p>When setting permissions for the token, choose <em>non-expiring</em> and select the <em>repo</em> option in the <em>scopes</em> section.</p></li>
+                </ol>
+
+                <p>Once you complete these steps, GitHub will display your token—a lengthy string of characters. You should then:</p>
+
+                <ol>
+                  <li><p>Immediately copy this token to your clipboard. Remember, this is the only time GitHub will show it to you.</p></li>
+                  <li><p>For security, save this token in a password manager. This ensures you can access it if needed later on.</p></li>
+                </ol>
+
+                <p>In some of the procedures outlined below, you'll be prompted to enter your password. Instead, paste the token you've copied. After this, password prompts should no longer appear. If you ever need the token again, retrieve it from your password manager.</p>
+
+                <p>For a much more detailed explanation, including how to use SSH instead of HTTPS, please consult Happy Git and GitHub for the useR.</p>
+
+                <p>The next step is to let Git know who we are. This will make it easier to connect with GitHub. To to this type the following two commands in our terminal window:</p>
+
+                <program language="r">
+                  <input>
+      git config --global user.name "Your Name"
+      git config --global user.email "your@email.com"
+                  </input>
+                </program>
+
+                <p>This will change the Git configuration in way that anytime you use Git, it will know this information. Note that <alert>you need to use the email account that you used to open your GitHub account</alert>.</p>
+
+              </section>
+
+              <section xml:id="sec-init">
+                <title>Initial setup</title>
+
+                <p>In a terminal, move to the directory you want to store the local repository. We recommend naming the directory the same as the GitHub repo. In our example we would use:</p>
+
+                <program language="r">
+                  <input>
+      mkdir homework-0
+      cd homework-0
+                  </input>
+                </program>
+
+                <p>We then initialize the directory as a Git repository, starting the version control process.</p>
+
+                <program language="r">
+                  <input>
+      git init
+                  </input>
+                </program>
+
+                <note>
+                  <p>## main verus master</p>
+                  <p>GitHub now uses <c>main</c> as the default branch name. In the past, both Git and GitHub used <c>master</c> as the default. As a result, many older repositories or older versions of Git might still use <c>master</c> as their primary branch.</p>
+                  <p>To ensure your local branch aligns with the GitHub repository's branch name:</p>
+                  <p>1. Visit the GitHub repository page.</p>
+                  <p>2. Check the dropdown menu on the left that lists branches. This will display the default branch name.</p>
+                  <p>To verify your local branch name, use:</p>
+                  <p>```</p>
+                  <p>git branch</p>
+                  <p>```</p>
+                  <p>If you see a branch name other than <c>main</c> but want it to be <c>main</c>, rename it with:</p>
+                  <program language="bash">
+                    <input>
+      git branch -M main
+                    </input>
+                  </program>
+                  <p>The <c>-M</c> stands for move. Note that this is different from changing branches, it is renaming the current branch.</p>
+                </note>
+
+                <p>To link your local repository to its counterpart on GitHub, you'll need the GitHub repository's URL. To find this, go to the repository's webpage. Click the green <em>Code</em> button to quickly copy the URL, which in our example is <c>https://github.com/rairizarry/homework-0.git</c>.</p>
+
+                <figure>
+                  <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_24_19.png"/>
+                </figure>
+
+                <p>Once you have this you can type</p>
+
+                <program language="r">
+                  <input>
+      git remote add origin https://github.com/rairizarry/homework-0.git
+                  </input>
+                </program>
+
+                <p>To understand this command note that <c>git remote add</c> adds a new remote reference. A <em>remote</em> in Git refers to another place where your code repository is stored, usually on the internet or another network. <c>origin</c> is the conventional name given to the remote repository or the central repository that other people will treat as an main project source. It's essentially a shorthand alias for the repository's URL. You could technically name it anything you want, but <c>origin</c> is the convention most use. Finally, <c>https://github.com/rairizarry/homework-0.git</c>  is the URL of the remote repository. It tells Git where the repository is hosted. Together, these commands set up a new local Git repository and link it to a remote repository on GitHub.</p>
+
+              </section>
+
+              <section xml:id="sec-git-basics">
+                <title>Git basics</title>
+
+                <p>Now that you have initialized a directory to store your local repository, we can learn how to move files from our <em>working directory</em> all the way to the upstream repo.</p>
+
+                <subsection xml:id="subsec-the-working-directory">
+                  <title>The working directory</title>
+
+                  <figure>
+                    <image source="dataviz/img/git/git-status.png"/>
+                  </figure>
+
+                  <p>The working directory is the same as your Unix working directory. In our example, if we create a file in the <c>homework-0</c> directory, it is considered to be in the working directory. Git can tell you how the files in the working directory relate to the versions of the files in other areas with the command</p>
+
+                  <program language="r">
+                    <input>
+      git status
+                    </input>
+                  </program>
+
+                  <p>Because we have not done anything yet, you should receive a message such as</p>
+
+                  <program language="r">
+                    <input>
+      On branch main
+
+      No commits yet
+
+      nothing to commit (create/copy files and use "git add" to track)
+                    </input>
+                  </program>
+
+                  <p>If we add a file, say <c>code.R</c>, you will see a message like:</p>
+
+                  <program language="r">
+                    <input>
+      Untracked files:
+        (use "git add &lt;file&gt;..." to include in what will be committed)
+      	code.R
+                    </input>
+                  </program>
+
+                </subsection>
+
+                <subsection xml:id="subsec-add">
+                  <title>add</title>
+
+                  <figure>
+                    <image source="dataviz/img/git/git-add.png"/>
+                  </figure>
+
+                  <p>Now we are going to make changes to these files. Eventually, we want these new versions of the files to be tracked and synced with the upstream repo. But we don't want to keep track of every little change: we don't want to sync until we are sure these versions are final enough to share as a new version. For this reason, edits in the staging area are not kept by the version control system.</p>
+
+                  <p>To demonstrate, we add <c>code.R</c> to the staging area:</p>
+
+                  <program language="r">
+                    <input>
+      git add code.R
+                    </input>
+                  </program>
+
+                  <p>Running <c>git status</c> now shows</p>
+
+                  <program language="r">
+                    <input>
+      Changes to be committed:
+        (use "git rm --cached &lt;file&gt;..." to unstage)
+      	new file:   code.R
+                    </input>
+                  </program>
+
+                  <p>Note that it is not a problem to have other files in the working directory that are not in the staging area. For example, if we create files <c>test-1.R</c> and <c>test-2.R</c>, <c>git status</c> reminds us these are not staged:</p>
+
+                  <program language="r">
+                    <input>
+      On branch main
+
+      No commits yet
+
+      Changes to be committed:
+        (use "git rm --cached &lt;file&gt;..." to unstage)
+      	new file:   code.R
+
+      Untracked files:
+        (use "git add &lt;file&gt;..." to include in what will be committed)
+      	test-1.R
+      	test-2.R
+                    </input>
+                  </program>
+
+                </subsection>
+
+                <subsection xml:id="subsec-commit">
+                  <title>commit</title>
+
+                  <figure>
+                    <image source="dataviz/img/git/git-commit.png"/>
+                  </figure>
+
+                  <p>If we are now ready to make a first version of our repository, which only includes <c>code.R</c>, we can use the following command:</p>
+
+                  <program language="r">
+                    <input>
+      git commit -m "Adding a new file." 
+                    </input>
+                  </program>
+
+                  <p>Note that <c>commit</c> requires us to add a message. Making these informative will help us remember why this change was made. After running <c>commit</c> we will receive a message letting us know it was committed:</p>
+
+                  <program language="r">
+                    <input>
+      [main (root-commit) 1735c25] adding a new file
+       1 file changed, 0 insertions(+), 0 deletions(-)
+       create mode 100644 code.R
+                    </input>
+                  </program>
+
+                  <p>Note that  if we edit <c>code.R</c>, it changes only in the working directory. <c>git status</c> shows us</p>
+
+                  <program language="r">
+                    <input>
+      Changes not staged for commit:
+       (use "git add &lt;file&gt;..." to update what will be committed)
+        (use "git restore &lt;file&gt;..." to discard changes in working directory)
+      	modified:   code.R
+                    </input>
+                  </program>
+
+                  <p>To add the edited file to the local repo, we need to stage the edited file and commit the changes</p>
+
+                  <program language="r">
+                    <input>
+      git add code.R
+      git commit -m "Added some lines of code."
+                    </input>
+                  </program>
+
+                  <p>which gives us a message letting us know a change was made:</p>
+
+                  <program language="r">
+                    <input>
+      [main 8843673] added some lines of code
+       1 file changed, 1 insertion(+)
+                    </input>
+                  </program>
+
+                  <p>Note that we can achieve the same results with just one line by following the commit command with the files we want committed:</p>
+
+                  <program language="r">
+                    <input>
+      git commit -m "Added some lines of code." code.R
+                    </input>
+                  </program>
+
+                  <p>This is convenient when the number of files that change is small and we can list them at the end.</p>
+
+                  <p>To see version control in action note what happens when we type</p>
+
+                  <program language="r">
+                    <input>
+      git log code.R
+                    </input>
+                  </program>
+
+                  <p>we get a list of the version that have been stored in our log:</p>
+
+                  <program language="r">
+                    <input>
+      commit 88436739dcbd57d8ad27a23663d30fd2c06034ca (HEAD -&gt; main)
+      Author: Rafael A Irizarry 
+      Date:   Sun Sep 3 15:32:03 2023 -0400
+
+          Added some lines of code.
+
+      commit 1735c25c675d23790df1f9cdb3a215a13c8ae5d6
+      Author: Rafael A Irizarry 
+      Date:   Sun Sep 3 15:27:19 2023 -0400
+
+          Adding a new file.
+                    </input>
+                  </program>
+
+                </subsection>
+
+                <subsection xml:id="subsec-push">
+                  <title>push</title>
+
+                  <figure>
+                    <image source="dataviz/img/git/git-push.png"/>
+                  </figure>
+
+                  <p>Once we are ready to sync our local repo with the upstream GitHub repo, we can use</p>
+
+                  <program language="r">
+                    <input>
+      git push -u origin main
+                    </input>
+                  </program>
+
+                  <note>
+                    <p>If this is your first time pushing to your GitHub account, you will be asked for a password and you have to enter the personal access token we described in <xref ref="sec-connecting-git-github"/>. You should only need to do this once.</p>
+                  </note>
+
+                  <p>The <c>-u</c> flag, short for <c>--set-upstream</c> will make Git remember that in this repository you want to push to the <c>main</c> branch in the remote repo <c>origin</c> defined in the initialization. This is beneficial because the next time you want to push or pull from this branch, you can simply use</p>
+
+                  <program language="r">
+                    <input>
+      git push
+                    </input>
+                  </program>
+
+                  <p>If you need a reminder of where you are pushing to you can type</p>
+
+                  <program language="r">
+                    <input>
+      git remote -v
+                    </input>
+                  </program>
+
+                  <p>The <c>v</c> stands for <c>verbose</c>. In our example we will get</p>
+
+                  <program language="r">
+                    <input>
+      origin  https://github.com/username/homework-0.git (fetch)
+      origin  https://github.com/username/homework-0.git (push)
+                    </input>
+                  </program>
+
+                  <p>We describe <c>fetch</c> next. If you don't get anything back it means you have not defined your remote as we did in <xref ref="sec-init"/>.</p>
+
+                </subsection>
+
+                <subsection xml:id="subsec-fetch-and-merge">
+                  <title>fetch and merge</title>
+
+                  <figure>
+                    <image source="dataviz/img/git/git-fetch.png"/>
+                  </figure>
+
+                  <figure>
+                    <image source="dataviz/img/git/git-merge.png"/>
+                  </figure>
+
+                  <p>If this is a collaborative project, the upstream repo may change and become different than your version. To update your local repository to be like the upstream repo, we use the command <c>fetch</c>:</p>
+
+                  <program language="r">
+                    <input>
+      git fetch
+                    </input>
+                  </program>
+
+                  <p>And then to make these copies to our working directory, we use the command:</p>
+
+                  <program language="r">
+                    <input>
+      git merge
+                    </input>
+                  </program>
+
+                </subsection>
+
+                <subsection xml:id="subsec-git-pull">
+                  <title>pull</title>
+
+                  <figure>
+                    <image source="dataviz/img/git/git-pull.png"/>
+                  </figure>
+
+                  <p>We very often just want to fetch and merge without checking. For this, we use:</p>
+
+                  <program language="r">
+                    <input>
+      git pull
+                    </input>
+                  </program>
+
+                </subsection>
+
+                <subsection xml:id="subsec-clone">
+                  <title>clone</title>
+
+                  <p>You can easily download all the code and version control logs from an existing public repository using <c>git clone</c>. When you clone you are essentially making a complete copy of the entire directory. For example, you can download all the code used to create this book using:</p>
+
+                  <program language="r">
+                    <input>
+      git clone https://github.com/rafalab/dsbook-part-1.git
+                    </input>
+                  </program>
+
+                  <p>You can see a simple example with the murders directory created in the Unix chapter by cloning this repository:</p>
+
+                  <program language="r">
+                    <input>
+      git clone https://github.com/rairizarry/murders.git
+                    </input>
+                  </program>
+
+                  <p>If you use <c>git clone</c>, you do not need to initialize as the branch and remote will already be defined. Now, to push changes you need to be added as a collaborator. Otherwise you will have to follow the more complex process of a <em>pull request</em>, which we don't cover here.</p>
+
+                </subsection>
+
+              </section>
+
+              <section xml:id="sec-gitignore">
+                <title>.gitignore</title>
+
+                <p>When we use <c>git status</c> we obtain information about all files in our local repo. But we don't necessarily need to add all the files in our working directory to the Git repo, only the ones we want to keep track of or the ones we want to share. If our work is producing files of a certain type that we do not want to keep track of, we can add the suffix that defines these files to the .gitignore file. More details on using .gitignore are included on the git-scm website. These files will stop appearing when you type <c>git status</c>.</p>
+
+              </section>
+
+              <section xml:id="sec-rstudio-git">
+                <title>Git in RStudio</title>
+
+                <p>While command line Git is a powerful and flexible tool, it can be somewhat daunting when we are getting started. RStudio provides a graphical interface that facilitates the use of Git in the context of a data analysis project.</p>
+
+                <p>To do this, we start a project but, instead of <em>New Directory</em>, or <em>Existing Directory</em>, we select <em>Version Control</em> and then we will select <em>Git</em> as our version control system:</p>
+
+                <figure>
+                  <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_30_35.png"/>
+                </figure>
+
+                <figure>
+                  <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_30_43.png"/>
+                </figure>
+
+                <p>The repository URL is the link you used as <c>origin</c> or to clone. We used <c>https://github.com/username/homework-0.git</c> as an example. In the project directory name, you need to put the name of the folder that was generated, which in our example will be the name of the repo <c>homework-0</c>. This will create a folder called <c>homework-0</c> on your local system. Note you will need to remove the folder if it already exists or chose a different name. Once you do this, the project is created and it is aware of the connection to a GitHub repo. You will see on the top right corner the name and type of project as well as a new tab on the upper right pane titled <em>Git</em>.</p>
+
+                <figure>
+                  <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_31_10.png"/>
+                </figure>
+
+                <figure>
+                  <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_31_11.png"/>
+                </figure>
+
+                <p>If you select this tab, it will show you the files in your project, excluding those in <c>.gitignore</c>, with some icons that give you information about these files and their relationship to the repo. In the example below, we already added a file to the folder, called <em>code.R</em> which you can see in the editing pane.</p>
+
+                <figure>
+                  <image source="dataviz/img//windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_34_06.png"/>
+                </figure>
+
+                <p>We now need to pay attention to the Git pane. It is important to know that <alert>your local files and the GitHub repo will not be synced automatically</alert>. You have to sync using git push when you are ready. We show how you can do this through RStudio rather than the terminal below.</p>
+
+                <p>Before we start working on a collaborative project, usually the first thing we do is <em>pull</em> in the changes from the remote repo, in our case the one on GitHub. However, for the example shown here, since we are starting with an empty repo and we are the only ones making changes, we don't need to start by pulling.</p>
+
+                <p>In RStudio, the status of the file as it relates to the remote and local repos are represented in the status symbols with colors. A yellow square means that Git knows nothing about this file. To sync with the GitHub repo, we need to <em>add</em> the file, then <em>commit</em> the change to our local Git repo, then <em>push</em> the change to the GitHub repo. Right now, the file is just on our computer. To add the file using RStudio, we click the <em>Stage</em> box. You will see that the status icon now changes to a green A.</p>
+
+                <figure>
+                  <image source="dataviz/img//windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_51_31.png"/>
+                </figure>
+
+                <p>Now we are ready to commit the file to our local repo. In RStudio, we can use the <em>Commit</em> button. This will open a new dialog window. With Git, whenever we commit a change, we are required to enter a message describing the changes being <em>committed</em>.</p>
+
+                <figure>
+                  <image source="dataviz/img//windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_51_54.png"/>
+                </figure>
+
+                <p>In this case, we will simply describe that we are adding a new script. In this dialog box, RStudio also gives you a summary of what you are changing to the GitHub repo. In this case, because it is a new file, the entire file is highlighted as green, which highlights the changes.</p>
+
+                <p>Once we hit the commit button, we should see a message from Git with a summary of the changes that were committed. Now we are ready to <em>push</em> these changes to the GitHub repo. We can do this by clicking on the <em>Push</em> button on the top right corner:</p>
+
+                <figure>
+                  <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_52_05.png"/>
+                </figure>
+
+                <figure>
+                  <image source="dataviz/img//windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_52_17.png"/>
+                </figure>
+
+                <p>We now see a message from Git letting us know that the push has succeeded. In the pop-up window we no longer see the <c>code.R</c> file. This is because no new changes have been performed since we last pushed. We can exit this pop-up window now and continue working on our code.</p>
+
+                <figure>
+                  <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_52_35.png"/>
+                </figure>
+
+                <figure>
+                  <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_52_44.png"/>
+                </figure>
+
+                <p>If we now visit our repo on the web, we will see that it matches our local copy.</p>
+
+                <figure>
+                  <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_53_09.png"/>
+                </figure>
+
+                <p>Congratulations, you have successfully shared code on a GitHub repository!</p>
+
+                <note>
+                  <p>For the example shown here, we only added <em>code.R</em>. But, in general, for an RStudio project, we recommend adding a README.md file and both the .gitignore and .Rproj files.</p>
+                </note>
+
+              </section>
+      
       </chapter>
 
       <chapter xml:id="ch-reproducible-projects">
         <title>Reproducible projects</title>
-        <p>Content will be added here.</p>
+        
+                <p>The final product of a data analysis project is often a report. Many scientific publications can be thought of as a final report of a data analysis. The same is true for news articles based on data, an analysis report for your company, or lecture notes for a class on how to analyze data. The reports are often on paper or in a PDF that includes a textual description of the findings along with some figures and tables resulting from the analysis.</p>
+
+                <p>Imagine that after you finish the analysis and the report, you are told that you were given the wrong dataset, you are sent a new one and you are asked to run the same analysis. Or what if you realize that a mistake was made and you need to re-examine the code, fix the error, and re-run the analysis? Or imagine that someone you are training wants to see your code and be able to reproduce the results to learn about your approach?</p>
+
+                <p>Situations like the ones just described are actually quite common for a data analyst. Here, we describe how you can keep your projects organized with RStudio so that re-running an analysis is straight-forward. We then demonstrate how to generate reproducible reports with quarto or R markdown. The <alert>knitR</alert> package will greatly help with recreating reports with minimal work. This is possible due to the fact that markdown documents permit code and textual descriptions to be combined into the same document, and the figures and tables produced by the code are automatically added to the document.</p>
+
+                <program language="r">
+                  <input>
+      img_path &lt;- "productivity/img"
+      screenshots &lt;- list.files(file.path(img_path, "windows-screenshots"))
+      screenshots &lt;- file.path(img_path, "windows-screenshots", screenshots)
+      mac_screenshots &lt;- list.files(file.path(img_path, "mac-screenshots"))
+      mac_screenshots &lt;- file.path(img_path,"mac-screenshots", mac_screenshots)
+                  </input>
+                </program>
+
+              <section xml:id="sec-rstudio-projects">
+                <title>RStudio projects</title>
+
+                <p>RStudio provides a way to keep all the components of a data analysis project organized into one folder and to keep track of information about this project, such as the Git status of files, in one place. RStudio facilitates the use of Git and GitHub through RStudio projects. In this section we quickly demonstrate how to start a new a project and some recommendations on how to keep these organized. RStudio projects also permit you to have several RStudio sessions open and keep track of which is which.</p>
+
+                <p>To start a project, click on <em>File</em> and then <em>New Project</em>. Often we have already created a folder to save the work, and we select <em>Existing Directory</em>. Here we show an example in which we have not yet created a folder and select the <em>New Directory</em> option.</p>
+
+                <figure>
+                  <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_09_20_21.png"/>
+                </figure>
+
+                <figure>
+                  <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_09_20_28.png"/>
+                </figure>
+
+                <p>Then, for a data analysis project, you usually select the <em>New Project</em> option:</p>
+
+                <figure>
+                  <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_09_20_35.png"/>
+                </figure>
+
+                <p>Now you will have to decide on the location of the folder that will be associated with your project, as well as the name of the folder. When choosing a folder name, just like with file names, make sure it is a meaningful name that will help you remember what the project is about. As with files, we recommend using lower case letters, no spaces, and hyphens to separate words. We will call the folder for this project <c>my-first-project</c>. This will then generate a <em>Rproj</em> file called <c>my-first-project.Rproj</c> in the folder associated with the project. We will see how this is useful a few lines below.</p>
+
+                <figure>
+                  <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_09_21_09.png"/>
+                </figure>
+
+                <p>You will be given options on where this folder should be on your filesystem. In this example, we will place it in our home folder, but this is generally not good practice. In the Unix chapter, we discussed organizing your filesystem following a hierarchical approach and with a folder called <em>projects</em> where you keep a folder for each project.</p>
+
+                <figure>
+                  <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_09_21_56.png"/>
+                </figure>
+
+                <p>When you start using RStudio with a project, you will see the project name in the upper right corner. This will remind you what project this particular RStudio session belongs to. When you open an RStudio session with no project, it will say <em>Project: (None)</em>.</p>
+
+                <p>When working on a project, all files will be saved and searched for in the folder associated with the project. Below, we show an example of a script that we wrote and saved with the name <c>code.R</c>. Because we used a meaningful name for the project, we can be a bit less informative when we name the files. Although we do not do it here, you can have several scripts open at once. You simply need to click <em>File</em>, then <em>New File</em> and pick the type of file you want to edit.</p>
+
+                <figure>
+                  <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_09_23_26.png"/>
+                </figure>
+
+                <p>One of the main advantages of using Projects is that after closing RStudio, if we wish to continue where we left off on the project, we simply double click or open the file saved when we first created the RStudio project. In this case, the file is called <c>my-first-project.Rproj</c>. If we open this file, RStudio will start up and open the scripts we were editing.</p>
+
+                <figure>
+                  <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_09_24_08.png"/>
+                </figure>
+
+                <figure>
+                  <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_09_24_21.png"/>
+                </figure>
+
+                <p>Another advantage is that if you click on two or more different Rproj files, you start new RStudio and R sessions for each.</p>
+
+              </section>
+
+              <section xml:id="sec-markdown">
+                <title>Markdown</title>
+
+                <p>Markdown is a format for <em>literate programming</em> documents that is widely used to generate html pages or pdf documents. Literate programming weaves instructions, documentation, and detailed comments in between machine executable code, producing a document that describes the program that is best for human understanding. You can learn more about markdown with online tutorials.</p>
+
+                <p>Unlike a word processor, such as Microsoft Word, where what you see is what you get, with markdown, you need to <em>compile</em> the document into the final report. The markdown document looks different than the final product. This approach seems like a disadvantage at first, but it can save you time in the long run. For example, instead of producing plots and inserting them one by one into the word processing document, the plots are automatically added when the document is compiled. If you need to change the plots, you just recompile the document after editing the code that produces the plot.</p>
+
+                <p>In R, we can produce literate programming documents using Quarto or R markdown. We recommend using Quarto because it is a newer and more flexible version of R markdown that permits the use of languages other than R. Because R markdown preceded Quarto by several years, many public and educational literate programming documents are written in R markdown. However, because the format is similar and both use the <alert>knitr</alert> package to execute the R code (details in <xref ref="sec-knitr"/>), most existing R markdown files can be rendered with Quarto without modification.</p>
+
+                <p>In RStudio, you can start either a Quarto or R markdown document by clicking on <em>File</em>, <em>New File</em>, then <em>Quarto Document</em> or <em>R Markdown</em>, respectively. You will then be asked to enter a title and author for your document. We are going to prepare a report on gun murders so we will give it an appropriate name. You can also decide what format you would like the final report to be in: HTML, PDF, or Microsoft Word. Later, we can easily change this, but here we select html as it is the preferred format for debugging purposes:</p>
+
+                <figure>
+                  <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_53_18.png"/>
+                </figure>
+
+                <figure>
+                  <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_53_19.png"/>
+                </figure>
+
+                <p>This will generate a template file:</p>
+
+                <figure>
+                  <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_53_20.png"/>
+                </figure>
+
+                <p>As a convention, we use <c>qmd</c> and <c>Rmd</c> suffixes for Quarto and R markdown files, respectively.</p>
+
+                <p>Once you gain experience with markdown, you will be able to do this without the template and can simply start from a blank template.</p>
+
+                <p>In the template, you will see several things to note.</p>
+
+                <subsection xml:id="subsec-the-header">
+                  <title>The header</title>
+
+                  <p>At the top you see:</p>
+
+                  <program language="r">
+                    <input>
+      ---
+      title: "Report on Gun Murders"
+      author: "Rafael Irizarry"
+      format: html
+      ---
+                    </input>
+                  </program>
+
+                  <p>The things between the <c>---</c> is the <em>YAML</em> header. YAML is a widely used language mainly used for providing configuration data. With Quarto and R markdown it is mainly used to define options for the document. You can define many other things in the header than what is included in the template. We don't discuss those here, but much information is available from the quarto guide. The one parameter that we will highlight is <c>format</c>. By changing this to, say, <c>pdf</c>, we can control the type of output that is produced when we compile. The title and author parameters are automatically filled because we filled in the blanks in the RStudio dialog box that pops up when creating a new document.</p>
+
+                </subsection>
+
+                <subsection xml:id="subsec-r-code-chunks">
+                  <title>R code chunks</title>
+
+                  <p>In various places in the document, we see something like this:</p>
+
+                  <program language="r">
+                    <input>
+      1 + 1
+                    </input>
+                  </program>
+
+                  <p>These are the code chunks. When you compile the document, the R code inside the chunk, in this case <c>1+1</c>, will be evaluated and the result included in that position in the final document.</p>
+
+                  <p>To add your own R chunks, you can type the characters above quickly with the key binding command-option-I on the Mac and Ctrl-Alt-I on Windows.</p>
+
+                  <p>This applies to plots as well; the plot will be placed in that position. We can write something like this:</p>
+
+                  <program language="r">
+                    <input>
+      plot(1)
+                    </input>
+                  </program>
+
+                  <p>By default, the code will show up as well. To avoid having the code show up, you can use an argument, which are annotated with <c>#|</c> To avoid showing code in the final document, you can use the argument <c>echo: FALSE</c>. For example:</p>
+
+                  <program language="r">
+                    <input>
+      #| echo: false
+
+      1+1
+                    </input>
+                  </program>
+
+                  <p>We recommend getting into the habit of adding a label to the R code chunks. This will be very useful when debugging, among other situations. You do this by adding a descriptive word like this:</p>
+
+                  <program language="r">
+                    <input>
+      #| label: one-plus-one
+
+      1+1
+                    </input>
+                  </program>
+
+                </subsection>
+
+                <subsection xml:id="subsec-global-execution-options">
+                  <title>Global execution options</title>
+
+                  <p>If you want to apply an option globally, you can include in the header, under <c>execute</c>. For example adding the following line to the header make code not show up, by default:</p>
+
+                  <program language="r">
+                    <input>
+      execute:
+        echo: false
+                    </input>
+                  </program>
+
+                  <p>We will not cover more details here, but as you become more experienced with R Markdown, you will learn the advantages of setting global options for the compilation process.</p>
+
+                </subsection>
+
+                <subsection xml:id="sec-knitr">
+                  <title>knitR</title>
+
+                  <p>We use the <alert>knitR</alert> package to compile Quarto or R markdown documents. The specific function used to compile is the <c>knit</c> function, which takes a filename as input. RStudio provides a button that makes it easier to compile the document. For the screenshot below, we have edited the document so that a report on gun murders is produced. You can see the file on GitHub. You can now click on the <c>Render</c> button:</p>
+
+                  <figure>
+                    <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_53_21.0.png"/>
+                  </figure>
+
+                  <p>Note that the first time you click on the <em>Render</em> button, a dialog box may appear asking you to install packages you need. Once you have installed the packages, clicking <em>Render</em> will compile your Quarto file and the resulting document will pop up.</p>
+
+                  <p>This particular example produces an html document which you can see in your working directory. To view it, open a terminal and list the files. You can open the file in a browser and use this to present your analysis. You can also produce a PDF or Microsoft document by changing: <c>format: html</c> to <c>format: pdf</c> or <c>format: docx</c>. Note this is one difference between Quarto and R markdown. With R markdown we use <c>output: html_document</c>, <c>output: pdf_document</c>, or <c>output: word_document</c>.</p>
+
+                  <p>We can also produce documents that render on GitHub using <c>format: gfm</c>, which stands for GitHub flavored markdown. This will produce a markdown file, with suffix <c>md</c>, that renders nicely on GitHub. Because we have uploaded these files to GitHub, you can click on the <c>md</c> file and you will see the report as a webpage:</p>
+
+                  <figure>
+                    <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_53_38.png"/>
+                  </figure>
+
+                  <p>This is a convenient way to share your reports.</p>
+
+                </subsection>
+
+                <subsection xml:id="subsec-learning-more">
+                  <title>Learning more</title>
+
+                  <p>There is a lot more you can do with R markdown. We highly recommend you continue learning as you gain more experience writing reports in R. There are many free resources on the internet including:</p>
+
+                  <p>-   The Quarto Guide -   Hello, Quarto tutorial -   Dynamic Documents with R and knitr textbook</p>
+
+                </subsection>
+
+              </section>
+
+              <section xml:id="sec-organizing">
+                <title>Organizing a data science project</title>
+
+                <p>In this section we put it all together to create the US murders project and share it on GitHub.</p>
+
+                <subsection xml:id="subsec-create-directories-in-unix">
+                  <title>Create directories in Unix</title>
+
+                  <p>We demonstrated how to use Unix to prepare for a data science project using an example. Here we continue this example and show how to use RStudio. We created the following directories using Unix:</p>
+
+                  <program language="bash">
+                    <input>
+      cd ~
+      cd projects
+      mkdir murders
+      cd murders
+      mkdir data rdas 
+                    </input>
+                  </program>
+
+                </subsection>
+
+                <subsection xml:id="subsec-create-an-rstudio-project">
+                  <title>Create an RStudio project</title>
+
+                  <p>In the next section we will use create an RStudio project. In RStudio we go to <em>File</em> and then <em>New Project...</em> and when given the options we pick <em>Existing Directory</em>. We then write the full path of the <c>murders</c> directory created above.</p>
+
+                  <figure>
+                    <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_53_14.png"/>
+                  </figure>
+
+                  <figure>
+                    <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_53_15.png"/>
+                  </figure>
+
+                  <p>Once you do this, you will see the <c>rdas</c> and <c>data</c> directories you created in the RStudio <em>Files</em> tab.</p>
+
+                  <figure>
+                    <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_53_16.png"/>
+                  </figure>
+
+                  <p>Keep in mind that when we are in this project, our default working directory will be <c>~/projects/murders</c>. You can confirm this by typing <c>getwd()</c> into your R session. This is important because it will help us organize the code when we need to write file paths.</p>
+
+                  <p>Try to always use relative paths in code for data analysis projects. These should be relative to the default working directory. The problem with using full paths, including using the home directory <c>~</c> as part of your path, is that your code is unlikely to work on file systems other than yours since the directory structures will be different.</p>
+
+                </subsection>
+
+                <subsection xml:id="subsec-editting-r-scripts">
+                  <title>Editting R scripts</title>
+
+                  <p>Let's now write a script that downloads a file into the data directory. We will call this file <c>download-data.R</c>.</p>
+
+                  <p>The content of this file will be:</p>
+
+                  <program language="r">
+                    <input>
+      url &lt;- "https://raw.githubusercontent.com/rafalab/dslabs/master/inst/
+      extdata/murders.csv"
+      dest_file &lt;- "data/murders.csv"
+      download.file(url, destfile = dest_file)
+                    </input>
+                  </program>
+
+                  <p>Notice that we are using the relative path <c>data/murders.csv</c>.</p>
+
+                  <p>Run this code in R and you will see that a file is added to the <c>data</c> directory.</p>
+
+                  <p>Now we are ready to write a script to read this data and prepare a table that we can use for analysis. Call the file <c>wrangle-data.R</c>. The content of this file will be:</p>
+
+                  <program language="r">
+                    <input>
+      library(tidyverse)
+      murders &lt;- read_csv("data/murders.csv")
+      murders &lt;- murders |&gt; mutate(region = factor(region),
+                                   rate = total / population * 10^5)
+      save(murders, file = "rdas/murders.rda")
+                    </input>
+                  </program>
+
+                  <p>Again note that we use relative paths exclusively.</p>
+
+                </subsection>
+
+                <subsection xml:id="subsec-saving-processed-data">
+                  <title>Saving processed data</title>
+
+                  <p>In this file, we introduce an R command we have not seen: <c>save</c>. The <c>save</c> command in R saves objects into what is called an <em>rda file</em>: <em>rda</em> is short for R data. We recommend using the <c>.rda</c> suffix on files saving R objects. You will see that <c>.RData</c> is also used.</p>
+
+                  <p>If you run this code above, the processed data object will be saved in a file in the <c>rda</c> directory. You can then restore the object using <c>load</c>. Although not the case here, this approach is often practical because generating the data object we use for final analyses and plots can be a complex and time-consuming process. So we run this process once and save the file. But we still want to be able to generate the entire analysis from the raw data.</p>
+
+                  <p>While <c>save</c> let's you save several objects that then get loaded with the same names used when saving, the function <c>saveRDS</c> lets you save one object, without the name. To bring it back you use the <c>readRDS</c> function. An example of how this is used is you save it in one session:</p>
+
+                  <program language="r">
+                    <input>
+      #| eval: false
+      saveRDS(murders, file = "rdas/murders.rda")
+                    </input>
+                  </program>
+
+                  <p>Then read it in in another session, using whatever object name you want:</p>
+
+                  <program language="r">
+                    <input>
+      #| eval: false
+      dat &lt;- readRDS("rdas/murders.rda")
+                    </input>
+                  </program>
+
+                </subsection>
+
+                <subsection xml:id="subsec-the-main-analysis-file">
+                  <title>The main analysis file</title>
+
+                  <p>Now we are ready to write the analysis file. Let's call it <c>analysis.R</c>. The content should be the following:</p>
+
+                  <program language="r">
+                    <input>
+      library(tidyverse)
+      load("rdas/murders.rda")
+
+      murders |&gt; mutate(abb = reorder(abb, rate)) |&gt;
+        ggplot(aes(abb, rate)) +
+        geom_bar(width = 0.5, stat = "identity", color = "black") +
+        coord_flip()
+                    </input>
+                  </program>
+
+                  <p>If you run this analysis, you will see that it generates a plot.</p>
+
+                </subsection>
+
+                <subsection xml:id="subsec-other-directories">
+                  <title>Other directories</title>
+
+                  <p>Now suppose we want to save the generated plot for use in a report or presentation. We can do this with the <alert>ggplot</alert> command <c>ggsave</c>. But where do we put the graph? We should be systematically organized so we will save plots to a directory called <c>figs</c>. Start by creating a directory by typing the following in the terminal:</p>
+
+                  <program language="bash">
+                    <input>
+      mkdir figs
+                    </input>
+                  </program>
+
+                  <p>and then you can add the line:</p>
+
+                  <program language="r">
+                    <input>
+      ggsave("figs/barplot.png")
+                    </input>
+                  </program>
+
+                  <p>to your R script. If you run the script now, a png file will be saved into the <c>figs</c> directory. If we wanted to copy that file to some other directory where we are developing a presentation, we can avoid using the mouse by using the <c>cp</c> command in our terminal.</p>
+
+                </subsection>
+
+                <subsection xml:id="subsec-the-readme-file">
+                  <title>The README file</title>
+
+                  <p>You now have a self-contained analysis in one directory. One final recommendation is to create a <c>README.txt</c> file describing what each of these files does for the benefit of others reading your code, including your future self. This would not be a script but just some notes. One of the options provided when opening a new file in RStudio is a text file. You can save something like this into the text file:</p>
+
+                  <program language="r">
+                    <input>
+      We analyze US gun murder data collected by the FBI.
+
+      download-data.R - Downloads csv file to data directory
+
+      wrangle-data.R - Creates a derived dataset and saves as R object in rdas
+      directory
+
+      analysis.R - A plot is generated and saved in the figs directory.
+                    </input>
+                  </program>
+
+                </subsection>
+
+                <subsection xml:id="subsec-initializing-a-git-directory">
+                  <title>Initializing a Git directory</title>
+
+                  <p>In <xref ref="sec-init"/> we demonstrated how to initialize a Git directory and connect it to the upstream repository on GitHub, which we already created in that section.</p>
+
+                  <p>We can do this in the Unix terminal:</p>
+
+                  <program language="bash">
+                    <input>
+      cd ~/projects/murders
+      git init
+      git add README.txt
+      git commit -m "First commit. Adding README.txt file just to get started"
+      git remote add origin `https://github.com/rairizarry/murders.git`
+      git push -u origin remote
+                    </input>
+                  </program>
+
+                </subsection>
+
+                <subsection xml:id="subsec-add-commit-and-push-files-using-rstudio">
+                  <title>Add, commit, and push files using RStudio</title>
+
+                  <p>We can continue adding and committing each file, but it might be easier to use RStudio. To do this, start the project by opening the Rproj file. The git icons should appear and you can add, commit and push using these.</p>
+
+                  <figure>
+                    <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_53_32.png"/>
+                  </figure>
+
+                  <figure>
+                    <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_53_34.png"/>
+                  </figure>
+
+                  <figure>
+                    <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_53_35.png"/>
+                  </figure>
+
+                  <p>We can now go to GitHub and confirm that our files are there. You can see a version of this project, organized with Unix directories, on GitHub. You can download a copy to your computer by using the <c>git clone</c> command on your terminal. This command will create a directory called <c>murders</c> in your working directory, so be careful where you call it from.</p>
+
+                  <program language="r">
+                    <input>
+      git clone https://github.com/rairizarry/murders.git
+                    </input>
+                  </program>
+
+                </subsection>
+
+              </section>
+      
       </chapter>
 
     </part>
