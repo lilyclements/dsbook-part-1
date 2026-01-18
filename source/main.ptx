@@ -10644,7 +10644,7 @@ gutenberg_metadata
         
                 <p>Unix is the operating system of choice in data science. We will introduce you to the Unix way of thinking using an example: how to keep a data analysis project organized. We will learn some of the most commonly used commands along the way. However, we won't go into advanced details. We highly encourage you to learn more, especially when you find yourself using the mouse or performing a repetitive task often. In those cases, there is probably a more efficient way to do it in Unix. Here are some basic courses to get you started:</p>
 
-                <p>-   "Learn the Command Line" through codecademy -   "LinuxFoundationX: Introduction to Linux" through edX -   "The Unix Workbench" through coursera</p>
+                <p>-   "Learn the Command Line" through Codecademy -   "LinuxFoundationX: Introduction to Linux" through edX -   "The Unix Workbench" through Coursera</p>
 
                 <p>There are many reference books as well. Bite Size Linux and Bite Size Command Line are two particularly clear, succinct, and complete examples.</p>
 
@@ -11554,7 +11554,10 @@ gutenberg_metadata
         
                 <p>Here we provide a brief introduction Git and GitHub. We are only scratching the surface. To learn more about Git, we highly recommend the following resources:</p>
 
-                <p><em> "Learn Git &amp; GitHub" on Codecademy </em> "Hello World" exercises GitHub Guides</p>
+                <ul>
+                  <li>"Learn Git &amp; GitHub" on Codecademy</li>
+                  <li>"Hello World" exercises GitHub Guides</li>
+                </ul>
 
                 <p>If you plan to use Git and Github frequently in conjunction with R, we highly recommend reading Happy Git and GitHub for the useR to learn about the details we don't cover here.</p>
 
@@ -11666,7 +11669,7 @@ gutenberg_metadata
                 <program language="r">
                   <input>
       git config --global user.name "Your Name"
-      git config --global user.mail "your@email.com"
+      git config --global user.email "your@email.com"
                   </input>
                 </program>
 
@@ -11705,9 +11708,11 @@ gutenberg_metadata
                   <p>git branch</p>
                   <p>```</p>
                   <p>If you see a branch name other than <c>main</c> but want it to be <c>main</c>, rename it with:</p>
-                  <p>```</p>
-                  <p>git branch -M main*</p>
-                  <p>```</p>
+                  <program language="bash">
+                    <input>
+      git branch -M main
+                    </input>
+                  </program>
                   <p>The <c>-M</c> stands for move. Note that this is different from changing branches, it is renaming the current branch.</p>
                 </note>
 
