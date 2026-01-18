@@ -10642,913 +10642,911 @@ gutenberg_metadata
       <chapter xml:id="ch-organizing-with-unix">
         <title>Organizing with Unix</title>
         
-                <p>Unix is the operating system of choice in data science. We will introduce you to the Unix way of thinking using an example: how to keep a data analysis project organized. We will learn some of the most commonly used commands along the way. However, we won't go into advanced details. We highly encourage you to learn more, especially when you find yourself using the mouse or performing a repetitive task often. In those cases, there is probably a more efficient way to do it in Unix. Here are some basic courses to get you started:</p>
+          <p>Unix is the operating system of choice in data science. We will introduce you to the Unix way of thinking using an example: how to keep a data analysis project organized. We will learn some of the most commonly used commands along the way. However, we won't go into advanced details. We highly encourage you to learn more, especially when you find yourself using the mouse or performing a repetitive task often. In those cases, there is probably a more efficient way to do it in Unix. Here are some basic courses to get you started:</p>
 
-                <p>-   "Learn the Command Line" through Codecademy -   "LinuxFoundationX: Introduction to Linux" through edX -   "The Unix Workbench" through Coursera</p>
+          <p>-   "Learn the Command Line" through codecademy -   "LinuxFoundationX: Introduction to Linux" through edX -   "The Unix Workbench" through coursera</p>
 
-                <p>There are many reference books as well. Bite Size Linux and Bite Size Command Line are two particularly clear, succinct, and complete examples.</p>
+          <p>There are many reference books as well. Bite Size Linux and Bite Size Command Line are two particularly clear, succinct, and complete examples.</p>
 
-                <p>When searching for Unix resources, keep in mind that other terms used to describe what we will learn here are <em>Linux</em>, <em>the shell</em>, and <em>the command line</em>. Basically, what we are learning is a series of commands and a way of thinking that facilitates the organization of files without using the mouse.</p>
+          <p>When searching for Unix resources, keep in mind that other terms used to describe what we will learn here are <em>Linux</em>, <em>the shell</em>, and <em>the command line</em>. Basically, what we are learning is a series of commands and a way of thinking that facilitates the organization of files without using the mouse.</p>
 
-                <p>To serve as motivation, we are going to start constructing a directory using Unix tools and RStudio.</p>
+          <p>To serve as motivation, we are going to start constructing a directory using Unix tools and RStudio.</p>
 
-              <section xml:id="sec-naming-convention">
-                <title>Naming convention</title>
+        <section xml:id="sec-naming-convention">
+          <title>Naming convention</title>
 
-                <p>Before you start organizing projects with Unix you want to pick a name convention that you will use to systematically name your files and directories. This will help you find files and know what is in them.</p>
+          <p>Before you start organizing projects with Unix you want to pick a name convention that you will use to systematically name your files and directories. This will help you find files and know what is in them.</p>
 
-                <p>In general you want to name your files in a way that is related to their contents and specifies how they relate to other files. The Smithsonian Data Management Best Practices has "five precepts of file naming and organization" and they are:</p>
+          <p>In general you want to name your files in a way that is related to their contents and specifies how they relate to other files. The Smithsonian Data Management Best Practices has "five precepts of file naming and organization" and they are:</p>
 
-                <blockquote>
-                  <p>-   Have a distinctive, human-readable name that gives an indication of the content.</p>
-                </blockquote>
+          <blockquote>
+            <p>-   Have a distinctive, human-readable name that gives an indication of the content.</p>
+          </blockquote>
 
-                <blockquote>
-                  <p>-   Follow a consistent pattern that is machine-friendly.</p>
-                </blockquote>
+          <blockquote>
+            <p>-   Follow a consistent pattern that is machine-friendly.</p>
+          </blockquote>
 
-                <blockquote>
-                  <p>-   Organize files into directories (when necessary) that follow a consistent pattern.</p>
-                </blockquote>
+          <blockquote>
+            <p>-   Organize files into directories (when necessary) that follow a consistent pattern.</p>
+          </blockquote>
 
-                <blockquote>
-                  <p>-   Avoid repetition of semantic elements among file and directory names.</p>
-                </blockquote>
+          <blockquote>
+            <p>-   Avoid repetition of semantic elements among file and directory names.</p>
+          </blockquote>
 
-                <blockquote>
-                  <p>-   Have a file extension that matches the file format (no changing extensions!)</p>
-                </blockquote>
+          <blockquote>
+            <p>-   Have a file extension that matches the file format (no changing extensions!)</p>
+          </blockquote>
 
-                <p>For specific recommendations we highly recommend you follow The Tidyverse Style Guide.</p>
+          <p>For specific recommendations we highly recommend you follow The Tidyverse Style Guide.</p>
 
-              </section>
+        </section>
 
-              <section xml:id="sec-the-terminal">
-                <title>The terminal</title>
+        <section xml:id="sec-the-terminal">
+          <title>The terminal</title>
 
-                <p>Instead of clicking, dragging, and dropping to organize our files and folders, we will be typing Unix commands into the terminal. The way we do this is similar to how we type commands into the R console, but instead of generating plots and statistical summaries, we will be organizing files on our system.</p>
+          <p>Instead of clicking, dragging, and dropping to organize our files and folders, we will be typing Unix commands into the terminal. The way we do this is similar to how we type commands into the R console, but instead of generating plots and statistical summaries, we will be organizing files on our system.</p>
 
-                <p>The terminal is integrated into Mac and Linux systems, but Windows users will have to install an <em>emulator</em>. Once you have a terminal open, you can start typing commands. You should see a blinking cursor at the spot where what you type will show up. This position is called the <em>command line</em>. Once you type something and hit enter on Windows or return on the Mac, Unix will try to execute this command. If you want to try out an example, type this command:</p>
+          <p>The terminal is integrated into Mac and Linux systems, but Windows users will have to install an <em>emulator</em>. Once you have a terminal open, you can start typing commands. You should see a blinking cursor at the spot where what you type will show up. This position is called the <em>command line</em>. Once you type something and hit enter on Windows or return on the Mac, Unix will try to execute this command. If you want to try out an example, type this command:</p>
 
-                <program language="r">
-                  <input>
-      echo "hello world"
-                  </input>
-                </program>
+          <program language="r">
+            <input>
+echo "hello world"
+            </input>
+          </program>
 
-                <p>The command <c>echo</c> is similar to <c>cat</c> in R. Executing this line should print out <c>hello world</c>, then return back to the command line.</p>
+          <p>The command <c>echo</c> is similar to <c>cat</c> in R. Executing this line should print out <c>hello world</c>, then return back to the command line.</p>
 
-                <p>Notice that you can't use the mouse to move around in the terminal. You have to use the keyboard. To go back to a command you previously typed, you can use the up arrow.</p>
+          <p>Notice that you can't use the mouse to move around in the terminal. You have to use the keyboard. To go back to a command you previously typed, you can use the up arrow.</p>
 
-                <p>Note that above we included a chunk of code showing Unix commands in the same way we have previously shown R commands. We will make sure to distinguish when the command is meant for R and when it is meant for Unix.</p>
+          <p>Note that above we included a chunk of code showing Unix commands in the same way we have previously shown R commands. We will make sure to distinguish when the command is meant for R and when it is meant for Unix.</p>
 
-              </section>
+        </section>
 
-              <section xml:id="sec-filesystem">
-                <title>The filesystem</title>
+        <section xml:id="sec-filesystem">
+          <title>The filesystem</title>
 
-                <p>We refer to all the files, folders, and programs on your computer as <em>the filesystem</em>. Keep in mind that folders and programs are also files, but this is a technicality we rarely think about and ignore in this book. We will focus on files and folders for now and discuss programs, or <em>executables</em>, in a later section.</p>
+          <p>We refer to all the files, folders, and programs on your computer as <em>the filesystem</em>. Keep in mind that folders and programs are also files, but this is a technicality we rarely think about and ignore in this book. We will focus on files and folders for now and discuss programs, or <em>executables</em>, in a later section.</p>
 
-                <subsection xml:id="subsec-directories-and-subdirectories">
-                  <title>Directories and subdirectories</title>
+          <subsection xml:id="subsec-directories-and-subdirectories">
+            <title>Directories and subdirectories</title>
 
-                  <p>The first concept you need to grasp to become a Unix user is how your filesystem is organized. You should think of it as a series of nested folders, each containing files, folders, and executables.</p>
+            <p>The first concept you need to grasp to become a Unix user is how your filesystem is organized. You should think of it as a series of nested folders, each containing files, folders, and executables.</p>
 
-                  <p>Here is a visual representation of the structure we are describing:</p>
+            <p>Here is a visual representation of the structure we are describing:</p>
 
-                  <figure>
-                    <image source="dataviz/img/unix/filesystem.png"/>
-                  </figure>
+            <figure>
+              <image source="dataviz/img/unix/filesystem.png"/>
+            </figure>
 
-                  <p>In Unix, we refer to folders as <em>directories</em>. Directories that are inside other directories are often referred to as <em>subdirectories</em>. So, for example, in the figure above, the directory <em>docs</em> has two subdirectories: <em>reports</em> and <em>resumes</em>, and <em>docs</em> is a subdirectory of <em>home</em>.</p>
+            <p>In Unix, we refer to folders as <em>directories</em>. Directories that are inside other directories are often referred to as <em>subdirectories</em>. So, for example, in the figure above, the directory <em>docs</em> has two subdirectories: <em>reports</em> and <em>resumes</em>, and <em>docs</em> is a subdirectory of <em>home</em>.</p>
 
-                </subsection>
+          </subsection>
 
-                <subsection xml:id="subsec-the-home-directory">
-                  <title>The home directory</title>
+          <subsection xml:id="subsec-the-home-directory">
+            <title>The home directory</title>
 
-                  <p>The <em>home</em> directory is where all your stuff is kept, as opposed to the system files that come with your computer, which are kept elsewhere. In the figure above, the directory called <em>home</em> represents your home directory, but that is rarely the name used. On your system, the name of your home directory is likely the same as your username on that system. Below are an example on Windows and Mac showing a home directory, in this case, named <em>rafa</em>:</p>
+            <p>The <em>home</em> directory is where all your stuff is kept, as opposed to the system files that come with your computer, which are kept elsewhere. In the figure above, the directory called <em>home</em> represents your home directory, but that is rarely the name used. On your system, the name of your home directory is likely the same as your username on that system. Below are an example on Windows and Mac showing a home directory, in this case, named <em>rafa</em>:</p>
 
-                  <figure>
-                    <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_53_13.png"/>
-                  </figure>
+            <figure>
+              <image source="dataviz/img/windows-screenshots/VirtualBox_Windows-7-Enterprise_23_03_2018_14_53_13.png"/>
+            </figure>
 
-                  <figure>
-                    <image source="dataviz/img/mac-screenshots/Screen-Shot-2018-04-13-at-4.34.01-PM.png"/>
-                  </figure>
+            <figure>
+              <image source="dataviz/img/mac-screenshots/Screen-Shot-2018-04-13-at-4.34.01-PM.png"/>
+            </figure>
 
-                  <p>Now, look back at the figure showing a filesystem. Suppose you are using a point-and-click system and you want to remove the file <em>cv.tex</em>. Imagine that on your screen you can see the <em>home</em> directory. To erase this file, you would double click on the <em>home</em> directory, then <em>docs</em>, then <em>resumes</em>, and then drag <em>cv.tex</em> to the trash. Here you are experiencing the hierarchical nature of the system: <em>cv.tex</em> is a file inside the <em>resumes</em> directory, which is a subdirectory inside the <em>docs</em> directory, which is a subdirectory of the <em>home</em> directory.</p>
+            <p>Now, look back at the figure showing a filesystem. Suppose you are using a point-and-click system and you want to remove the file <em>cv.tex</em>. Imagine that on your screen you can see the <em>home</em> directory. To erase this file, you would double click on the <em>home</em> directory, then <em>docs</em>, then <em>resumes</em>, and then drag <em>cv.tex</em> to the trash. Here you are experiencing the hierarchical nature of the system: <em>cv.tex</em> is a file inside the <em>resumes</em> directory, which is a subdirectory inside the <em>docs</em> directory, which is a subdirectory of the <em>home</em> directory.</p>
 
-                  <p>Now suppose you can't see your home directory on your screen. You would somehow need to make it appear on your screen. One way to do this is to navigate from what is called the <em>root</em> directory all the way to your home directory. Any filesystem will have what is called a <em>root</em> directory, which is the directory that contains all directories. The <em>home</em> directory shown in the figure above will usually be two or more levels from the root. On Windows, you will have a structure like this:</p>
+            <p>Now suppose you can't see your home directory on your screen. You would somehow need to make it appear on your screen. One way to do this is to navigate from what is called the <em>root</em> directory all the way to your home directory. Any filesystem will have what is called a <em>root</em> directory, which is the directory that contains all directories. The <em>home</em> directory shown in the figure above will usually be two or more levels from the root. On Windows, you will have a structure like this:</p>
 
-                  <figure>
-                    <image source="dataviz/img/unix/windows-filesystem-from-root.png"/>
-                  </figure>
+            <figure>
+              <image source="dataviz/img/unix/windows-filesystem-from-root.png"/>
+            </figure>
 
-                  <p>while on the Mac, it will be like this:</p>
+            <p>while on the Mac, it will be like this:</p>
 
-                  <figure>
-                    <image source="dataviz/img/unix/mac-filesystem-from-root.png"/>
-                  </figure>
+            <figure>
+              <image source="dataviz/img/unix/mac-filesystem-from-root.png"/>
+            </figure>
 
-                  <p>On Windows, the typical R installation will make your <em>Documents</em> directory your home directory in R. This will likely be different from your home directory in Git Bash. Generally, when we discuss home directories, we refer to the Unix home directory which for Windows, in this book, is the Git Bash Unix directory.</p>
+            <p>On Windows, the typical R installation will make your <em>Documents</em> directory your home directory in R. This will likely be different from your home directory in Git Bash. Generally, when we discuss home directories, we refer to the Unix home directory which for Windows, in this book, is the Git Bash Unix directory.</p>
 
-                </subsection>
+          </subsection>
 
-                <subsection xml:id="sec-working-directory">
-                  <title>Working directory</title>
+          <subsection xml:id="sec-working-directory">
+            <title>Working directory</title>
 
-                  <p>The concept of a <em>current location</em> is part of the point-and-click experience: at any given moment we are <em>in a folder</em> and see the content of that folder. As you search for a file, as we did above, you are experiencing the concept of a current location: once you double click on a directory, you change locations and are now <em>in that folder</em>, as opposed to the folder you were in before.</p>
+            <p>The concept of a <em>current location</em> is part of the point-and-click experience: at any given moment we are <em>in a folder</em> and see the content of that folder. As you search for a file, as we did above, you are experiencing the concept of a current location: once you double click on a directory, you change locations and are now <em>in that folder</em>, as opposed to the folder you were in before.</p>
 
-                  <p>In Unix, we don't have the same visual cues, but the concept of a <em>current location</em> is indispensable. We refer to this as the <em>working directory</em>. Each terminal window you have open has a working directory associated with it.</p>
+            <p>In Unix, we don't have the same visual cues, but the concept of a <em>current location</em> is indispensable. We refer to this as the <em>working directory</em>. Each terminal window you have open has a working directory associated with it.</p>
 
-                  <p>How do we know what is our working directory? To answer this, we learn our next Unix command: <c>pwd</c>, which stands for <em>print working directory</em>. This command returns the working directory.</p>
+            <p>How do we know what is our working directory? To answer this, we learn our next Unix command: <c>pwd</c>, which stands for <em>print working directory</em>. This command returns the working directory.</p>
 
-                  <p>Open a terminal and type:</p>
+            <p>Open a terminal and type:</p>
 
-                  <program language="r">
-                    <input>
-      pwd
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+pwd
+              </input>
+            </program>
 
-                  <p>We do not show the result of running this command because it will be quite different on your system compared to others. If you open a terminal and type <c>pwd</c> as your first command, you should see something like <c>/Users/yourusername</c> on a Mac or something like <c>/c/Users/yourusername</c> on Windows. The character string returned by calling <c>pwd</c> represents your working directory. When we first open a terminal, it will start in our home directory so in this case the working directory is the home directory.</p>
+            <p>We do not show the result of running this command because it will be quite different on your system compared to others. If you open a terminal and type <c>pwd</c> as your first command, you should see something like <c>/Users/yourusername</c> on a Mac or something like <c>/c/Users/yourusername</c> on Windows. The character string returned by calling <c>pwd</c> represents your working directory. When we first open a terminal, it will start in our home directory so in this case the working directory is the home directory.</p>
 
-                  <p>Notice that the forward slashes <c>/</c> in the strings above separate directories. So, for example, the location <c>/c/Users/rafa</c> implies that our working directory is called <c>rafa</c> and it is a subdirectory of <c>Users</c>, which is a subdirectory of <c>c</c>, which is a subdirectory of the root directory. The root directory is therefore represented by just a forward slash: <c>/</c>.</p>
+            <p>Notice that the forward slashes <c>/</c> in the strings above separate directories. So, for example, the location <c>/c/Users/rafa</c> implies that our working directory is called <c>rafa</c> and it is a subdirectory of <c>Users</c>, which is a subdirectory of <c>c</c>, which is a subdirectory of the root directory. The root directory is therefore represented by just a forward slash: <c>/</c>.</p>
 
-                </subsection>
+          </subsection>
 
-                <subsection xml:id="sec-paths">
-                  <title>Paths</title>
+          <subsection xml:id="sec-paths">
+            <title>Paths</title>
 
-                  <p>We refer to the string returned by <c>pwd</c> as the <em>full path</em> of the working directory. The name comes from the fact that this string spells out the <em>path</em> you need to follow to get to the directory in question from the root directory. Every directory has a full path. Later, we will about <em>relative paths</em>, which tell us how to get to a directory from the working directory.</p>
+            <p>We refer to the string returned by <c>pwd</c> as the <em>full path</em> of the working directory. The name comes from the fact that this string spells out the <em>path</em> you need to follow to get to the directory in question from the root directory. Every directory has a full path. Later, we will about <em>relative paths</em>, which tell us how to get to a directory from the working directory.</p>
 
-                  <p>In Unix, we use the shorthand <c>~</c> as a nickname for your home directory. So, for example, if <c>docs</c> is a directory in your home directory, the full path for <em>docs</em> can be written like this <c>~/docs</c>.</p>
+            <p>In Unix, we use the shorthand <c>~</c> as a nickname for your home directory. So, for example, if <c>docs</c> is a directory in your home directory, the full path for <em>docs</em> can be written like this <c>~/docs</c>.</p>
 
-                  <p>Most terminals will show the path to your working directory right on the command line. If you are using default settings and open a terminal on the Mac, you will see that right at the command line you have something like <c>computername:~ username</c> with <c>~</c> representing your working directory, which in this example is the home directory <c>~</c>. The same is true for the Git Bash terminal where you will see something like <c>username@computername MINGW64 ~</c>, with the working directory at the end. When we change directories, we will see this change on both Macs and Windows.</p>
+            <p>Most terminals will show the path to your working directory right on the command line. If you are using default settings and open a terminal on the Mac, you will see that right at the command line you have something like <c>computername:~ username</c> with <c>~</c> representing your working directory, which in this example is the home directory <c>~</c>. The same is true for the Git Bash terminal where you will see something like <c>username@computername MINGW64 ~</c>, with the working directory at the end. When we change directories, we will see this change on both Macs and Windows.</p>
 
-                </subsection>
+          </subsection>
 
-              </section>
+        </section>
 
-              <section xml:id="sec-unix-commands">
-                <title>Unix commands</title>
+        <section xml:id="sec-unix-commands">
+          <title>Unix commands</title>
 
-                <p>We will now learn a series of Unix commands that will permit us to prepare a directory for a data science project. We also provide examples of commands that, if you type into your terminal, will return an error. This is because we are assuming the filesystem in the earlier diagram. Your filesystem is different. In the next section, we will provide examples that you can type in.</p>
+          <p>We will now learn a series of Unix commands that will permit us to prepare a directory for a data science project. We also provide examples of commands that, if you type into your terminal, will return an error. This is because we are assuming the filesystem in the earlier diagram. Your filesystem is different. In the next section, we will provide examples that you can type in.</p>
 
-                <subsection xml:id="subsec-ls-listing-directory-content">
-                  <title>`ls`: Listing directory content</title>
+          <subsection xml:id="subsec-ls-listing-directory-content">
+            <title>`ls`: Listing directory content</title>
 
-                  <p>In a point-and-click system, we know what is in a directory because we see it. In the terminal, we do not see the icons. Instead, we use the command <c>ls</c> to list the directory content.</p>
+            <p>In a point-and-click system, we know what is in a directory because we see it. In the terminal, we do not see the icons. Instead, we use the command <c>ls</c> to list the directory content.</p>
 
-                  <p>To see the content of your home directory, open a terminal and type:</p>
+            <p>To see the content of your home directory, open a terminal and type:</p>
 
-                  <program language="r">
-                    <input>
-      ls
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+ls
+              </input>
+            </program>
 
-                  <p>We will see more examples soon.</p>
+            <p>We will see more examples soon.</p>
 
-                </subsection>
+          </subsection>
 
-                <subsection xml:id="subsec-mkdir-and-rmdir-make-and-remove-a-directory">
-                  <title>`mkdir` and `rmdir`: make and remove a directory</title>
+          <subsection xml:id="subsec-mkdir-and-rmdir-make-and-remove-a-directory">
+            <title>`mkdir` and `rmdir`: make and remove a directory</title>
 
-                  <p>When we are preparing for a data science project, we will need to create directories. In Unix, we can do this with the command <c>mkdir</c>, which stands for <em>make directory</em>.</p>
+            <p>When we are preparing for a data science project, we will need to create directories. In Unix, we can do this with the command <c>mkdir</c>, which stands for <em>make directory</em>.</p>
 
-                  <p>Because you will soon be working on several projects, we highly recommend creating a directory called <em>projects</em> in your home directory.</p>
+            <p>Because you will soon be working on several projects, we highly recommend creating a directory called <em>projects</em> in your home directory.</p>
 
-                  <p>You can try this particular example on your system. Open a terminal and type:</p>
+            <p>You can try this particular example on your system. Open a terminal and type:</p>
 
-                  <program language="r">
-                    <input>
-      mkdir projects
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+mkdir projects
+              </input>
+            </program>
 
-                  <p>If you do this correctly, nothing will happen: no news is good news. If the directory already exists, you will get an error message and the existing directory will remain untouched.</p>
+            <p>If you do this correctly, nothing will happen: no news is good news. If the directory already exists, you will get an error message and the existing directory will remain untouched.</p>
 
-                  <p>To confirm that you created the directory, you can list the contents of the current working directory:</p>
+            <p>To confirm that you created the directory, you can list the contents of the current working directory:</p>
 
-                  <program language="r">
-                    <input>
-      ls
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+ls
+              </input>
+            </program>
 
-                  <p>You should see the directory we just created listed. Perhaps you can also see many other directories that were already on your computer.</p>
+            <p>You should see the directory we just created listed. Perhaps you can also see many other directories that were already on your computer.</p>
 
-                  <p>For illustrative purposes, let's make a few more directories. You can list more than one directory name like this:</p>
+            <p>For illustrative purposes, let's make a few more directories. You can list more than one directory name like this:</p>
 
-                  <program language="r">
-                    <input>
-      mkdir docs teaching
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+mkdir docs teaching
+              </input>
+            </program>
 
-                  <p>You can check to see if the three directories were created:</p>
+            <p>You can check to see if the three directories were created:</p>
 
-                  <program language="r">
-                    <input>
-      ls
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+ls
+              </input>
+            </program>
 
-                  <p>If you made a mistake and need to remove the directory, you can use the command <c>rmdir</c> to remove it.</p>
+            <p>If you made a mistake and need to remove the directory, you can use the command <c>rmdir</c> to remove it.</p>
 
-                  <program language="r">
-                    <input>
-      mkdir junk
-      rmdir junk
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+mkdir junk
+rmdir junk
+              </input>
+            </program>
 
-                  <p>This will remove the directory as long as it is empty. If it is not empty, you will get an error message and the directory will remain untouched. To remove directories that are not empty, we will learn about the command <c>rm</c> later.</p>
+            <p>This will remove the directory as long as it is empty. If it is not empty, you will get an error message and the directory will remain untouched. To remove directories that are not empty, we will learn about the command <c>rm</c> later.</p>
 
-                </subsection>
+          </subsection>
 
-                <subsection xml:id="subsec-cd-navigating-the-filesystem-by-changing-directories">
-                  <title>`cd`: navigating the filesystem by changing directories</title>
+          <subsection xml:id="subsec-cd-navigating-the-filesystem-by-changing-directories">
+            <title>`cd`: navigating the filesystem by changing directories</title>
 
-                  <p>Next we want to create directories inside directories that we have already created. We also want to avoid pointing and clicking our way through the filesystem. We explain how to do this in Unix, using the command line.</p>
+            <p>Next we want to create directories inside directories that we have already created. We also want to avoid pointing and clicking our way through the filesystem. We explain how to do this in Unix, using the command line.</p>
 
-                  <p>Suppose we open a terminal and our working directory is our home directory. We want to change our working directory to <c>projects</c>. We do this using the <c>cd</c> command, which stands for <em>change directory</em>:</p>
+            <p>Suppose we open a terminal and our working directory is our home directory. We want to change our working directory to <c>projects</c>. We do this using the <c>cd</c> command, which stands for <em>change directory</em>:</p>
 
-                  <program language="r">
-                    <input>
-      cd projects
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+cd projects
+              </input>
+            </program>
 
-                  <p>To check that the working directory changed, we can use a command we previously learned to see our location:</p>
+            <p>To check that the working directory changed, we can use a command we previously learned to see our location:</p>
 
-                  <program language="r">
-                    <input>
-      pwd
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+pwd
+              </input>
+            </program>
 
-                  <p>Our working directory should now be <c>~/projects</c>. Note that on your computer the home directory <c>~</c> will be spelled out to something like <c>/c/Users/yourusername</c>.</p>
+            <p>Our working directory should now be <c>~/projects</c>. Note that on your computer the home directory <c>~</c> will be spelled out to something like <c>/c/Users/yourusername</c>.</p>
 
-                  <p>In Unix you can auto-complete by hitting tab. This means that we can type <c>cd d</c> then hit tab. Unix will either auto-complete if <c>docs</c> is the only directory/file starting with <c>d</c> or show you the options. Try it out! Using Unix without auto-complete can make it unbearable.</p>
+            <p>In Unix you can auto-complete by hitting tab. This means that we can type <c>cd d</c> then hit tab. Unix will either auto-complete if <c>docs</c> is the only directory/file starting with <c>d</c> or show you the options. Try it out! Using Unix without auto-complete can make it unbearable.</p>
 
-                  <p>When using <c>cd</c>, we can either type a full path, which will start with <c>/</c> or <c>~</c>, or a <em>relative path</em>. In the example above, in which we typed <c>cd projects</c>, we used a relative path. If the path you type does not start with <c>/</c> or <c>~</c>, Unix will assume you are typing a relative path, meaning that it will look for the directory in your current working directory. So something like this will give you an error:</p>
+            <p>When using <c>cd</c>, we can either type a full path, which will start with <c>/</c> or <c>~</c>, or a <em>relative path</em>. In the example above, in which we typed <c>cd projects</c>, we used a relative path. If the path you type does not start with <c>/</c> or <c>~</c>, Unix will assume you are typing a relative path, meaning that it will look for the directory in your current working directory. So something like this will give you an error:</p>
 
-                  <program language="r">
-                    <input>
-      cd Users
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+cd Users
+              </input>
+            </program>
 
-                  <p>because there is no <c>Users</c> directory in your working directory.</p>
+            <p>because there is no <c>Users</c> directory in your working directory.</p>
 
-                  <p>Now suppose we want to move back to the directory in which <c>projects</c> is a subdirectory, referred to as the <em>parent directory</em>. We could use the full path of the parent directory, but Unix provides a shortcut for this: the parent directory of the working directory is represented with two dots: <c>..</c> so to move back we simply type:</p>
+            <p>Now suppose we want to move back to the directory in which <c>projects</c> is a subdirectory, referred to as the <em>parent directory</em>. We could use the full path of the parent directory, but Unix provides a shortcut for this: the parent directory of the working directory is represented with two dots: <c>..</c> so to move back we simply type:</p>
 
-                  <program language="r">
-                    <input>
-      cd ..
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+cd ..
+              </input>
+            </program>
 
-                  <p>You should now be back in your home directory which you can confirm using <c>pwd</c>.</p>
+            <p>You should now be back in your home directory which you can confirm using <c>pwd</c>.</p>
 
-                  <p>Because we can use full paths with <c>cd</c>, the following command:</p>
+            <p>Because we can use full paths with <c>cd</c>, the following command:</p>
 
-                  <program language="r">
-                    <input>
-      cd ~
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+cd ~
+              </input>
+            </program>
 
-                  <p>will always take us back to the home directory, no matter where we are in the filesystem.</p>
+            <p>will always take us back to the home directory, no matter where we are in the filesystem.</p>
 
-                  <p>The working directory also has a nickname, which is a single <c>.</c> so if you type</p>
+            <p>The working directory also has a nickname, which is a single <c>.</c> so if you type</p>
 
-                  <program language="r">
-                    <input>
-      cd .
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+cd .
+              </input>
+            </program>
 
-                  <p>you will not move. Although this particular use of <c>.</c> is not useful, this nickname does come in handy sometimes. The reasons are not relevant for this section, but you should still be aware of this fact.</p>
+            <p>you will not move. Although this particular use of <c>.</c> is not useful, this nickname does come in handy sometimes. The reasons are not relevant for this section, but you should still be aware of this fact.</p>
 
-                  <p>In summary, we have learned that when using <c>cd</c> we either stay put, move to a new directory using the desired directory name, or move back to the parent directory using <c>..</c>.</p>
+            <p>In summary, we have learned that when using <c>cd</c> we either stay put, move to a new directory using the desired directory name, or move back to the parent directory using <c>..</c>.</p>
 
-                  <p>When typing directory names, we can concatenate directories with the forward-slashes. So if we want a command that takes us to the <c>projects</c> directory no matter where we are in the filesystem, we can type:</p>
+            <p>When typing directory names, we can concatenate directories with the forward-slashes. So if we want a command that takes us to the <c>projects</c> directory no matter where we are in the filesystem, we can type:</p>
 
-                  <program language="r">
-                    <input>
-      cd ~/projects
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+cd ~/projects
+              </input>
+            </program>
 
-                  <p>which is equivalent to writing the entire path out. For example, in Windows we would write something like</p>
+            <p>which is equivalent to writing the entire path out. For example, in Windows we would write something like</p>
 
-                  <program language="r">
-                    <input>
-      cd /c/Users/yourusername/projects
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+cd /c/Users/yourusername/projects
+              </input>
+            </program>
 
-                  <p>The last two commands are equivalent and in both cases we are typing the full path.</p>
+            <p>The last two commands are equivalent and in both cases we are typing the full path.</p>
 
-                  <p>We can also concatenate directory names for relative paths. For instance, if we want to move back to the parent directory of the parent directory of the working directory, we can type:</p>
+            <p>We can also concatenate directory names for relative paths. For instance, if we want to move back to the parent directory of the parent directory of the working directory, we can type:</p>
 
-                  <program language="r">
-                    <input>
-      cd ../..
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+cd ../..
+              </input>
+            </program>
 
-                  <p>Here are a couple of final tips related to the <c>cd</c> command. First, you can go back to whatever directory you just left by typing:</p>
+            <p>Here are a couple of final tips related to the <c>cd</c> command. First, you can go back to whatever directory you just left by typing:</p>
 
-                  <program language="r">
-                    <input>
-      cd -
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+cd -
+              </input>
+            </program>
 
-                  <p>This can be useful if you type a very long path and then realize you want to go back to where you were, and that too has a very long path.</p>
+            <p>This can be useful if you type a very long path and then realize you want to go back to where you were, and that too has a very long path.</p>
 
-                  <p>Second, if you just type:</p>
+            <p>Second, if you just type:</p>
 
-                  <program language="r">
-                    <input>
-      cd
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+cd
+              </input>
+            </program>
 
-                  <p>you will be returned to your home directory.</p>
+            <p>you will be returned to your home directory.</p>
 
-                </subsection>
+          </subsection>
 
-                <subsection xml:id="subsec-examples">
-                  <title>Examples</title>
+          <subsection xml:id="subsec-examples">
+            <title>Examples</title>
 
-                  <p>Let's explore some examples of using <c>cd</c>. To help visualize, we will show the graphical representation of our filesystem vertically:</p>
+            <p>Let's explore some examples of using <c>cd</c>. To help visualize, we will show the graphical representation of our filesystem vertically:</p>
 
-                  <figure>
-                    <image source="dataviz/img/unix/filesystem-vertical.png"/>
-                  </figure>
+            <figure>
+              <image source="dataviz/img/unix/filesystem-vertical.png"/>
+            </figure>
 
-                  <p>Suppose our working directory is <c>~/projects</c> and we want to move to <c>figs</c> in <c>project-1</c>.</p>
+            <p>Suppose our working directory is <c>~/projects</c> and we want to move to <c>figs</c> in <c>project-1</c>.</p>
 
-                  <p>Here it is convenient to use relative paths:</p>
+            <p>Here it is convenient to use relative paths:</p>
 
-                  <program language="r">
-                    <input>
-      cd project-1/figs
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+cd project-1/figs
+              </input>
+            </program>
 
-                  <p>Now suppose our working directory is <c>~/projects</c> and we want to move to <c>reports</c> in <c>docs</c>, how can we do this?</p>
+            <p>Now suppose our working directory is <c>~/projects</c> and we want to move to <c>reports</c> in <c>docs</c>, how can we do this?</p>
 
-                  <p>One way is to use relative paths:</p>
+            <p>One way is to use relative paths:</p>
 
-                  <program language="r">
-                    <input>
-      cd ../docs/reports
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+cd ../docs/reports
+              </input>
+            </program>
 
-                  <p>Another is to use the full path:</p>
+            <p>Another is to use the full path:</p>
 
-                  <program language="r">
-                    <input>
-      cd ~/docs/reports
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+cd ~/docs/reports
+              </input>
+            </program>
 
-                  <p>If you are trying this out on your system, remember to use auto-complete.</p>
+            <p>If you are trying this out on your system, remember to use auto-complete.</p>
 
-                  <p>Let's examine one more example. Suppose we are in <c>~/projects/project-1/figs</c> and want to change to <c>~/projects/project-2</c>. Again, there are two ways.</p>
+            <p>Let's examine one more example. Suppose we are in <c>~/projects/project-1/figs</c> and want to change to <c>~/projects/project-2</c>. Again, there are two ways.</p>
 
-                  <p>With relative paths:</p>
+            <p>With relative paths:</p>
 
-                  <program language="r">
-                    <input>
-      cd ../../project-2
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+cd ../../project-2
+              </input>
+            </program>
 
-                  <p>and with full paths:</p>
+            <p>and with full paths:</p>
 
-                  <program language="r">
-                    <input>
-      cd ~/projects/project-2
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+cd ~/projects/project-2
+              </input>
+            </program>
 
-                </subsection>
+          </subsection>
 
-              </section>
+        </section>
 
-              <section xml:id="sec-more-unix-commands">
-                <title>More Unix commands</title>
+        <section xml:id="sec-more-unix-commands">
+          <title>More Unix commands</title>
 
-                <subsection xml:id="subsec-mv-moving-files">
-                  <title>`mv`: moving files</title>
+          <subsection xml:id="subsec-mv-moving-files">
+            <title>`mv`: moving files</title>
 
-                  <p>In a point-and-click system, we move files from one directory to another by dragging and dropping. In Unix, we use the <c>mv</c> command.</p>
+            <p>In a point-and-click system, we move files from one directory to another by dragging and dropping. In Unix, we use the <c>mv</c> command.</p>
 
-                  <p><c>mv</c> will not ask "are you sure?" if your move results in overwriting a file.</p>
+            <p><c>mv</c> will not ask "are you sure?" if your move results in overwriting a file.</p>
 
-                  <p>Now that you know how to use full and relative paths, using <c>mv</c> is relatively straightforward. The general form is:</p>
+            <p>Now that you know how to use full and relative paths, using <c>mv</c> is relatively straightforward. The general form is:</p>
 
-                  <program language="r">
-                    <input>
-      mv path-to-file path-to-destination-directory
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+mv path-to-file path-to-destination-directory
+              </input>
+            </program>
 
-                  <p>For example, if we want to move the file <c>cv.tex</c> from <c>resumes</c> to <c>reports</c>, you could use the full paths like this:</p>
+            <p>For example, if we want to move the file <c>cv.tex</c> from <c>resumes</c> to <c>reports</c>, you could use the full paths like this:</p>
 
-                  <program language="r">
-                    <input>
-      mv ~/docs/resumes/cv.tex ~/docs/reports/
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+mv ~/docs/resumes/cv.tex ~/docs/reports/
+              </input>
+            </program>
 
-                  <p>You can also use relative paths. You could do this:</p>
+            <p>You can also use relative paths. You could do this:</p>
 
-                  <program language="r">
-                    <input>
-      cd ~/docs/resumes
-      mv cv.tex ../reports/
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+cd ~/docs/resumes
+mv cv.tex ../reports/
+              </input>
+            </program>
 
-                  <p>or this:</p>
+            <p>or this:</p>
 
-                  <program language="r">
-                    <input>
-      cd ~/docs/reports/
-      mv ../resumes/cv.tex ./
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+cd ~/docs/reports/
+mv ../resumes/cv.tex ./
+              </input>
+            </program>
 
-                  <p>Notice that in the last one we used the working directory shortcut <c>.</c> to give a relative path as the destination directory.</p>
+            <p>Notice that in the last one we used the working directory shortcut <c>.</c> to give a relative path as the destination directory.</p>
 
-                  <p>We can also use <c>mv</c> to change the name of a file. To do this, instead of the second argument being the destination directory, it also includes a filename. So, for example, to change the name from <c>cv.tex</c> to <c>resume.tex</c>, we simply type:</p>
+            <p>We can also use <c>mv</c> to change the name of a file. To do this, instead of the second argument being the destination directory, it also includes a filename. So, for example, to change the name from <c>cv.tex</c> to <c>resume.tex</c>, we simply type:</p>
 
-                  <program language="r">
-                    <input>
-      cd ~/docs/resumes
-      mv cv.tex resume.tex
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+cd ~/docs/resumes
+mv cv.tex resume.tex
+              </input>
+            </program>
 
-                  <p>We can also combine the move and a rename. For example:</p>
+            <p>We can also combine the move and a rename. For example:</p>
 
-                  <program language="r">
-                    <input>
-      cd ~/docs/resumes
-      mv cv.tex ../reports/resume.tex
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+cd ~/docs/resumes
+mv cv.tex ../reports/resume.tex
+              </input>
+            </program>
 
-                  <p>And we can move entire directories. To move the <c>resumes</c> directory into <c>reports</c>, we do as follows:</p>
+            <p>And we can move entire directories. To move the <c>resumes</c> directory into <c>reports</c>, we do as follows:</p>
 
-                  <program language="r">
-                    <input>
-      mv ~/docs/resumes ~/docs/reports/
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+mv ~/docs/resumes ~/docs/reports/
+              </input>
+            </program>
 
-                  <p>It is important to add the last <c>/</c> to make it clear you do not want to rename the <c>resumes</c> directory to <c>reports</c>, but rather move it into the <c>reports</c> directory.</p>
+            <p>It is important to add the last <c>/</c> to make it clear you do not want to rename the <c>resumes</c> directory to <c>reports</c>, but rather move it into the <c>reports</c> directory.</p>
 
-                </subsection>
+          </subsection>
 
-                <subsection xml:id="subsec-cp-copying-files">
-                  <title>`cp`: copying files</title>
+          <subsection xml:id="subsec-cp-copying-files">
+            <title>`cp`: copying files</title>
 
-                  <p>The command <c>cp</c> behaves similar to <c>mv</c> except instead of moving, we copy the file, meaning that the original file stays untouched.</p>
+            <p>The command <c>cp</c> behaves similar to <c>mv</c> except instead of moving, we copy the file, meaning that the original file stays untouched.</p>
 
-                  <p>So in all the <c>mv</c> examples above, you can switch <c>mv</c> to <c>cp</c> and they will copy instead of move with one exception: we can't copy entire directories without learning about arguments, which we do later.</p>
+            <p>So in all the <c>mv</c> examples above, you can switch <c>mv</c> to <c>cp</c> and they will copy instead of move with one exception: we can't copy entire directories without learning about arguments, which we do later.</p>
 
-                </subsection>
+          </subsection>
 
-                <subsection xml:id="subsec-rm-removing-files">
-                  <title>`rm`: removing files</title>
+          <subsection xml:id="subsec-rm-removing-files">
+            <title>`rm`: removing files</title>
 
-                  <p>In point-and-click systems, we remove files by dragging and dropping them into the trash or using a special click on the mouse. In Unix, we use the <c>rm</c> command.</p>
+            <p>In point-and-click systems, we remove files by dragging and dropping them into the trash or using a special click on the mouse. In Unix, we use the <c>rm</c> command.</p>
 
-                  <p>Unlike throwing files into the trash, <c>rm</c> is permanent. Be careful!</p>
+            <p>Unlike throwing files into the trash, <c>rm</c> is permanent. Be careful!</p>
 
-                  <p>The general way it works is as follows:</p>
+            <p>The general way it works is as follows:</p>
 
-                  <program language="r">
-                    <input>
-      rm filename
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+rm filename
+              </input>
+            </program>
 
-                  <p>You can actually list files as well like this:</p>
+            <p>You can actually list files as well like this:</p>
 
-                  <program language="r">
-                    <input>
-      rm filename-1 filename-2 filename-3
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+rm filename-1 filename-2 filename-3
+              </input>
+            </program>
 
-                  <p>You can use full or relative paths. To remove non-empty directories, you will have to learn about arguments, which we do later.</p>
+            <p>You can use full or relative paths. To remove non-empty directories, you will have to learn about arguments, which we do later.</p>
 
-                </subsection>
+          </subsection>
 
-                <subsection xml:id="subsec-less-looking-at-a-file">
-                  <title>`less`: looking at a file</title>
+          <subsection xml:id="subsec-less-looking-at-a-file">
+            <title>`less`: looking at a file</title>
 
-                  <p>Often you want to quickly look at the content of a file. If this file is a text file, the quickest way to do is by using the command <c>less</c>. To look a the file <c>cv.tex</c>, you do this:</p>
+            <p>Often you want to quickly look at the content of a file. If this file is a text file, the quickest way to do is by using the command <c>less</c>. To look a the file <c>cv.tex</c>, you do this:</p>
 
-                  <program language="r">
-                    <input>
-      cd ~/docs/resumes
-      less cv.tex 
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+cd ~/docs/resumes
+less cv.tex 
+              </input>
+            </program>
 
-                  <p>To exit the viewer, you type <c>q</c>. If the files are long, you can use the arrow keys to move up and down. There are many other keyboard commands you can use within <c>less</c> to, for example, search or jump pages.</p>
+            <p>To exit the viewer, you type <c>q</c>. If the files are long, you can use the arrow keys to move up and down. There are many other keyboard commands you can use within <c>less</c> to, for example, search or jump pages.</p>
 
-                  <p>If you are wondering why the command is called <c>less</c>, it is because the original was called <c>more</c>, as in "show me more of this file". The second version was called <c>less</c> because of the saying "less is more".</p>
+            <p>If you are wondering why the command is called <c>less</c>, it is because the original was called <c>more</c>, as in "show me more of this file". The second version was called <c>less</c> because of the saying "less is more".</p>
 
-                </subsection>
+          </subsection>
 
-              </section>
+        </section>
 
-              <section xml:id="sec-prep-project">
-                <title>Case study: Preparing for a project</title>
+        <section xml:id="sec-prep-project">
+          <title>Case study: Preparing for a project</title>
 
-                <p>We are now ready to prepare a directory for a project. We will use the US murders project as an example.</p>
+          <p>We are now ready to prepare a directory for a project. We will use the US murders project as an example.</p>
 
-                <p>You should start by creating a directory where you will keep all your projects. We recommend a directory called <em>projects</em> in your home directory. To do this you would type:</p>
+          <p>You should start by creating a directory where you will keep all your projects. We recommend a directory called <em>projects</em> in your home directory. To do this you would type:</p>
 
-                <program language="r">
-                  <input>
-      cd ~
-      mkdir projects
-                  </input>
-                </program>
+          <program language="r">
+            <input>
+cd ~
+mkdir projects
+            </input>
+          </program>
 
-                <p>Our project relates to gun violence murders so we will call the directory for our project <c>murders</c>. It will be a subdirectory in our projects directories. In the <c>murders</c> directory, we will create two subdirectories to hold the raw data and intermediate data. We will call these <c>data</c> and <c>rda</c>, respectively.</p>
+          <p>Our project relates to gun violence murders so we will call the directory for our project <c>murders</c>. It will be a subdirectory in our projects directories. In the <c>murders</c> directory, we will create two subdirectories to hold the raw data and intermediate data. We will call these <c>data</c> and <c>rda</c>, respectively.</p>
 
-                <p>Open a terminal and make sure you are in the home directory:</p>
+          <p>Open a terminal and make sure you are in the home directory:</p>
 
-                <program language="r">
-                  <input>
-      cd ~
-                  </input>
-                </program>
+          <program language="r">
+            <input>
+cd ~
+            </input>
+          </program>
 
-                <p>Now run the following commands to create the directory structure we want. At the end, we use <c>ls</c> and <c>pwd</c> to confirm we have generated the correct directories in the correct working directory:</p>
+          <p>Now run the following commands to create the directory structure we want. At the end, we use <c>ls</c> and <c>pwd</c> to confirm we have generated the correct directories in the correct working directory:</p>
 
-                <program language="r">
-                  <input>
-      cd projects
-      mkdir murders
-      cd murders
-      mkdir data rdas 
-      ls
-      pwd
-                  </input>
-                </program>
+          <program language="r">
+            <input>
+cd projects
+mkdir murders
+cd murders
+mkdir data rdas 
+ls
+pwd
+            </input>
+          </program>
 
-                <p>Note that the full path of our <c>murders</c> dataset is <c>~/projects/murders</c>.</p>
+          <p>Note that the full path of our <c>murders</c> dataset is <c>~/projects/murders</c>.</p>
 
-                <p>So if we open a new terminal and want to navigate into that directory we type:</p>
+          <p>So if we open a new terminal and want to navigate into that directory we type:</p>
 
-                <program language="r">
-                  <input>
-      cd projects/murders
-                  </input>
-                </program>
+          <program language="r">
+            <input>
+cd projects/murders
+            </input>
+          </program>
 
-                <p>In <xref ref="sec-organizing"/> we will describe how we can use RStudio to organize a data analysis project, once these directories have been created.</p>
+          <p>In <xref ref="sec-organizing"/> we will describe how we can use RStudio to organize a data analysis project, once these directories have been created.</p>
 
-              </section>
+        </section>
 
-              <section xml:id="sec-advanced-unix">
-                <title>Advanced Unix</title>
+        <section xml:id="sec-advanced-unix">
+          <title>Advanced Unix</title>
 
-                <p>Most Unix implementations include a large number of powerful tools and utilities. We have just learned the very basics here. We recommend that you use Unix as your main file management tool. It will take time to become comfortable with it, but as you struggle, you will find yourself learning just by looking up solutions on the internet. In this section, we superficially cover slightly more advanced topics. The main purpose of the section is to make you aware of what is available rather than explain everything in detail.</p>
+          <p>Most Unix implementations include a large number of powerful tools and utilities. We have just learned the very basics here. We recommend that you use Unix as your main file management tool. It will take time to become comfortable with it, but as you struggle, you will find yourself learning just by looking up solutions on the internet. In this section, we superficially cover slightly more advanced topics. The main purpose of the section is to make you aware of what is available rather than explain everything in detail.</p>
 
-                <subsection xml:id="subsec-arguments">
-                  <title>Arguments</title>
+          <subsection xml:id="subsec-arguments">
+            <title>Arguments</title>
 
-                  <p>Most Unix commands can be run with arguments. Arguments are typically defined by using a dash <c>-</c> or two dashes <c>--</c> (depending on the command) followed by a letter or a word. An example of an argument is the <c>-r</c> behind <c>rm</c>. The <c>r</c> stands for recursive, and the result is that files and directories are removed recursively, which means that if you type:</p>
+            <p>Most Unix commands can be run with arguments. Arguments are typically defined by using a dash <c>-</c> or two dashes <c>--</c> (depending on the command) followed by a letter or a word. An example of an argument is the <c>-r</c> behind <c>rm</c>. The <c>r</c> stands for recursive, and the result is that files and directories are removed recursively, which means that if you type:</p>
 
-                  <program language="r">
-                    <input>
-      rm -r directory-name
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+rm -r directory-name
+              </input>
+            </program>
 
-                  <p>all files, subdirectories, files in subdirectories, subdirectories in subdirectories, and so on, will be removed. This is equivalent to throwing a folder in the trash, except you can't recover it. Once you remove it, it is deleted for good. Often, when you are removing directories, you will encounter files that are protected. In such cases, you can use the argument <c>-f</c> which stands for <c>force</c>.</p>
+            <p>all files, subdirectories, files in subdirectories, subdirectories in subdirectories, and so on, will be removed. This is equivalent to throwing a folder in the trash, except you can't recover it. Once you remove it, it is deleted for good. Often, when you are removing directories, you will encounter files that are protected. In such cases, you can use the argument <c>-f</c> which stands for <c>force</c>.</p>
 
-                  <p>You can also combine arguments. For instance, to remove a directory regardless of protected files, you type:</p>
+            <p>You can also combine arguments. For instance, to remove a directory regardless of protected files, you type:</p>
 
-                  <program language="r">
-                    <input>
-      rm -rf directory-name
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+rm -rf directory-name
+              </input>
+            </program>
 
-                  <p>Remember that once you remove there is no going back, so use this command very carefully.</p>
+            <p>Remember that once you remove there is no going back, so use this command very carefully.</p>
 
-                  <p>A command that is often called with argument is <c>ls</c>. Here are some examples:</p>
+            <p>A command that is often called with argument is <c>ls</c>. Here are some examples:</p>
 
-                  <program language="r">
-                    <input>
-      ls -a 
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+ls -a 
+              </input>
+            </program>
 
-                  <p>The <c>a</c> stands for all. This argument makes <c>ls</c> show you all files in the directory, including hidden files. In Unix, all files starting with a <c>.</c> are hidden. Many applications create hidden directories to store important information without getting in the way of your work. An example is <c>git</c>. Once you initialize a directory as a git directory with <c>git init</c>, a hidden directory called <c>.git</c> is created. Another hidden file is the <c>.gitignore</c> file.</p>
+            <p>The <c>a</c> stands for all. This argument makes <c>ls</c> show you all files in the directory, including hidden files. In Unix, all files starting with a <c>.</c> are hidden. Many applications create hidden directories to store important information without getting in the way of your work. An example is <c>git</c> (which we cover in depth in <xref ref="sec-git"/>). Once you initialize a directory as a git directory with <c>git init</c>, a hidden directory called <c>.git</c> is created. Another hidden file is the <c>.gitignore</c> file.</p>
 
-                  <p>Another example of using an argument is:</p>
+            <p>Another example of using an argument is:</p>
 
-                  <program language="r">
-                    <input>
-      ls -l 
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+ls -l 
+              </input>
+            </program>
 
-                  <p>The <c>l</c> stands for long and the result is that more information about the files is shown.</p>
+            <p>The <c>l</c> stands for long and the result is that more information about the files is shown.</p>
 
-                  <p>It is often useful to see files in chronological order. For that we use:</p>
+            <p>It is often useful to see files in chronological order. For that we use:</p>
 
-                  <program language="r">
-                    <input>
-      ls -t 
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+ls -t 
+              </input>
+            </program>
 
-                  <p>and to reverse the order of how files are shown you can use:</p>
+            <p>and to reverse the order of how files are shown you can use:</p>
 
-                  <program language="r">
-                    <input>
-      ls -r 
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+ls -r 
+              </input>
+            </program>
 
-                  <p>We can combine all these arguments to show more information for all files in reverse chronological order:</p>
+            <p>We can combine all these arguments to show more information for all files in reverse chronological order:</p>
 
-                  <program language="r">
-                    <input>
-      ls -lart 
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+ls -lart 
+              </input>
+            </program>
 
-                  <p>Each command has a different set of arguments. In the next section, we learn how to find out what they each do.</p>
+            <p>Each command has a different set of arguments. In the next section, we learn how to find out what they each do.</p>
 
-                </subsection>
+          </subsection>
 
-                <subsection xml:id="subsec-getting-help">
-                  <title>Getting help</title>
+          <subsection xml:id="subsec-getting-help">
+            <title>Getting help</title>
 
-                  <p>As you may have noticed, Unix uses an extreme version of abbreviations. This makes it very efficient, but hard to guess how to call commands. To make up for this weakness, Unix includes complete help files or <em>man pages</em> (man is short for manual). In most systems, you can type <c>man</c> followed by the command name to get help. So for <c>ls</c>, we would type:</p>
+            <p>As you may have noticed, Unix uses an extreme version of abbreviations. This makes it very efficient, but hard to guess how to call commands. To make up for this weakness, Unix includes complete help files or <em>man pages</em> (man is short for manual). In most systems, you can type <c>man</c> followed by the command name to get help. So for <c>ls</c>, we would type:</p>
 
-                  <program language="r">
-                    <input>
-      man ls
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+man ls
+              </input>
+            </program>
 
-                  <p>This command is not available in some of the compact implementations of Unix, such as Git Bash. An alternative way to get help that works on Git Bash is to type the command followed by <c>--help</c>. So for <c>ls</c>, it would be as follows:</p>
+            <p>This command is not available in some of the compact implementations of Unix, such as Git Bash. An alternative way to get help that works on Git Bash is to type the command followed by <c>--help</c>. So for <c>ls</c>, it would be as follows:</p>
 
-                  <program language="r">
-                    <input>
-      ls --help
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+ls --help
+              </input>
+            </program>
 
-                </subsection>
+          </subsection>
 
-                <subsection xml:id="subsec-pipes">
-                  <title>Pipes</title>
+          <subsection xml:id="subsec-pipes">
+            <title>Pipes</title>
 
-                  <p>The help pages are typically long and if you type the commands above to see the help, it scrolls all the way to the end. It would be useful if we could save the help to a file and then use <c>less</c> to see it. The <c>pipe</c>, written like this <c>|</c>, does something similar. It <em>pipes</em> the results of a command to the command after the <c>pipe</c>. This is similar to the pipe <c>|&gt;</c> that we use in R. To get more help we thus can type:</p>
+            <p>The help pages are typically long and if you type the commands above to see the help, it scrolls all the way to the end. It would be useful if we could save the help to a file and then use <c>less</c> to see it. The <c>pipe</c>, written like this <c>|</c>, does something similar. It <em>pipes</em> the results of a command to the command after the <c>pipe</c>. This is similar to the pipe <c>|&gt;</c> that we use in R. To get more help we thus can type:</p>
 
-                  <program language="r">
-                    <input>
-      man ls | less
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+man ls | less
+              </input>
+            </program>
 
-                  <p>or in Git Bash:</p>
+            <p>or in Git Bash:</p>
 
-                  <program language="r">
-                    <input>
-      ls --help | less 
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+ls --help | less 
+              </input>
+            </program>
 
-                  <p>This is also useful when listing files with many files. We can type:</p>
+            <p>This is also useful when listing files with many files. We can type:</p>
 
-                  <program language="r">
-                    <input>
-      ls -lart | less 
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+ls -lart | less 
+              </input>
+            </program>
 
-                </subsection>
+          </subsection>
 
-                <subsection xml:id="subsec-wild-cards">
-                  <title>Wild cards</title>
+          <subsection xml:id="subsec-wild-cards">
+            <title>Wild cards</title>
 
-                  <p>Some of the most powerful aspects of Unix are the <em>wild cards</em>. Suppose we want to remove all the temporary html files produced while trouble shooting for a project. Imagine there are dozens of files. It would be quite painful to remove them one by one. In Unix, we can actually write an expression that means all the files that end in <c>.html</c>. To do this we type <em>wild card</em>: <c>*</c>. As discussed in the data wrangling part of this book, this character means any number of any combination of characters. Specifically, to list all html files, we would type:</p>
+            <p>Some of the most powerful aspects of Unix are the <em>wild cards</em>. Suppose we want to remove all the temporary html files produced while trouble shooting for a project. Imagine there are dozens of files. It would be quite painful to remove them one by one. In Unix, we can actually write an expression that means all the files that end in <c>.html</c>. To do this we type <em>wild card</em>: <c>*</c>. As discussed in the data wrangling part of this book, this character means any number of any combination of characters. Specifically, to list all html files, we would type:</p>
 
-                  <program language="r">
-                    <input>
-      ls *.html
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+ls *.html
+              </input>
+            </program>
 
-                  <p>To remove all html files in a directory, we would type:</p>
+            <p>To remove all html files in a directory, we would type:</p>
 
-                  <program language="r">
-                    <input>
-      rm *.html
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+rm *.html
+              </input>
+            </program>
 
-                  <p>The other useful wild card is the <c>?</c> symbol. This means any single character. So if all the files we want to erase have the form <c>file-001.html</c> with the numbers going from 1 to 999, we can type:</p>
+            <p>The other useful wild card is the <c>?</c> symbol. This means any single character. So if all the files we want to erase have the form <c>file-001.html</c> with the numbers going from 1 to 999, we can type:</p>
 
-                  <program language="r">
-                    <input>
-      rm file-???.html
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+rm file-???.html
+              </input>
+            </program>
 
-                  <p>This will only remove files with that format.</p>
+            <p>This will only remove files with that format.</p>
 
-                  <p>We can combine wild cards. For example, to remove all files with the form <c>file-001</c> up to <c>file-999</c> regardless of suffix, we can type:</p>
+            <p>We can combine wild cards. For example, to remove all files with the form <c>file-001</c> up to <c>file-999</c> regardless of suffix, we can type:</p>
 
-                  <program language="r">
-                    <input>
-      rm file-???.* 
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+rm file-???.* 
+              </input>
+            </program>
 
-                  <p>Combining rm with the <c>*</c> wild card can be dangerous. There are combinations of these commands that will erase your entire filesystem without asking "are you sure?". So make sure you understand how it works before using this wild card with the <c>rm</c> command. We recommend always checking what files will match the wild card first by using the <c>ls</c> command.</p>
+            <p>Combining rm with the <c>*</c> wild card can be dangerous. There are combinations of these commands that will erase your entire filesystem without asking "are you sure?". So make sure you understand how it works before using this wild card with the <c>rm</c> command. We recommend always checking what files will match the wild card first by using the <c>ls</c> command.</p>
 
-                </subsection>
+          </subsection>
 
-                <subsection xml:id="subsec-environment-variables">
-                  <title>Environment variables</title>
+          <subsection xml:id="subsec-environment-variables">
+            <title>Environment variables</title>
 
-                  <p>Unix has settings that affect your command line <em>environment</em>. These are called environment variables. The home directory is one of them. We can actually change some of these. In Unix, variables are distinguished from other entities by adding a <c>$</c> in front. The home directory is stored in <c>$HOME</c>.</p>
+            <p>Unix has settings that affect your command line <em>environment</em>. These are called environment variables. The home directory is one of them. We can actually change some of these. In Unix, variables are distinguished from other entities by adding a <c>$</c> in front. The home directory is stored in <c>$HOME</c>.</p>
 
-                  <p>Earlier we saw that <c>echo</c> is the Unix command for print. So we can see our home directory by typing:</p>
+            <p>Earlier we saw that <c>echo</c> is the Unix command for print. So we can see our home directory by typing:</p>
 
-                  <program language="r">
-                    <input>
-      echo $HOME 
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+echo $HOME 
+              </input>
+            </program>
 
-                  <p>You can see them all by typing:</p>
+            <p>You can see them all by typing:</p>
 
-                  <program language="r">
-                    <input>
-      env
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+env
+              </input>
+            </program>
 
-                  <p>You can change some of these environment variables. But their names vary across different <em>shells</em>. We describe shells in the next section.</p>
+            <p>You can change some of these environment variables. But their names vary across different <em>shells</em>. We describe shells in the next section.</p>
 
-                </subsection>
+          </subsection>
 
-                <subsection xml:id="subsec-shells">
-                  <title>Shells</title>
+          <subsection xml:id="subsec-shells">
+            <title>Shells</title>
 
-                  <p>Much of what we use in this chapter is part of what is called the <em>Unix shell</em>. There are actually different shells, but the differences are almost unnoticeable. They are also important, although we do not cover those here. You can see what shell you are using by typing:</p>
+            <p>Much of what we use in this chapter is part of what is called the <em>Unix shell</em>. There are actually different shells, but the differences are almost unnoticeable. They are also important, although we do not cover those here. You can see what shell you are using by typing:</p>
 
-                  <program language="r">
-                    <input>
-      echo $SHELL
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+echo $SHELL
+              </input>
+            </program>
 
-                  <p>The most common one is <c>bash</c>.</p>
+            <p>The most common one is <c>bash</c>.</p>
 
-                  <p>Once you know the shell, you can change environmental variables. In Bash Shell, we do it using <c>export variable value</c>. To change the path, described in more detail soon, you would type:</p>
+            <p>Once you know the shell, you can change environmental variables. In Bash Shell, we do it using <c>export variable value</c>. To change the path, described in more detail soon, you would type:</p>
 
-                  <program language="r">
-                    <input>
-      export PATH = /usr/bin/
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+export PATH = /usr/bin/
+              </input>
+            </program>
 
-                  <p>Don't actually run this command though!</p>
+            <p>Don't actually run this command though!</p>
 
-                  <p>There is a program that is run before each terminal starts where you can edit variables so they change whenever you call the terminal. This changes in different implementations, but if using bash, you can create a file called <c>.bashrc</c>, <c>.bash_profile</c>,<c>.bash_login</c>, or <c>.profile</c>. You might already have one.</p>
+            <p>There is a program that is run before each terminal starts where you can edit variables so they change whenever you call the terminal. This changes in different implementations, but if using bash, you can create a file called <c>.bashrc</c>, <c>.bash_profile</c>,<c>.bash_login</c>, or <c>.profile</c>. You might already have one.</p>
 
-                </subsection>
+          </subsection>
 
-                <subsection xml:id="subsec-executables">
-                  <title>Executables</title>
+          <subsection xml:id="subsec-executables">
+            <title>Executables</title>
 
-                  <p>In Unix, all programs are files. They are called executables. So <c>ls</c>, <c>mv</c> and <c>git</c> are all files. But where are these program files? You can find out using the command <c>which</c>:</p>
+            <p>In Unix, all programs are files. They are called executables. So <c>ls</c>, <c>mv</c> and <c>git</c> are all files. But where are these program files? You can find out using the command <c>which</c>:</p>
 
-                  <program language="bash">
-                    <input>
-      which git
-                    </input>
-                  </program>
+            <program language="bash">
+              <input>
+which git
+              </input>
+            </program>
 
-                  <p>That directory is probably full of program files. The directory <c>/usr/bin</c> usually holds many program files. If you type:</p>
+            <p>That directory is probably full of program files. The directory <c>/usr/bin</c> usually holds many program files. If you type:</p>
 
-                  <program language="r">
-                    <input>
-      ls /usr/bin
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+ls /usr/bin
+              </input>
+            </program>
 
-                  <p>in your terminal, you will see several executable files.</p>
+            <p>in your terminal, you will see several executable files.</p>
 
-                  <p>There are other directories that usually hold program files. The Application directory in the Mac or Program Files directory in Windows are examples.</p>
+            <p>There are other directories that usually hold program files. The Application directory in the Mac or Program Files directory in Windows are examples.</p>
 
-                  <p>When you type <c>ls</c>, Unix knows to run a program which is an executable that is stored in some other directory. So how does Unix know where to find it? This information is included in the environmental variable <c>$PATH</c>. If you type:</p>
+            <p>When you type <c>ls</c>, Unix knows to run a program which is an executable that is stored in some other directory. So how does Unix know where to find it? This information is included in the environmental variable <c>$PATH</c>. If you type:</p>
 
-                  <program language="r">
-                    <input>
-      echo $PATH
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+echo $PATH
+              </input>
+            </program>
 
-                  <p>you will see a list of directories separated by <c>:</c>. The directory <c>/usr/bin</c> is probably one of the first ones on the list.</p>
+            <p>you will see a list of directories separated by <c>:</c>. The directory <c>/usr/bin</c> is probably one of the first ones on the list.</p>
 
-                  <p>Unix looks for program files in those directories in that order. Although we don't teach it here, you can actually create executables yourself. However, if you put it in your working directory and this directory is not on the path, you can't run it just by typing the command. You get around this by typing the full path. So if your command is called my-ls, you can type:</p>
+            <p>Unix looks for program files in those directories in that order. Although we don't teach it here, you can actually create executables yourself. However, if you put it in your working directory and this directory is not on the path, you can't run it just by typing the command. You get around this by typing the full path. So if your command is called my-ls, you can type:</p>
 
-                  <program language="r">
-                    <input>
-      ./my-ls
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+./my-ls
+              </input>
+            </program>
 
-                  <p>Once you have mastered the basics of Unix, you should consider learning to write your own executables as they can help alleviate repetitive work.</p>
+            <p>Once you have mastered the basics of Unix, you should consider learning to write your own executables as they can help alleviate repetitive work.</p>
 
-                </subsection>
+          </subsection>
 
-                <subsection xml:id="subsec-permissions-and-file-types">
-                  <title>Permissions and file types</title>
+          <subsection xml:id="subsec-permissions-and-file-types">
+            <title>Permissions and file types</title>
 
-                  <p>If you type:</p>
+            <p>If you type:</p>
 
-                  <program language="r">
-                    <input>
-      ls -l
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+ls -l
+              </input>
+            </program>
 
-                  <p>At the beginning, you will see a series of symbols like this <c>-rw-r--r--</c>. This string indicates the type of file: regular file <c>-</c>, directory <c>d</c>, or executable <c>x</c>. This string also indicates the permission of the file: is it readable? writable? executable? Can other users on the system read the file? Can other users on the system edit the file? Can other users execute if the file is executable? This is more advanced than what we cover here, but you can learn much more in a Unix reference book.</p>
+            <p>At the beginning, you will see a series of symbols like this <c>-rw-r--r--</c>. This string indicates the type of file: regular file <c>-</c>, directory <c>d</c>, or executable <c>x</c>. This string also indicates the permission of the file: is it readable? writable? executable? Can other users on the system read the file? Can other users on the system edit the file? Can other users execute if the file is executable? This is more advanced than what we cover here, but you can learn much more in a Unix reference book.</p>
 
-                </subsection>
+          </subsection>
 
-                <subsection xml:id="subsec-commands-you-should-learn">
-                  <title>Commands you should learn</title>
+          <subsection xml:id="subsec-commands-you-should-learn">
+            <title>Commands you should learn</title>
 
-                  <p>There are many commands that we do not teach in this book, but we want to make you aware of them and what they do. They are:</p>
+            <p>There are many commands that we do not teach in this book, but we want to make you aware of them and what they do. They are:</p>
 
-                  <p>-   open/start - On the Mac, <c>open filename</c> tries to figure out the right application of the filename and open it with that application. This is a very useful command. On Git Bash, you can try <c>start filename</c>. Try opening an <c>R</c> or <c>Rmd</c> file with <c>open</c> or <c>start</c>: it should open them with RStudio.</p>
+            <p>-   open/start - On the Mac, <c>open filename</c> tries to figure out the right application of the filename and open it with that application. This is a very useful command. On Git Bash, you can try <c>start filename</c>. Try opening an <c>R</c> or <c>Rmd</c> file with <c>open</c> or <c>start</c>: it should open them with RStudio.</p>
 
-                  <p>-   nano - Opens a bare-bones text editor.</p>
+            <p>-   nano - Opens a bare-bones text editor.</p>
 
-                  <p>-   tar - Archives files and subdirectories of a directory into one file.</p>
+            <p>-   tar - Archives files and subdirectories of a directory into one file.</p>
 
-                  <p>-   ssh - Connects to another computer.</p>
+            <p>-   ssh - Connects to another computer.</p>
 
-                  <p>-   find - Finds files by filename on your system.</p>
+            <p>-   find - Finds files by filename on your system.</p>
 
-                  <p>-   grep - Searches for patterns in a file.</p>
+            <p>-   grep - Searches for patterns in a file.</p>
 
-                  <p>-   awk/sed - These are two very powerful commands that permit you to find specific strings in files and change them.</p>
+            <p>-   awk/sed - These are two very powerful commands that permit you to find specific strings in files and change them.</p>
 
-                  <p>-   ln - Creates a symbolic link. We do not recommend its use, but you should be familiar with it.</p>
+            <p>-   ln - Creates a symbolic link. We do not recommend its use, but you should be familiar with it.</p>
 
-                </subsection>
+          </subsection>
 
-                <subsection xml:id="subsec-file-manipulation-in-r">
-                  <title>File manipulation in R</title>
+          <subsection xml:id="subsec-file-manipulation-in-r">
+            <title>File manipulation in R</title>
 
-                  <p>We can also perform file management from within R. The key functions to learn about can be seen by looking at the help file for <c>?files</c>. Another useful function is <c>unlink</c>.</p>
+            <p>We can also perform file management from within R. The key functions to learn about can be seen by looking at the help file for <c>?files</c>. Another useful function is <c>unlink</c>.</p>
 
-                  <p>Although not generally recommended, you can run Unix commands in R using <c>system</c>.</p>
+            <p>Although not generally recommended, you can run Unix commands in R using <c>system</c>.</p>
 
-                  <program language="r">
-                    <input>
-      knitr::opts_chunk$set(out.width = NULL, out.extra = NULL)
-                    </input>
-                  </program>
+            <program language="r">
+              <input>
+knitr::opts_chunk$set(out.width = NULL, out.extra = NULL)
+              </input>
+            </program>
 
-                </subsection>
+          </subsection>
 
-              </section>
-      
+        </section>
       </chapter>
-
       <chapter xml:id="ch-git-and-github">
         <title>Git and GitHub</title>
         
