@@ -28,7 +28,8 @@ jobs:
               uses: actions/checkout@v4
 
             - name: install deps
-              run: pip install -r requirements.txt
+              working-directory: Pretext
+              run: pip install -r ../requirements.txt
 
             - name: set up node
               uses: actions/setup-node@v4
@@ -36,9 +37,11 @@ jobs:
                 node-version: '22'
 
             - name: install local ptx files
+              working-directory: Pretext
               run: pretext --version
 
             - name: build deploy targets
+              working-directory: Pretext
               run: |
                 version="$(pretext --version)"
                 major="$(echo $version | cut -d '.' -f 1)"
@@ -51,13 +54,14 @@ jobs:
                     pretext build
                 fi
             - name: stage deployment
+              working-directory: Pretext
               run: pretext deploy --stage-only
 
             - name: Bundle output/stage as artifact
               uses: actions/upload-artifact@v4
               with:
                   name: deploy
-                  path: output/stage
+                  path: Pretext/output/stage
 
     deploy-cloudflare:
         runs-on: ubuntu-latest
